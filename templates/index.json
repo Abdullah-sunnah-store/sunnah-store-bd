@@ -1,0 +1,529 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "custom_banner_section_XKBJbD": {
+      "type": "custom-banner-section",
+      "name": "Custom Banner Section",
+      "settings": {
+        "media_type": "image",
+        "invitation_image": "shopify://shop_images/hijabwebsitecover.jpg",
+        "image_alt": "Nikah Wedding Invitation",
+        "invitation_image_mobile": "shopify://shop_images/phone_Web_pic_2.jpg",
+        "image_alt_mobile": "Nikah Wedding Invitation - Mobile",
+        "invitation_video": "",
+        "video_autoplay": true,
+        "video_loop": true,
+        "video_muted": true,
+        "video_controls": false,
+        "media_link": "shopify://collections/all",
+        "open_in_new_tab": false,
+        "title": "SPREAD YOUR DEEN.",
+        "subtitle": "<p><em><strong>Every box we curate carries love, faith & beauty.</strong></em></p>",
+        "heading_color": "#fafafa",
+        "subheading_color": "#fafafa",
+        "button_text": "Explore",
+        "button_link": "shopify://collections/all",
+        "button_open_new_tab": false,
+        "button_bg_color": "#fafafa",
+        "button_text_color": "#000000",
+        "button_border_color": "#ffffff4d",
+        "button_hover_bg_color": "#ffffff",
+        "button_hover_text_color": "#000000"
+      }
+    },
+    "custom_banner_section_NAaahQ": {
+      "type": "custom-banner-section",
+      "name": "Custom Banner Section",
+      "settings": {
+        "media_type": "video",
+        "image_alt": "Nikah Wedding Invitation",
+        "image_alt_mobile": "Nikah Wedding Invitation - Mobile",
+        "invitation_video": "https://cdn.shopify.com/videos/c/o/v/608fc5f2722b43ef8eb2363cb3fced2c.mp4",
+        "video_autoplay": true,
+        "video_loop": true,
+        "video_muted": true,
+        "video_controls": false,
+        "media_link": "shopify://collections/home-accessories",
+        "open_in_new_tab": false,
+        "title": "Personalized Prayer Mat",
+        "subtitle": "<p><em>Pray Side by Side, Forever Engraved</em></p>",
+        "heading_color": "#fafafa",
+        "subheading_color": "#fafafa",
+        "button_text": "Customize Yours",
+        "button_link": "shopify://collections/home-accessories",
+        "button_open_new_tab": false,
+        "button_bg_color": "#ffffffe6",
+        "button_text_color": "#000000",
+        "button_border_color": "#ffffff4d",
+        "button_hover_bg_color": "#ffffff",
+        "button_hover_text_color": "#000000"
+      }
+    },
+    "custom_product_showcase_zdk4Ba": {
+      "type": "custom-product-showcase",
+      "blocks": {
+        "product_gFDRxV": {
+          "type": "product",
+          "settings": {
+            "product_image": "shopify://shop_images/Love_Mercy_Mug-1.jpg",
+            "product_title": "Explore Mugs",
+            "product_description": "",
+            "product_link": "shopify://collections/mugs",
+            "cta_text": "Shop Now",
+            "cta_link": ""
+          }
+        },
+        "product_3zk3EQ": {
+          "type": "product",
+          "settings": {
+            "product_image": "shopify://shop_images/Rabbana_Dua_Card_1.jpg",
+            "product_title": "Shop Dua Card",
+            "product_description": "",
+            "product_link": "shopify://collections/dua-cards",
+            "cta_text": "Shop Now",
+            "cta_link": ""
+          }
+        },
+        "product_wGfhXP": {
+          "type": "product",
+          "settings": {
+            "product_image": "shopify://shop_images/Grow_Through_What_you_go_through_Gold_Foiled_Notebook-1_1.jpg",
+            "product_title": "Start Writing",
+            "product_description": "",
+            "product_link": "shopify://collections/notebooks",
+            "cta_text": "Shop Now",
+            "cta_link": ""
+          }
+        },
+        "product_rWp7C8": {
+          "type": "product",
+          "settings": {
+            "product_image": "shopify://shop_images/Ayatul-Kursi-2-Metal-Frame_041cb9dc-1b05-4852-9524-0d8bf4f19607.webp",
+            "product_title": "Browse Frames",
+            "product_description": "",
+            "product_link": "shopify://collections/frames",
+            "cta_text": "Shop Now",
+            "cta_link": ""
+          }
+        }
+      },
+      "block_order": [
+        "product_gFDRxV",
+        "product_3zk3EQ",
+        "product_wGfhXP",
+        "product_rWp7C8"
+      ],
+      "name": "Product Showcase",
+      "settings": {
+        "section_title": "",
+        "desktop_columns": "4",
+        "background_color": "#fafafa",
+        "title_color": "#333333",
+        "text_color": "#333333",
+        "description_color": "#666666",
+        "button_color": "#007bff",
+        "button_text_color": "#ffffff",
+        "button_hover_color": "#0056b3"
+      }
+    },
+    "custom_banner_section_j3fdrU": {
+      "type": "custom-banner-section",
+      "name": "Custom Banner Section",
+      "settings": {
+        "media_type": "image",
+        "invitation_image": "shopify://shop_images/Black_Cover_for_Web.jpg",
+        "image_alt": "Nikah Wedding Invitation",
+        "invitation_image_mobile": "shopify://shop_images/Black_Cover_for_Web-_Mobile.jpg",
+        "image_alt_mobile": "Nikah Wedding Invitation - Mobile",
+        "invitation_video": "",
+        "video_autoplay": true,
+        "video_loop": true,
+        "video_muted": true,
+        "video_controls": false,
+        "media_link": "shopify://collections/all-gifts",
+        "open_in_new_tab": false,
+        "title": "Gift Box",
+        "subtitle": "<p><em>Gift to grow love. (Adab al-Mufrad)</em></p>",
+        "heading_color": "#fafafa",
+        "subheading_color": "#fafafa",
+        "button_text": "Explore",
+        "button_link": "shopify://collections/all-gifts",
+        "button_open_new_tab": false,
+        "button_bg_color": "#ffffffe6",
+        "button_text_color": "#000000",
+        "button_border_color": "#ffffff4d",
+        "button_hover_bg_color": "#ffffff",
+        "button_hover_text_color": "#000000"
+      }
+    },
+    "new_custom_categories_design_YGn7yP": {
+      "type": "new-custom-categories-design",
+      "blocks": {
+        "category_GyWfwG": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/Bismillah_Calligraphy_Mug-1.jpg",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Bismillah Calligraphy",
+            "category_link": "shopify://collections/calligraphy-mugs"
+          }
+        },
+        "category_kJV6R6": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/231351f6-Asma-Ul-Husna-Regular-2.webp",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Asma Ul Husna",
+            "category_link": "shopify://collections/calligraphy-frames"
+          }
+        },
+        "category_TgwtdQ": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/cf0d3933-Metal-Showpiece-SWORD-Calligraphy-DSC02193-jpg.webp",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Sword Calligraphy",
+            "category_link": "shopify://collections/showpieces"
+          }
+        },
+        "category_MDwMAE": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/2c6b7a0d-Spray-Perfume-DSC04362-scaled.webp",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Urban Spice",
+            "category_link": "shopify://collections/spray-perfume"
+          }
+        },
+        "category_Pi9t9J": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/ad478f08-Beard-Balm-Category-3.webp",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Beard Balm",
+            "category_link": "shopify://collections/beard-balm"
+          }
+        },
+        "category_Q9QKY8": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/e9b63696-Rabbana-Dua-Card-Gold-Foil-4-jpg.webp",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Rabbana Dua",
+            "category_link": "shopify://collections/dua-cards"
+          }
+        },
+        "category_Y3mLb3": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/480768501_961288146091359_2977023914217183221_n.jpg",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Hijab",
+            "category_link": "shopify://collections/hijab"
+          }
+        },
+        "category_CwgHjk": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/Masala_Tea-5.jpg",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Masala Tea",
+            "category_link": "shopify://collections/foods"
+          }
+        },
+        "category_dPCcEj": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/f205955b-Miswak-with-leather-cover-DSC03707-3-scaled-1-jpg.webp",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Miswak Cover",
+            "category_link": "shopify://collections/essentials"
+          }
+        },
+        "category_XteHxz": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/SHIRE-HORSEMEN-WALLET-DSC04455-jpg.webp",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Wallet",
+            "category_link": "shopify://collections/wallet"
+          }
+        }
+      },
+      "block_order": [
+        "category_GyWfwG",
+        "category_kJV6R6",
+        "category_TgwtdQ",
+        "category_MDwMAE",
+        "category_Pi9t9J",
+        "category_Q9QKY8",
+        "category_Y3mLb3",
+        "category_CwgHjk",
+        "category_dPCcEj",
+        "category_XteHxz"
+      ],
+      "name": "new custom categories design",
+      "settings": {
+        "heading_text": "Best seller",
+        "sub_heading_text": "",
+        "section_id": ""
+      }
+    },
+    "soulful_latte_blog_hXn4a7": {
+      "type": "soulful-latte-blog",
+      "name": "Soulful Latte Blog",
+      "settings": {
+        "blog": "news",
+        "posts_to_show": 4,
+        "desktop_columns": "4",
+        "section_title": "SOULFUL LATTE",
+        "section_subtitle": "faith & self-growth journal"
+      }
+    },
+    "brand_logo_slider_YignaH": {
+      "type": "brand-logo-slider",
+      "blocks": {
+        "logo_FaBExY": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "logo": "shopify://shop_images/Logo_Text-01.png",
+            "show_text": false,
+            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/foods\" title=\"https://www.thesunnah.store/collections/foods\">Life</a></h2>",
+            "show_text_background": false
+          }
+        },
+        "logo_T9HPXY": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "logo": "shopify://shop_images/Logo_Text-05_c2f98f26-05bc-4267-81a9-0bd85088772c.png",
+            "show_text": false,
+            "rich_text": "<h2><a href=\"https://wearehorsemen.com/\" title=\"https://wearehorsemen.com/\">Horsemen</a></h2>",
+            "show_text_background": false
+          }
+        },
+        "logo_nyBJQE": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "logo": "shopify://shop_images/Logo_Text-02_df801956-0f40-494b-9f55-4070de804b2f.png",
+            "show_text": false,
+            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/all\" title=\"https://www.thesunnah.store/collections/all\">Studio Pillars</a></h2>",
+            "show_text_background": false
+          }
+        },
+        "logo_JxXrMh": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "logo": "shopify://shop_images/Logo_Text-04.png",
+            "show_text": false,
+            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/books\" title=\"https://www.thesunnah.store/collections/books\">Sunnah Academy</a></h2>",
+            "show_text_background": false
+          }
+        },
+        "logo_w7zfR6": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "logo": "shopify://shop_images/Logo_Text-03_dea1f5a9-1de1-471d-8ad5-afcabf22b186.png",
+            "show_text": false,
+            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/hijab\" title=\"https://www.thesunnah.store/collections/hijab\">Qloset</a></h2>",
+            "show_text_background": false
+          }
+        },
+        "logo_N4VHRb": {
+          "type": "logo",
+          "settings": {
+            "show_image": false,
+            "show_text": true,
+            "rich_text": "<h2><a href=\"https://thesunnahstore.co.uk/\" title=\"https://thesunnahstore.co.uk/\">The Sunnah Store UK</a></h2>",
+            "show_text_background": false
+          }
+        },
+        "logo_VaiG4Y": {
+          "type": "logo",
+          "disabled": true,
+          "settings": {
+            "show_image": false,
+            "logo": "shopify://shop_images/Horsemen_new_logo-01.png",
+            "show_text": true,
+            "rich_text": "<h2><a href=\"https://wearehorsemen.com/\" title=\"https://wearehorsemen.com/\">Horsemen</a></h2>",
+            "show_text_background": false
+          }
+        },
+        "logo_amD7ge": {
+          "type": "logo",
+          "disabled": true,
+          "settings": {
+            "show_image": false,
+            "logo": "shopify://shop_images/Studio_Pillars_DP.png",
+            "show_text": true,
+            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/all\" title=\"https://www.thesunnah.store/collections/all\">Studio Pillars</a></h2>",
+            "show_text_background": false
+          }
+        },
+        "logo_N3T7QD": {
+          "type": "logo",
+          "disabled": true,
+          "settings": {
+            "show_image": false,
+            "logo": "shopify://shop_images/Sunnah_Academy_Logo.png",
+            "show_text": true,
+            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/books\" title=\"https://www.thesunnah.store/collections/books\">Sunnah Academy</a></h2>",
+            "show_text_background": false
+          }
+        },
+        "logo_fX9V8w": {
+          "type": "logo",
+          "disabled": true,
+          "settings": {
+            "show_image": false,
+            "logo": "shopify://shop_images/Clean_Elegant_Typography_Brand_Logo_1.png",
+            "show_text": true,
+            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/hijab\" title=\"https://www.thesunnah.store/collections/hijab\">Qloset</a></h2>",
+            "show_text_background": false
+          }
+        }
+      },
+      "block_order": [
+        "logo_FaBExY",
+        "logo_T9HPXY",
+        "logo_nyBJQE",
+        "logo_JxXrMh",
+        "logo_w7zfR6",
+        "logo_N4VHRb",
+        "logo_VaiG4Y",
+        "logo_amD7ge",
+        "logo_N3T7QD",
+        "logo_fX9V8w"
+      ],
+      "name": "Brand Logo Slider",
+      "settings": {
+        "auto_scroll": false,
+        "show_second_row": false,
+        "desktop_animation_speed": 40,
+        "mobile_animation_speed": 20,
+        "background_color": "#ffffff"
+      }
+    },
+    "hair_reviews_section_V7LAKb": {
+      "type": "hair-reviews-section",
+      "blocks": {
+        "single_image_TKtwQF": {
+          "type": "single_image",
+          "settings": {
+            "image": "shopify://shop_images/513909704_1275314494213938_5866087445118907509_n.jpg",
+            "alt_text": "",
+            "overlay_text": ""
+          }
+        },
+        "single_image_WnAc4D": {
+          "type": "single_image",
+          "settings": {
+            "image": "shopify://shop_images/492837589_24119093027683100_80149506766500946_n.jpg",
+            "alt_text": "",
+            "overlay_text": ""
+          }
+        },
+        "single_image_ARYDDM": {
+          "type": "single_image",
+          "settings": {
+            "image": "shopify://shop_images/513681324_1275314697547251_4731433090713043911_n.jpg",
+            "alt_text": "",
+            "overlay_text": ""
+          }
+        },
+        "single_image_EnWTGq": {
+          "type": "single_image",
+          "settings": {
+            "image": "shopify://shop_images/471261726_10234641094705750_5385600285958832397_n.jpg",
+            "alt_text": "",
+            "overlay_text": ""
+          }
+        },
+        "single_image_nx3Wak": {
+          "type": "single_image",
+          "settings": {
+            "image": "shopify://shop_images/487039942_1220138912804181_4741929830682457056_n.jpg",
+            "alt_text": "",
+            "overlay_text": ""
+          }
+        },
+        "single_image_k4MPBE": {
+          "type": "single_image",
+          "settings": {
+            "image": "shopify://shop_images/518114438_122145589154596545_6689776681352197783_n.jpg",
+            "alt_text": "",
+            "overlay_text": ""
+          }
+        }
+      },
+      "block_order": [
+        "single_image_TKtwQF",
+        "single_image_WnAc4D",
+        "single_image_ARYDDM",
+        "single_image_EnWTGq",
+        "single_image_nx3Wak",
+        "single_image_k4MPBE"
+      ],
+      "disabled": true,
+      "name": "Hair Reviews Section",
+      "settings": {
+        "title": "Real People, Real Community Reviews",
+        "subtitle": "Question? We're here for you.",
+        "button_text": "View Real Result",
+        "button_link": "shopify://pages/reviews",
+        "title_color": "#121212",
+        "text_color": "#6b7280",
+        "button_color": "#121212",
+        "button_hover_color": "#121212"
+      }
+    },
+    "corporate_gifting_header_LgqYMz": {
+      "type": "corporate-gifting-header",
+      "disabled": true,
+      "name": "Corporate Gifting Header",
+      "settings": {
+        "call_us_label": "CALL US",
+        "phone_number": "+8801911242132",
+        "mail_us_label": "MAIL US",
+        "email": "rashid.sunnahstore@gmail.com",
+        "main_heading": "CORPORATE GIFTING FOR YOUR COMPANY",
+        "description": "With over 5 years of experience, we specialize in corporate gifts for companies in Bangladesh. Whether your budget is BDT 999 or 9999+, we have the perfect solution for you!",
+        "background_color": "rgba(0,0,0,0)",
+        "text_color": "#333333"
+      }
+    }
+  },
+  "order": [
+    "custom_banner_section_XKBJbD",
+    "custom_banner_section_NAaahQ",
+    "custom_product_showcase_zdk4Ba",
+    "custom_banner_section_j3fdrU",
+    "new_custom_categories_design_YGn7yP",
+    "soulful_latte_blog_hXn4a7",
+    "brand_logo_slider_YignaH",
+    "hair_reviews_section_V7LAKb",
+    "corporate_gifting_header_LgqYMz"
+  ]
+}

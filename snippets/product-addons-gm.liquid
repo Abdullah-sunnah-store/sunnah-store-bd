@@ -1,0 +1,426 @@
+<style>
+  .product-addon-container-gm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 100%;
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+  .cus-header-banner__title{
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.1;
+  }
+ .product-addon-container-gm .product-addon-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 20px;
+    padding: 10px;
+    background: #FFFFFF;
+}
+
+  .product-addon-image {
+    width: {{ image_size }}px;
+    height: {{ image_size }}px;
+    object-fit: cover;
+    border-radius: {{ image_type }}%;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+
+  .product-addon-image:hover {
+    opacity: 0.8;
+  }
+
+  .product-addon-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    min-width: 0; /* Allows text to wrap properly */
+  }
+
+  .product-addon-title {
+    font-size: {{ title_size }}px;
+    font-weight: {{ font_weight }}; 
+    color: {{ title_color }}; 
+    text-decoration: none;
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .product-addon-title:hover {
+    opacity: 0.8;
+  }
+
+  .product-addon-price-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .product-addon-price {
+    font-size: {{ price_size }}px;
+    color: {{ price_color }}; 
+    font-weight: 600;
+  }
+
+  .product-addon-compare-price {
+    font-size: 14px;
+    color: {{ price_color }}; 
+    text-decoration: line-through;
+    font-weight: 400;
+  }
+
+  .savings-text {
+    font-size: 12px;
+    color: #059669;
+    font-weight: 600;
+    background: #f0fdf4;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 4px;
+  }
+
+  /* Stock Status */
+  .stock-status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    margin: 4px 0;
+  }
+
+  .stock-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+  }
+
+  .stock-text {
+    color: {{ title_color }};
+    font-weight: 500;
+  }
+
+  .product-addon-button-column {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .product-addon-add-button {
+    padding: 12px 24px;
+    background-color: {{ checkbox_active_color | default: '#000' }};
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    min-width: 120px;
+  }
+
+  .product-addon-add-button:hover:not(:disabled) {
+    background-color: {{ checkbox_active_color | default: '#000' }};
+    transform: translateY(-1px);
+    opacity: 0.9;
+  }
+
+  .product-addon-add-button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  @media only screen and (max-width: 768px) {
+  .product-addon-container-gm .product-addon-item {
+    display: flex;
+    padding: 10px 0;
+    align-items: center;
+    gap: 15px; /* Add consistent gap */
+  }
+  
+  /* Ensure image stays fixed width */
+  .product-addon-image {
+    flex-shrink: 0;
+  }
+  
+  /* Let details section take available space */
+  .product-addon-details {
+    flex: 1;
+    min-width: 0; /* Allows text to wrap */
+  }
+  
+  /* Keep button fixed width and aligned */
+  .product-addon-button-column {
+    flex-shrink: 0;
+    justify-content: flex-end;
+  }
+  
+  .product-addon-add-button {
+    width: auto;
+    min-width: 80px;
+    padding: 10px 16px;
+  }
+}
+
+  @media only screen and (max-width: 600px) {
+    .product-addon-image {
+      width: {{ image_size_mb }}px;
+      height: {{ image_size_mb }}px;
+    }
+    .product-addon-title {
+      font-size: {{ title_size_mb }}px;
+    }
+    .product-addon-price {
+      font-size: {{ price_size_mb }}px;
+    }
+    .cus-header-banner__title{
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 30px;
+      line-height: 1.1;
+    }
+    
+    .product-addon-add-button {
+      padding: 12px 20px;
+      font-size: 13px;
+      min-width: 100px;
+    }
+
+
+  }
+</style>
+
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  <product-recommendations
+    class="related-products section-{{ section.id }}-padding isolate{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+    data-url="{{ routes.product_recommendations_url }}?limit={{ section.settings.products_to_show | default: 3 }}"
+    data-section-id="{{ section.id }}"
+    data-product-id="{{ product.id }}"
+  >
+    {% if recommendations.performed and recommendations.products_count > 0 %}
+      <div class="product-addon-container-gm">
+        <h2 class="cus-header-banner__title" style="color: {{ section.settings.text_color }}">
+          {{ section.settings.heading | default: "Pairs well with" }}
+        </h2>
+        
+        {% for recommendation in recommendations.products %}
+          {% if recommendation != blank and recommendation.available %}
+            {% comment %} Find first available variant {% endcomment %}
+            {% assign first_available_variant = null %}
+            {% for variant in recommendation.variants %}
+              {% if variant.available and first_available_variant == null %}
+                {% assign first_available_variant = variant %}
+                {% break %}
+              {% endif %}
+            {% endfor %}
+            
+            <div class="product-addon-item" data-product-id="{{ first_available_variant.id }}" data-product-handle="{{ recommendation.handle }}">
+              <!-- Column 1: Image -->
+              <a href="{{ recommendation.url }}">
+                <img class="product-addon-image" 
+                     src="{{ first_available_variant.featured_image | default: recommendation.featured_image | image_url }}" 
+                     alt="{{ recommendation.title }}">
+              </a>
+              
+              <!-- Column 2: Title and Price -->
+              <div class="product-addon-details">
+                <a href="{{ recommendation.url }}" class="product-addon-title" >
+                  {{ recommendation.title | truncatewords: 8 }}
+                </a>
+                
+                {% comment %} Store product variants data {% endcomment %}
+                <script type="application/json" class="product-variants-data">
+                  {
+                    "handle": "{{ recommendation.handle }}",
+                    "defaultImage": "{{ recommendation.featured_image | image_url }}",
+                    "variants": [
+                      {% for variant in recommendation.variants %}
+                      {
+                        "id": {{ variant.id }},
+                        "price": {{ variant.price }},
+                        "available": {{ variant.available }},
+                        "inventory_quantity": {{ variant.inventory_quantity | default: 0 }},
+                        "option1": "{{ variant.option1 }}",
+                        "option2": "{{ variant.option2 }}",
+                        "option3": "{{ variant.option3 }}",
+                        "featured_image": "{{ variant.featured_image | default: recommendation.featured_image | image_url }}"
+                      }{% unless forloop.last %},{% endunless %}
+                      {% endfor %}
+                    ],
+                    "firstAvailableVariant": {% if first_available_variant %}{{ first_available_variant.id }}{% else %}null{% endif %}
+                  }
+                </script>
+                
+                {% comment %} Price Section {% endcomment %}
+                <div class="product-addon-price-container">
+                  {% assign display_variant = first_available_variant | default: recommendation.variants.first %}
+                  {% if recommendation.tags contains 'free-gift' %}
+                    <span class="product-addon-price">{{ section.settings.free_gift_info | default: "Free Gift" }}</span>
+                  {% else %}
+                    <span class="product-addon-price" data-price="{{ display_variant.price }}">
+                      {{ display_variant.price | money }}
+                    </span>
+                    {% comment %} {% if display_variant.compare_at_price > display_variant.price %}
+                      <span class="product-addon-compare-price" data-compare-price="{{ display_variant.compare_at_price }}">
+                        {{ display_variant.compare_at_price | money }}
+                      </span>
+                      {% assign savings = display_variant.compare_at_price | minus: display_variant.price %}
+                      <span class="savings-text">
+                        Save {{ savings | money }}
+                      </span>
+                    {% endif %} {% endcomment %}
+                  {% endif %}
+                </div>
+
+                {% comment %} Stock Status {% endcomment %}
+                {% if display_variant.inventory_quantity > 0 and display_variant.inventory_quantity <= 10 %}
+                  <div class="stock-status">
+                    <div class="stock-indicator"></div>
+                    <span class="stock-text">Only {{ display_variant.inventory_quantity }} left in stock</span>
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Column 3: Add to Cart Button -->
+              <div class="product-addon-button-column">
+                {% assign button_variant = first_available_variant | default: recommendation.variants.first %}
+                <button 
+                  class="product-addon-add-button"
+                  data-product-id="{{ button_variant.id }}"
+                  data-product-handle="{{ recommendation.handle }}"
+                  {% unless button_variant.available %}disabled{% endunless %}>
+                  {% if button_variant.available %}
+                     Add
+                  {% else %}
+                    SOLD OUT
+                  {% endif %}
+                </button>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </product-recommendations>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  function addProductAddonEventListeners() {
+    const addButtons = document.querySelectorAll('.product-addon-add-button');
+
+    // Money formatting function
+    function formatMoney(cents) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: '{{ cart.currency.iso_code | default: "USD" }}'
+      }).format(cents / 100);
+    }
+
+    addButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        if (button.disabled) return;
+        
+        const productId = button.getAttribute('data-product-id');
+        const originalText = button.textContent;
+        
+        button.disabled = true;
+        button.textContent = 'Adding...';
+
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: productId,
+            quantity: 1
+          })
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('Product added to cart:', data);
+          button.textContent = 'Added!';
+          
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+          }, 2000);
+
+          // Check cart type and handle accordingly
+          const cartType = window.Shopify?.theme?.settings?.cart_type || 'drawer';
+          
+          if (cartType === 'page') {
+            // Redirect to cart page
+            window.location.href = window.routes?.cart_url || '/cart';
+          } else {
+            // Handle cart drawer
+            const cartDrawer = document.querySelector('cart-drawer');
+            if (cartDrawer) {
+              cartDrawer.classList.remove('is-empty');
+              
+              // Fetch updated cart drawer content
+              fetch('/cart?view=drawer')
+                .then(response => response.text())
+                .then(html => {
+                  const tempDiv = document.createElement('div');
+                  tempDiv.innerHTML = html;
+                  const newDrawerContent = tempDiv.querySelector('#CartDrawer');
+                  if (newDrawerContent && document.querySelector('#CartDrawer')) {
+                    document.querySelector('#CartDrawer').innerHTML = newDrawerContent.innerHTML;
+                    cartDrawer.open();
+                  }
+                })
+                .catch(error => {
+                  console.error('Error updating cart drawer:', error);
+                });
+            } else {
+              // Fallback: Try to trigger cart update event
+              document.dispatchEvent(new CustomEvent('cart:refresh'));
+            }
+          }
+        })
+        .catch((error) => {
+          console.error('Error adding product to cart:', error);
+          button.textContent = 'Error';
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+          }, 2000);
+        });
+      });
+    });
+  }
+
+  // Initialize event listeners
+  addProductAddonEventListeners();
+  
+  // Re-initialize when product recommendations are loaded dynamically
+  const productRecommendations = document.querySelector('product-recommendations');
+  if (productRecommendations) {
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+          // Re-add event listeners when new content is loaded
+          setTimeout(addProductAddonEventListeners, 100);
+        }
+      });
+    });
+    
+    observer.observe(productRecommendations, {
+      childList: true,
+      subtree: true
+    });
+  }
+});
+</script>

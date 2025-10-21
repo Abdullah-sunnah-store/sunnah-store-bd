@@ -1,0 +1,355 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "padding_top": 28,
+        "padding_bottom": 28
+      }
+    },
+    "review_section_B3VkYL": {
+      "type": "review-section",
+      "disabled": true,
+      "name": "Review Section",
+      "settings": {
+        "title": "",
+        "description": "",
+        "details": "",
+        "cta_text": "<p>Highly recommend.</p>",
+        "product_image": "shopify://shop_images/Dua_Jar_1.jpg"
+      }
+    },
+    "image_banner_main_x9BgpF": {
+      "type": "image-banner-main",
+      "blocks": {
+        "heading_JYGhX4": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>SPREAD YOUR DEEN</strong>",
+            "heading_size": "h1"
+          }
+        },
+        "text_aAbVEH": {
+          "type": "text",
+          "settings": {
+            "text": "<em><strong>Every box we curate carries love, faith & beauty.</strong></em>",
+            "text_style": "body"
+          }
+        },
+        "buttons_UgyEjq": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "",
+            "button_link_1": "shopify://collections/autumn-clearance-sale",
+            "button_style_secondary_1": false,
+            "button_label_2": "",
+            "button_link_2": "",
+            "button_style_secondary_2": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_JYGhX4",
+        "text_aAbVEH",
+        "buttons_UgyEjq"
+      ],
+      "name": "image banner main",
+      "settings": {
+        "image": "shopify://shop_images/Web_PIc_Long_2_eb2564a8-742a-46d4-9f7f-7f58424b7496.jpg",
+        "image_overlay_opacity": 0,
+        "image_height": "medium",
+        "desktop_content_position": "bottom-left",
+        "show_text_box": false,
+        "desktop_content_alignment": "left",
+        "color_scheme": "scheme-3",
+        "image_behavior": "none",
+        "mobile_content_alignment": "left",
+        "stack_images_on_mobile": true,
+        "show_text_below": true
+      }
+    },
+    "hair_reviews_section_tixUxN": {
+      "type": "hair-reviews-section",
+      "blocks": {
+        "single_image_U9HjcB": {
+          "type": "single_image",
+          "settings": {
+            "image": "shopify://shop_images/513909704_1275314494213938_5866087445118907509_n.jpg",
+            "alt_text": "",
+            "overlay_text": ""
+          }
+        },
+        "single_image_edqmBk": {
+          "type": "single_image",
+          "settings": {
+            "image": "shopify://shop_images/492837589_24119093027683100_80149506766500946_n.jpg",
+            "alt_text": "",
+            "overlay_text": ""
+          }
+        },
+        "single_image_RtdJBc": {
+          "type": "single_image",
+          "settings": {
+            "image": "shopify://shop_images/513681324_1275314697547251_4731433090713043911_n.jpg",
+            "alt_text": "",
+            "overlay_text": ""
+          }
+        },
+        "single_image_9UFYej": {
+          "type": "single_image",
+          "settings": {
+            "image": "shopify://shop_images/471261726_10234641094705750_5385600285958832397_n.jpg",
+            "alt_text": "",
+            "overlay_text": ""
+          }
+        },
+        "single_image_D9adbk": {
+          "type": "single_image",
+          "settings": {
+            "image": "shopify://shop_images/487039942_1220138912804181_4741929830682457056_n.jpg",
+            "alt_text": "",
+            "overlay_text": ""
+          }
+        },
+        "single_image_YWi7RQ": {
+          "type": "single_image",
+          "settings": {
+            "image": "shopify://shop_images/504100058_3945410719004832_3115165897882479854_n.jpg",
+            "alt_text": "",
+            "overlay_text": ""
+          }
+        }
+      },
+      "block_order": [
+        "single_image_U9HjcB",
+        "single_image_edqmBk",
+        "single_image_RtdJBc",
+        "single_image_9UFYej",
+        "single_image_D9adbk",
+        "single_image_YWi7RQ"
+      ],
+      "name": "Hair Reviews Section",
+      "settings": {
+        "title": "Real People, Real Community Reviews",
+        "subtitle": "Question? We're here for you.",
+        "button_text": "View All",
+        "button_link": "shopify://collections/autumn-clearance-sale",
+        "title_color": "#121212",
+        "text_color": "#6b7280",
+        "button_color": "#121212",
+        "button_hover_color": "#121212"
+      }
+    },
+    "brand_logo_slider_Rawgba": {
+      "type": "brand-logo-slider",
+      "blocks": {
+        "logo_4mc4z3": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p> I recently purchased tea from The Sunnah Store and was very pleased with its delightful aroma and excellent quality. It was a truly refreshing experience. I look forward to shopping with them again, In Sha Allah.</p>"
+          }
+        },
+        "logo_C3QtKi": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>ami onekdin thekei color-coded quran shorif nite chassilam, finally niye nilam eto sundor eto sundor je shamne theke dhore na dekhle bojha jabena. Masha Allah jajakallah khairan The Sunnah Store </p>"
+          }
+        },
+        "logo_nkNiEG": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>allah borkot dan korun. amin</p>"
+          }
+        },
+        "logo_EfJtwF": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>আলহামদুলিল্লাহ The Sunnah Store পেইজ থেকে যেমনটি চেয়েছিলাম ঠিক তেমনটাই প্রোডাক্টটা পেলাম দোয়া করি আপনাদের আগামী দিনগুলো এগিয়ে যাক জাযাকাল্লাহ খাইরান।</p>"
+          }
+        },
+        "logo_hcGLNj": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>আলহামদুলিল্লাহ!!! আমার এবারের উমরার সঙ্গী ছিলো The Sunnah Store\"\"\" এর দূআ কার্ড গুলো।দূআ কার্ড এর দূআ গুলো অনেক হেল্প করছে.....আমলের সময়</p>"
+          }
+        },
+        "logo_zNYefn": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>আলহামদুলিল্লাহ, যেমনটি চেয়েছিলাম  প্রোডাক্টটি তেমনই পেয়েছি।জাযাকাল্লাহ খাইরান</p>"
+          }
+        },
+        "logo_jEnzpC": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>আলহামদুলিল্লাহ, খুবই সুন্দর পণ্য। জাজাকাল্লাহ খাইরান।</p>"
+          }
+        },
+        "logo_Rm3nhY": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>The gift box for Ammu was really amazing. My mother loved it so much. Had good experience with the service Alhamdulillahh.</p>"
+          }
+        },
+        "logo_BjQNmd": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>আলহামদুলিল্লাহ! এতো সুন্দর ও উপকারী একটি উপহার পেয়েছি। Jar of Duass পাঠানোর জন্য অসংখ্য ধন্যবাদ  The Sunnah Store কে </p>"
+          }
+        },
+        "logo_xqaLjA": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>আলহামদুলিল্লাহ, দীর্ঘ সময় অপেক্ষার অবসান ঘটিয়ে গতকাল দোয়া জারটা হাতে এসে পৌঁছালো। অনেক কিউট একটা জার। সাথে অনেকগুলো দোয়া কার্ডও। জাযাকাল্লাহ খায়রন </p>"
+          }
+        },
+        "logo_JFCzxE": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>I am satisfied with their product and happy with the quick delivery.</p>"
+          }
+        },
+        "logo_pWCm7N": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>আমি The Sunnah Store  থেকে এই রুকইয়ার কার্ডগুলো নিয়েছি।কার্ডের কোয়ালিটি খুব ভালো,আর আমি বাংলা উচ্চারণ এর কার্ড নিয়েছি যাতে আমার জন্য সুবিধা হয়।এটার ইংলিশ ভার্সন ও আছে। সাথে কাঠের একটি হোল্ডার আছে কার্ডগুলো ধরে রাখার জন্য।দৈনন্দিন কাজের মাঝে ফ্রি সময়ে পড়ার মত একদম Handy Product.</p>"
+          }
+        },
+        "logo_KjBa3y": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>first time and maybe its continue lifetime.  Just loved this calendar. amazing outlook,creative efforts are shining through cards.</p>"
+          }
+        },
+        "logo_Vy4AxM": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>এতটা প্রিমিয়াম কোয়ালিটি এক্সপেক্ট করিনি! হাতে পেয়ে নতুন বইয়ের ঘ্রাণের ফিল পাচ্ছি, আর কোয়ালিটি তো এতটা প্রিমিয়াম যা চেকবুকের মতোই লাগছে একদম।মন থেকে দু'আ রইল আপনাদের জন্য। </p>"
+          }
+        },
+        "logo_TzWDHW": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "show_text": true,
+            "rich_text": "<p>আমি The Sunnah Store ফেসবুক পেজ থেকে আমার স্বামীর জন্য একটি \"দোয়া জার\" কিনেছি। আলহামদুলিল্লাহ, আমরা এই জার পেয়ে খুবই খুশি।ডেলিভারি ম্যান ছিলেন খুবই বিনয়ী ও সহায়ক, এবং সার্ভিসও ছিল দ্রুত ও চমৎকার।</p>"
+          }
+        }
+      },
+      "block_order": [
+        "logo_4mc4z3",
+        "logo_C3QtKi",
+        "logo_nkNiEG",
+        "logo_EfJtwF",
+        "logo_hcGLNj",
+        "logo_zNYefn",
+        "logo_jEnzpC",
+        "logo_Rm3nhY",
+        "logo_BjQNmd",
+        "logo_xqaLjA",
+        "logo_JFCzxE",
+        "logo_pWCm7N",
+        "logo_KjBa3y",
+        "logo_Vy4AxM",
+        "logo_TzWDHW"
+      ],
+      "name": "Brand Logo Slider",
+      "settings": {
+        "desktop_animation_speed": 300,
+        "mobile_animation_speed": 70,
+        "background_color": "#f8f9fa"
+      }
+    },
+    "testimonials_grid_custom_iEncmg": {
+      "type": "testimonials-grid-custom",
+      "name": "Testimonials Grid",
+      "settings": {
+        "bg_color_1": "#f8f9fa",
+        "image_1": "shopify://shop_images/Gift-Box-DSC08132-2048x2048.webp",
+        "quote_1": "I swear this will be the best gift for him on our anniversary! I'm so satisfied Alhamdulillah. Item, packaging, the entire giftbox is perfect. Jazakallahu Khairan The Sunnah Store.🌸",
+        "name_1": "Sabiha Mahmud",
+        "title_1": "",
+        "bg_color_2": "#f0f8ff",
+        "image_2": "shopify://shop_images/fb816480-Hajj-07.webp",
+        "quote_2": "The gift box for Ammu was really amazing. My mother loved it so much. Had good experience with the service Alhamdulillahh.",
+        "name_2": "Nishat Anjum",
+        "title_2": "",
+        "bg_color_3": "#fff5f5",
+        "image_3": "shopify://shop_images/acdf84ba-DSC02334-1x1-1-jpg.webp",
+        "quote_3": "Really loved the system of creating your own gift box...It was a great experience....Good luck for your business...",
+        "name_3": "Mafiur Rahman",
+        "title_3": "",
+        "bg_color_4": "#f0fff4",
+        "image_4": "shopify://shop_images/Ummi-Collection-jpg.webp",
+        "quote_4": "Alhamdulillah.. I am so much happy to get such an wonderful gift box and things.. I am truly satisfied and looking forward to order again. In Sha Allah",
+        "name_4": "Asma",
+        "title_4": "",
+        "bg_color_5": "#fffaf0",
+        "image_5": "shopify://shop_images/c97606c1-For-her-package-3--png.webp",
+        "quote_5": "Loved your products and I can't thank you enough for delivering my order within a couple of hours  Thanks for understanding my urgency. Loved the perfume quality btw. The musk aswad one specially, smells soo good  Best wishes",
+        "name_5": "Maiyesha Ekra",
+        "title_5": "",
+        "bg_color_6": "#f5f0ff",
+        "image_6": "shopify://shop_images/76f03ee3-Couple-01.webp",
+        "quote_6": "কাস্টোমাইজড গিফটবক্স অর্ডার করা অন্যরকম একটা অভিজ্ঞতা। এডমিন যথেষ্ট আন্তরিক ছিলেন",
+        "name_6": "Ishak Ahammed",
+        "title_6": ""
+      }
+    },
+    "instagram_section_design_XpHBRM": {
+      "type": "instagram-section-design",
+      "name": "Cus Instagram Design",
+      "settings": {
+        "image_01": "shopify://shop_images/518114438_122145589154596545_6689776681352197783_n.jpg",
+        "image_08": "shopify://shop_images/Dua_Jar_1.jpg"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "review_section_B3VkYL",
+    "image_banner_main_x9BgpF",
+    "hair_reviews_section_tixUxN",
+    "brand_logo_slider_Rawgba",
+    "testimonials_grid_custom_iEncmg",
+    "instagram_section_design_XpHBRM"
+  ]
+}

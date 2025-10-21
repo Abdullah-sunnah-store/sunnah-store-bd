@@ -1,0 +1,301 @@
+<style>
+  .cus-cgh-corporate-gifting-section {
+    background-color: #f8f9fa;
+    padding: 40px 20px;
+  }
+  
+  .cus-cgh-corporate-gifting-container {
+    margin: 0 auto;
+    text-align: center;
+    max-width:1400px;
+  }
+  
+  .cus-cgh-corporate-gifting-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+  }
+  
+  .cus-cgh-contact-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .cus-cgh-contact-label {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #666;
+    margin: 0;
+  }
+  
+  .cus-cgh-contact-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+    position: relative;
+  }
+  
+  .cus-cgh-contact-value a {
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+  
+  .cus-cgh-main-heading {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #666;
+    margin: 0 0 15px 0;
+  }
+  
+  .cus-cgh-main-description {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+    margin: 0;
+    max-width: 600px;
+  }
+  
+  /* Copy notification */
+  .cus-cgh-copy-notification {
+    position: fixed;
+    top: 0px;
+    right: 20px;
+    color: #000;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+  
+  .cus-cgh-copy-notification.cus-cgh-show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Desktop layout */
+  @media (min-width: 768px) {
+    .cus-cgh-corporate-gifting-section {
+      padding: 30px 20px;
+    }
+    
+    .cus-cgh-corporate-gifting-content {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 40px;
+    }
+    
+    .cus-cgh-contact-item {
+      align-items: flex-start;
+      text-align: left;
+      flex-shrink: 0;
+    }
+    
+    .cus-cgh-main-content {
+      flex: 1;
+      text-align: -webkit-center;
+      order: 2;
+    }
+    
+    .cus-cgh-call-us-item {
+      order: 1;
+    }
+    
+    .cus-cgh-mail-us-item {
+      order: 3;
+    }
+    
+    .cus-cgh-main-description {
+      max-width: 500px;
+    }
+  }
+</style>
+
+<section class="cus-cgh-corporate-gifting-section">
+  <div class="cus-cgh-corporate-gifting-container">
+    <div class="cus-cgh-corporate-gifting-content">
+      
+      <!-- Call Us -->
+      <div class="cus-cgh-contact-item cus-cgh-call-us-item">
+        <h3 class="cus-cgh-contact-label">{{ section.settings.call_us_label | default: "CALL US" }}</h3>
+        <p class="cus-cgh-contact-value">
+          <a href="tel:{{ section.settings.phone_number | default: '+8801911242132' }}" onclick="copyToClipboard('{{ section.settings.phone_number | default: '+8801911242132' }}', event)">
+            {{ section.settings.phone_number | default: "+8801911242132" }}
+          </a>
+        </p>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="cus-cgh-main-content">
+        <h2 class="cus-cgh-main-heading">{{ section.settings.main_heading | default: "CORPORATE GIFTING FOR YOUR COMPANY" }}</h2>
+        <p class="cus-cgh-main-description">
+          {{ section.settings.description | default: "With over 5 years of experience, we specialize in corporate gifts for companies in Bangladesh. Whether your budget is BDT 999 or 9999+, we have the perfect solution for you!" }}
+        </p>
+      </div>
+      
+      <!-- Mail Us -->
+      <div class="cus-cgh-contact-item cus-cgh-mail-us-item">
+        <h3 class="cus-cgh-contact-label">{{ section.settings.mail_us_label | default: "MAIL US" }}</h3>
+        <p class="cus-cgh-contact-value">
+          <a href="mailto:{{ section.settings.email | default: 'rashid.sunnahstore@gmail.com' }}" onclick="copyToClipboard('{{ section.settings.email | default: 'rashid.sunnahstore@gmail.com' }}', event)">
+            {{ section.settings.email | default: "rashid.sunnahstore@gmail.com" }}
+          </a>
+        </p>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- Copy notification -->
+  <div id="copyNotification" class="cus-cgh-copy-notification">
+    Copied to clipboard!
+  </div>
+</section>
+
+<script>
+  function copyToClipboard(text, event) {
+    // Prevent the default link action
+    event.preventDefault();
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(text).then(function() {
+      // Show notification
+      showCopyNotification();
+    }).catch(function(err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showCopyNotification();
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+      }
+      document.body.removeChild(textArea);
+    });
+  }
+  
+  function showCopyNotification() {
+    const notification = document.getElementById('copyNotification');
+    notification.classList.add('cus-cgh-show');
+    
+    // Hide notification after 2 seconds
+    setTimeout(() => {
+      notification.classList.remove('cus-cgh-show');
+    }, 2000);
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Corporate Gifting Contact",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contact Information"
+    },
+    {
+      "type": "text",
+      "id": "call_us_label",
+      "label": "Call Us Label",
+      "default": "CALL US"
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "Phone Number",
+      "default": "+8809611900315"
+    },
+    {
+      "type": "text",
+      "id": "mail_us_label",
+      "label": "Mail Us Label",
+      "default": "MAIL US"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email Address",
+      "default": "rashid.sunnahstore@gmail.com"
+    },
+    {
+      "type": "header",
+      "content": "Main Content"
+    },
+    {
+      "type": "text",
+      "id": "main_heading",
+      "label": "Main Heading",
+      "default": "CORPORATE GIFTING FOR YOUR COMPANY"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "With over 5 years of experience, we specialize in corporate gifts for companies in Bangladesh. Whether your budget is BDT 999 or 9999+, we have the perfect solution for you!"
+    },
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#f8f9fa"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#333333"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Corporate Gifting Contact"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  {% if section.settings.background_color != blank %}
+    #shopify-section-{{ section.id }} .cus-cgh-corporate-gifting-section {
+      background-color: {{ section.settings.background_color }};
+    }
+  {% endif %}
+  
+  {% if section.settings.text_color != blank %}
+    #shopify-section-{{ section.id }} .cus-cgh-contact-label,
+    #shopify-section-{{ section.id }} .cus-cgh-contact-value,
+    #shopify-section-{{ section.id }} .cus-cgh-main-heading,
+    #shopify-section-{{ section.id }} .cus-cgh-main-description {
+      color: {{ section.settings.text_color }};
+    }
+    
+    #shopify-section-{{ section.id }} .cus-cgh-contact-value a {
+      color: {{ section.settings.text_color }};
+    }
+  {% endif %}
+</style>

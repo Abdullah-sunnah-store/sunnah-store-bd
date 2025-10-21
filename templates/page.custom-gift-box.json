@@ -1,0 +1,145 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "padding_top": 28,
+        "padding_bottom": 28
+      }
+    },
+    "gift_box_builder_wbbM39": {
+      "type": "gift-box-builder",
+      "blocks": {
+        "collection_Nhf4Hf": {
+          "type": "collection",
+          "settings": {
+            "collection": "all"
+          }
+        },
+        "collection_hNkVVx": {
+          "type": "collection",
+          "settings": {
+            "collection": "all-gifts"
+          }
+        },
+        "collection_HxHVMN": {
+          "type": "collection",
+          "settings": {
+            "collection": "mugs"
+          }
+        },
+        "collection_A3UNL9": {
+          "type": "collection",
+          "settings": {
+            "collection": "frames"
+          }
+        },
+        "collection_n9MWt7": {
+          "type": "collection",
+          "settings": {
+            "collection": "notebooks"
+          }
+        },
+        "collection_qLy9et": {
+          "type": "collection",
+          "settings": {
+            "collection": "grooming"
+          }
+        },
+        "collection_BM6Uqc": {
+          "type": "collection",
+          "settings": {
+            "collection": "fragrances-for-him"
+          }
+        },
+        "collection_DHaFVU": {
+          "type": "collection",
+          "settings": {
+            "collection": "bespoke"
+          }
+        },
+        "collection_DkGVmW": {
+          "type": "collection",
+          "settings": {
+            "collection": "journals"
+          }
+        },
+        "collection_8CFXeM": {
+          "type": "collection",
+          "settings": {
+            "collection": "cards"
+          }
+        },
+        "collection_CYfUTH": {
+          "type": "collection",
+          "settings": {
+            "collection": "foods"
+          }
+        },
+        "collection_RgYkP7": {
+          "type": "collection",
+          "settings": {
+            "collection": "essentials"
+          }
+        },
+        "collection_KwHLtH": {
+          "type": "collection",
+          "settings": {
+            "collection": "sunnah-essentials"
+          }
+        },
+        "collection_hyk999": {
+          "type": "collection",
+          "settings": {
+            "collection": "panjabi"
+          }
+        },
+        "collection_WGDnLy": {
+          "type": "collection",
+          "settings": {
+            "collection": "thobe"
+          }
+        },
+        "collection_hwHwpx": {
+          "type": "collection",
+          "settings": {
+            "collection": "academic"
+          }
+        }
+      },
+      "block_order": [
+        "collection_Nhf4Hf",
+        "collection_hNkVVx",
+        "collection_HxHVMN",
+        "collection_A3UNL9",
+        "collection_n9MWt7",
+        "collection_qLy9et",
+        "collection_BM6Uqc",
+        "collection_DHaFVU",
+        "collection_DkGVmW",
+        "collection_8CFXeM",
+        "collection_CYfUTH",
+        "collection_RgYkP7",
+        "collection_KwHLtH",
+        "collection_hyk999",
+        "collection_WGDnLy",
+        "collection_hwHwpx"
+      ],
+      "name": "Custom Gift Box",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main",
+    "gift_box_builder_wbbM39"
+  ]
+}

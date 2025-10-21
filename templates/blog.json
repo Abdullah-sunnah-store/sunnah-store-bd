@@ -1,0 +1,40 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-blog",
+      "disabled": true,
+      "settings": {
+        "layout": "grid",
+        "show_image": true,
+        "image_height": "adapt",
+        "show_date": true,
+        "show_author": true,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "blog_section_design_wtPfhk": {
+      "type": "blog-section-design",
+      "name": "Blog Section design",
+      "settings": {
+        "blog_title": "SOULFUL LATTE",
+        "blog_description": "faith & self-growth journal",
+        "featured_first": true,
+        "articles_per_page": 12
+      }
+    }
+  },
+  "order": [
+    "main",
+    "blog_section_design_wtPfhk"
+  ]
+}

@@ -1,0 +1,81 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.footer.name",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "image_yeACgK": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Tss_Header_logo_430x_9db16241-0f8c-4b6b-8307-963ec2f9a9cc.avif",
+            "image_width": 200,
+            "alignment": ""
+          }
+        },
+        "text_GXXkck": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "heading": "<strong>Pickup from The Sunnah Store</strong>",
+            "subtext": "<p>29, Plumbers Row, E1 1EQ<br/>London, UK</p>"
+          }
+        },
+        "link_list_K9UVBP": {
+          "type": "link_list",
+          "settings": {
+            "heading": "<strong>Shop</strong>",
+            "menu": "main-menu-v2-shop-all"
+          }
+        },
+        "link_list_n9AEdH": {
+          "type": "link_list",
+          "settings": {
+            "heading": "<strong>Privacy</strong>",
+            "menu": "footer"
+          }
+        },
+        "link_list_jMXKda": {
+          "type": "link_list",
+          "settings": {
+            "heading": "<strong>Information</strong>",
+            "menu": "customer-account-main-menu"
+          }
+        }
+      },
+      "block_order": [
+        "image_yeACgK",
+        "text_GXXkck",
+        "link_list_K9UVBP",
+        "link_list_n9AEdH",
+        "link_list_jMXKda"
+      ],
+      "settings": {
+        "color_scheme": "scheme-4",
+        "newsletter_enable": true,
+        "newsletter_heading": "<strong>For your weekly soulful coffee ↓</strong>",
+        "enable_follow_on_shop": true,
+        "show_social": true,
+        "enable_country_selector": false,
+        "enable_language_selector": false,
+        "payment_enable": true,
+        "show_policy": true,
+        "margin_top": 0,
+        "padding_top": 40,
+        "padding_bottom": 0
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

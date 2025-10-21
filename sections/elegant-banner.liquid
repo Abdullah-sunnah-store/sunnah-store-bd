@@ -1,0 +1,516 @@
+<!-- sections/collection-banner.liquid -->
+{%- liquid
+  assign selected_collection = collections[section.settings.collection] | default: collection
+  assign banner_media = selected_collection.metafields.custom.collection_banner_image
+  assign show_overlay = section.settings.show_overlay
+  assign overlay_opacity = section.settings.overlay_opacity
+  assign banner_height = section.settings.banner_height
+  assign show_collection_title = section.settings.show_collection_title
+  assign custom_title = section.settings.custom_title
+  assign banner_subtitle = section.settings.banner_subtitle
+  assign text_alignment = section.settings.text_alignment
+  assign text_color = section.settings.text_color
+  assign show_collection_list = section.settings.show_collection_list
+  
+  assign display_title = custom_title
+  if custom_title == blank and show_collection_title and selected_collection
+    assign display_title = selected_collection.title
+  endif
+
+  comment
+    Only show banner if media exists
+  endcomment
+  assign show_banner = false
+  
+  if banner_media != blank
+    assign show_banner = true
+  endif
+-%}
+
+<style>
+  .collection-banner-{{ section.id }} {
+    width: 100%;
+    height: {{ banner_height }}px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: {{ text_alignment }};
+  }
+
+  .collection-banner-{{ section.id }} .banner-media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .collection-banner-{{ section.id }} .banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .collection-banner-{{ section.id }} .banner-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  {% if show_overlay %}
+    .collection-banner-{{ section.id }} .banner-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, {{ overlay_opacity | divided_by: 100.0 }});
+      z-index: 2;
+    }
+  {% endif %}
+
+  .collection-banner-{{ section.id }} .banner-content {
+    position: relative;
+    z-index: 3;
+    max-width: var(--page-width, 120rem);
+    width: 100%;
+    padding: 0 1.5rem;
+    margin: 0 auto;
+    text-align: {{ text_alignment }};
+  }
+
+  .collection-banner-{{ section.id }} .banner-title {
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    font-weight: var(--font-heading-weight, 400);
+    line-height: 1.1;
+    letter-spacing: 0.06rem;
+    margin-bottom: 1.6rem;
+    color: {{ text_color }};
+    text-shadow: 0.2rem 0.2rem 0.4rem rgba(0, 0, 0, 0.3);
+    font-family: var(--font-heading-family);
+    opacity: 0;
+    transform: translateY(3rem);
+    animation: fadeInUp 1s ease-out 0.5s forwards;
+  }
+
+  .collection-banner-{{ section.id }} .banner-subtitle {
+    font-size: clamp(1.4rem, 2vw, 1.8rem);
+    font-weight: var(--font-body-weight, 400);
+    letter-spacing: 0.1rem;
+    color: {{ text_color }};
+    opacity: 0.9;
+    text-shadow: 0.1rem 0.1rem 0.2rem rgba(0, 0, 0, 0.2);
+    font-family: var(--font-body-family);
+    opacity: 0;
+    transform: translateY(2rem);
+    animation: fadeInUp 1s ease-out 0.8s forwards;
+  }
+
+  /* Collection List Styles */
+  .collection-banner-{{ section.id }} .collection-list {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: {{ text_alignment }};
+    opacity: 0;
+    transform: translateY(2rem);
+    animation: fadeInUp 1s ease-out 1.2s forwards;
+  }
+
+  .collection-banner-{{ section.id }} .collection-item {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.8rem;
+    padding: 1rem 1.5rem;
+    color: {{ text_color }};
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 1.4rem;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .collection-banner-{{ section.id }} .collection-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-0.2rem);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
+  }
+
+  .collection-banner-{{ section.id }} .collection-item.active {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .collection-banner-{{ section.id }} .collection-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .collection-banner-{{ section.id }} .collection-item:hover::before {
+    left: 100%;
+  }
+
+  .collection-banner-{{ section.id }} .collection-toggle {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    z-index: 4;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    padding: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .collection-banner-{{ section.id }} .collection-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+  }
+
+  .collection-banner-{{ section.id }} .collection-toggle-icon {
+    width: 2rem;
+    height: 2rem;
+    fill: {{ text_color }};
+    transition: transform 0.3s ease;
+  }
+
+  .collection-banner-{{ section.id }} .collection-toggle.active .collection-toggle-icon {
+    transform: rotate(180deg);
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .collection-banner-{{ section.id }} {
+      height: {{ banner_height | divided_by: 1.3 }}px;
+    }
+    
+    .collection-banner-{{ section.id }} .banner-content {
+      padding: 0 1.5rem;
+    }
+
+    .collection-banner-{{ section.id }} .collection-list {
+      justify-content: center;
+    }
+
+    .collection-banner-{{ section.id }} .collection-toggle {
+      top: 1rem;
+      right: 1rem;
+    }
+  }
+
+  @media screen and (max-width: 550px) {
+    .collection-banner-{{ section.id }} {
+      height: {{ banner_height | divided_by: 1.8 }}px;
+    }
+
+    .collection-banner-{{ section.id }} .collection-item {
+      font-size: 1.2rem;
+      padding: 0.8rem 1.2rem;
+    }
+  }
+</style>
+
+{% if show_banner %}
+<section class="collection-banner-{{ section.id }} color-{{ section.settings.color_scheme }} gradient">
+  <div class="banner-media">
+    {% if banner_media.type == 'image' or banner_media.media_type == 'image' %}
+      <img 
+        src="{{ banner_media | image_url: width: 2000 }}"
+        srcset="{{ banner_media | image_url: width: 750 }} 750w,
+                {{ banner_media | image_url: width: 1100 }} 1100w,
+                {{ banner_media | image_url: width: 1500 }} 1500w,
+                {{ banner_media | image_url: width: 2000 }} 2000w"
+        sizes="100vw"
+        alt="{{ banner_media.alt | default: display_title | escape }}"
+        class="banner-image"
+        loading="eager"
+      >
+    {% elsif banner_media.type == 'video' or banner_media.media_type == 'video' %}
+      <video 
+        class="banner-video"
+        autoplay
+        muted
+        loop
+        playsinline
+      >
+        <source src="{{ banner_media.sources[0].url }}" type="{{ banner_media.sources[0].mime_type }}">
+      </video>
+    {% else %}
+      {%- comment -%} Fallback for direct image URL {%- endcomment -%}
+      <img 
+        src="{{ banner_media | image_url: width: 2000 }}"
+        srcset="{{ banner_media | image_url: width: 750 }} 750w,
+                {{ banner_media | image_url: width: 1100 }} 1100w,
+                {{ banner_media | image_url: width: 1500 }} 1500w,
+                {{ banner_media | image_url: width: 2000 }} 2000w"
+        sizes="100vw"
+        alt="{{ display_title | escape }}"
+        class="banner-image"
+        loading="eager"
+      >
+    {% endif %}
+  </div>
+  
+  {% if show_overlay %}
+    <div class="banner-overlay"></div>
+  {% endif %}
+
+  {% if show_collection_list %}
+    <button class="collection-toggle" onclick="toggleCollectionList()" aria-label="Toggle collection list">
+      <svg class="collection-toggle-icon" viewBox="0 0 24 24">
+        <path d="M7 10l5 5 5-5z"/>
+      </svg>
+    </button>
+  {% endif %}
+  
+  <div class="banner-content">
+    {% if display_title != blank %}
+      <h1 class="banner-title h0">
+        {{ display_title }}
+      </h1>
+    {% endif %}
+    
+    {% if banner_subtitle != blank %}
+      <p class="banner-subtitle">{{ banner_subtitle | escape }}</p>
+    {% endif %}
+
+    {% if selected_collection and selected_collection.description != blank and section.settings.show_collection_description %}
+      <div class="banner-description rte">
+        {{ selected_collection.description | truncate: 200 }}
+      </div>
+    {% endif %}
+
+    {% if show_collection_list %}
+      <div class="collection-list" id="collection-list-{{ section.id }}" style="display: none;">
+        {% for block in section.blocks %}
+          {% if block.type == 'collection_item' %}
+            {% assign block_collection = collections[block.settings.collection] %}
+            {% if block_collection and block.settings.show_collection %}
+              <a href="{{ block_collection.url }}" 
+                 class="collection-item{% if collection.handle == block_collection.handle %} active{% endif %}"
+                 data-collection="{{ block_collection.handle }}">
+                {{ block_collection.title }}
+                {% if block_collection.products_count > 0 %}
+                  <span class="collection-count">({{ block_collection.products_count }})</span>
+                {% endif %}
+              </a>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  {% if show_collection_list %}
+  function toggleCollectionList() {
+    const collectionList = document.getElementById('collection-list-{{ section.id }}');
+    const toggleButton = document.querySelector('.collection-banner-{{ section.id }} .collection-toggle');
+    
+    if (collectionList.style.display === 'none' || collectionList.style.display === '') {
+      collectionList.style.display = 'flex';
+      toggleButton.classList.add('active');
+    } else {
+      collectionList.style.display = 'none';
+      toggleButton.classList.remove('active');
+    }
+  }
+
+  // Auto-hide collection list after 5 seconds of inactivity
+  let hideTimeout;
+  const collectionList = document.getElementById('collection-list-{{ section.id }}');
+  const toggleButton = document.querySelector('.collection-banner-{{ section.id }} .collection-toggle');
+
+  if (collectionList) {
+    collectionList.addEventListener('mouseenter', () => {
+      clearTimeout(hideTimeout);
+    });
+
+    collectionList.addEventListener('mouseleave', () => {
+      hideTimeout = setTimeout(() => {
+        collectionList.style.display = 'none';
+        toggleButton.classList.remove('active');
+      }, 3000);
+    });
+  }
+  {% endif %}
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Collection Banner",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Banner image/video comes from collection metafield: custom.collection_banner_image. If no media exists, the banner will be hidden."
+    },
+    {
+      "type": "header",
+      "content": "Display Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Uses collection's metafield media (custom.collection_banner_image). Leave blank to use current page collection."
+    },
+    {
+      "type": "range",
+      "id": "banner_height",
+      "min": 300,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "label": "Desktop Height",
+      "default": 600
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_title",
+      "label": "Show collection title",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "custom_title",
+      "label": "Custom title",
+      "info": "Overrides collection title if provided"
+    },
+    {
+      "type": "text",
+      "id": "banner_subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_description",
+      "label": "Show collection description",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Collection List"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_list",
+      "label": "Show collection list toggle",
+      "default": false,
+      "info": "Add collection items in blocks below to display them"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "flex-end",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "options": [
+        {
+          "value": "accent-1",
+          "label": "Accent 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Accent 2"
+        },
+        {
+          "value": "background-1",
+          "label": "Background 1"
+        },
+        {
+          "value": "background-2",
+          "label": "Background 2"
+        },
+        {
+          "value": "inverse",
+          "label": "Inverse"
+        }
+      ],
+      "default": "background-1",
+      "label": "Color scheme"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Image overlay"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_overlay",
+      "label": "Show overlay",
+      "default": true,
+      "info": "Adds overlay to improve text readability over images"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 10,
+      "unit": "%",
+      "label": "Overlay opacity",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Banner"
+    }
+  ]
+}
+{% endschema %}

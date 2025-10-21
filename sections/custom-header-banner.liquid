@@ -1,0 +1,256 @@
+{% schema %}
+{
+  "name": "Custom Header Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "background_image_desktop",
+      "label": "Desktop Background Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image_mobile",
+      "label": "Mobile Background Image"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Timeless Islamic Gifting."
+    },
+    {
+      "type": "text",
+      "id": "sub_headline",
+      "label": "Sub-Headline",
+      "default": "Timeless Islamic Gifting."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Shop"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button Color",
+      "default": "#6950e8"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Header Banner",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+.cus-header-banner {
+  position: relative;
+  width: 100%;
+  height: 800px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0c150d;
+   background-image: url('https://cdn.shopify.com/s/files/1/0934/9539/4644/files/Untitled-3.png?v=1748084444');
+}
+
+.cus-header-banner__background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 1;
+}
+
+.background-desktop {
+  display: block;
+}
+
+.background-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .background-desktop {
+    display: none;
+  }
+
+  .background-mobile {
+    display: block;
+  }
+}
+
+.cus-header-banner__content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 20px;
+  max-width: 800px;
+  margin-bottom: 100px;
+}
+
+.cus-header-banner__title {
+  font-size: 64px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  line-height: 1.1;
+}
+
+.cus-header-banner__sub-title {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 30px;
+  line-height: 1.1;
+}
+
+.cus-header-banner-button_design {
+  gap: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.cus-header-banner__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 25px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+  color: #fff;
+  background: linear-gradient(45deg, #17443F, #2ABCA7);
+  transition: all 0.3s ease;
+  letter-spacing: 2px;
+}
+
+.cus-header-banner__button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.4) 70%, rgba(255, 255, 255, 0) 80%);
+  transform: translateX(-100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cus-header-banner__button:hover::before {
+  animation: smooth-shine 2s ease-in-out infinite;
+}
+
+.cus-header-banner__button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.cus-header-banner__button > * {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes smooth-shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.cus-header-banner__button-arrow {
+  margin-left: 8px;
+}
+
+@media (max-width: 768px) {
+  .cus-header-banner__title {
+    font-size: 36px;
+  }
+
+  .cus-header-banner__sub-title {
+    font-size: 18px;
+    line-height: 1.3;
+  }
+
+  .cus-header-banner {
+    height: 550px;
+  }
+
+  .cus-header-banner-button_design {
+    gap: 8px;
+    flex-direction: column;
+  }
+
+  .cus-header-banner__button {
+    margin: 0 auto;
+    padding: 12px 25px;
+    font-size: 16px;
+  }
+}
+</style>
+
+<div class="cus-header-banner">
+  {% if section.settings.background_image_desktop %}
+    {{ section.settings.background_image_desktop | image_url: width: 2000 | image_tag:
+      class: 'cus-header-banner__background background-desktop',
+      loading: 'lazy',
+      alt: section.settings.headline
+    }}
+  {% endif %}
+
+  {% if section.settings.background_image_mobile %}
+    {{ section.settings.background_image_mobile | image_url: width: 1000 | image_tag:
+      class: 'cus-header-banner__background background-mobile',
+      loading: 'lazy',
+      alt: section.settings.headline
+    }}
+  {% endif %}
+
+  <div class="cus-header-banner__content">
+    <h2 class="cus-header-banner__title" style="color: {{ section.settings.text_color }}">
+      {{ section.settings.headline }}
+    </h2>
+    <p class="cus-header-banner__sub-title" style="color: {{ section.settings.text_color }}">
+      {{ section.settings.sub_headline }}
+    </p>
+
+    <div class="cus-header-banner-button_design">
+      {% if section.settings.button_text != blank and section.settings.button_link != blank %}
+        <a href="{{ section.settings.button_link }}" class="cus-header-banner__button" style="background-color: {{ section.settings.button_color }}; color: {{ section.settings.text_color }}">
+          {{ section.settings.button_text }}
+          <!-- <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="arrow-icon">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg> -->
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>

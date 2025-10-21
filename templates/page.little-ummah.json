@@ -1,0 +1,152 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "custom_banner_section_EdaHmY": {
+      "type": "custom-banner-section",
+      "name": "Custom Banner Section",
+      "settings": {
+        "media_type": "video",
+        "image_alt": "Nikah Wedding Invitation",
+        "image_alt_mobile": "Nikah Wedding Invitation - Mobile",
+        "invitation_video": "https://cdn.shopify.com/videos/c/o/v/9fc11c792a8443e697c58ed55bb6c502.mp4",
+        "video_poster": "shopify://shop_images/WhatsApp_Image_2025-09-16_at_17.59.19_5002679c.jpg",
+        "video_autoplay": true,
+        "video_loop": true,
+        "video_muted": false,
+        "video_controls": true,
+        "media_link": "shopify://pages/little-ummah",
+        "open_in_new_tab": false,
+        "title": "Little Ummah",
+        "subtitle": "",
+        "heading_color": "#ffffff",
+        "subheading_color": "#ffffff",
+        "button_text": "Explore Togetherness",
+        "button_link": "shopify://pages/little-ummah",
+        "button_open_new_tab": false,
+        "button_bg_color": "#ffffffe6",
+        "button_text_color": "#000000",
+        "button_border_color": "#ffffff4d",
+        "button_hover_bg_color": "#ffffff",
+        "button_hover_text_color": "#000000"
+      }
+    },
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "padding_top": 28,
+        "padding_bottom": 28
+      }
+    },
+    "image_with_text_4VPCAm": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_MaJ6Kc": {
+          "type": "heading",
+          "settings": {
+            "heading": "Make Islam",
+            "heading_size": "h1"
+          }
+        },
+        "text_mc4VWt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Fun For Your  Little Ummah!</p>",
+            "text_style": "body"
+          }
+        },
+        "button_H7gGGh": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "shopify://pages/little-ummah",
+            "button_style_secondary": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_MaJ6Kc",
+        "text_mc4VWt",
+        "button_H7gGGh"
+      ],
+      "name": "t:sections.image-with-text.presets.name",
+      "settings": {
+        "image": "shopify://shop_images/WhatsApp_Image_2025-09-16_at_17.59.19_5002679c.jpg",
+        "height": "adapt",
+        "desktop_image_width": "medium",
+        "layout": "image_first",
+        "desktop_content_position": "middle",
+        "desktop_content_alignment": "center",
+        "content_layout": "no-overlap",
+        "section_color_scheme": "",
+        "color_scheme": "",
+        "image_behavior": "none",
+        "mobile_content_alignment": "left",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "recently_viewed_products_ngfjQm": {
+      "type": "recently-viewed-products",
+      "name": "Recently Viewed Products",
+      "settings": {
+        "show_title": true,
+        "title": "Recently Viewed",
+        "products_to_show": 16,
+        "selected_products": [
+          "arabic-alphabets-flashcards",
+          "amazing-electricity-biggan-baksho",
+          "children-s-story-of-empathy-kids-books",
+          "focus-challenge-smart-kit",
+          "fun-with-measurement-biggan-baksho",
+          "is-he-the-messenger",
+          "kids-brain-boosting-book",
+          "kids-iman-series-books",
+          "little-ummah-01-package-premium-gift-box",
+          "little-ummah-02-package-premium-gift-box",
+          "magic-of-magnet-biggan-baksho",
+          "moral-stories-for-children-kids-books",
+          "mystery-of-chemistry-biggan-baksho",
+          "আর-রাহিকুল-মাখতুম",
+          "কুরআন-অনুধাবন-পদ্ধতি-ও-সতর্কতা",
+          "কারবালার-প্রকৃত-ইতিহাস",
+          "দ্বীনের-পথে-যাত্রা",
+          "নারীজীবনের-সুখ-সংগ্রাম",
+          "পর্দা-গাইডলাইন",
+          "বাইতুল্লাহ-প্রস্তুতি-বিধান-ও-সফরনামা",
+          "বাইতুল্লাহ-প্যাকেজ-baitullah-package",
+          "মা-মা-মা-এবং-বাবা",
+          "ভালো-মা-বাবার-দুষ্টু-বাচ্চা",
+          "মা-মা-মা-এবং-বাবা-দ্বিতীয়-খণ্ড",
+          "স্টেপ-বাই-স্টেপ-হজ-গাইডলাইন",
+          "সিরাতে-ইবনে-হিশাম",
+          "সালাফের-জীবন-থেকে",
+          "শিকড়ের-সন্ধানে",
+          "রিক্লেইম-ইয়োর-হার্ট"
+        ],
+        "add_to_cart_text": "+",
+        "sold_out_text": "Sold Out",
+        "background_color": "#f8f9fa",
+        "text_color": "#333333",
+        "accent_color": "#2c5aa0",
+        "auto_refresh": false,
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
+    }
+  },
+  "order": [
+    "custom_banner_section_EdaHmY",
+    "main",
+    "image_with_text_4VPCAm",
+    "recently_viewed_products_ngfjQm"
+  ]
+}
