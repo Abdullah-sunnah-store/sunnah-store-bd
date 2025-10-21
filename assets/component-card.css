@@ -4,7 +4,6 @@
   position: relative;
   text-decoration: none;
 }
- 
 .card {
   text-decoration: none;
   text-align: var(--text-alignment);
@@ -13,7 +12,7 @@
 .card:not(.ratio) {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 101%;
 }
 
 .card.card--horizontal {
