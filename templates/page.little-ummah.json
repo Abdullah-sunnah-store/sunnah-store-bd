@@ -9,35 +9,6 @@
  */
 {
   "sections": {
-    "custom_banner_section_EdaHmY": {
-      "type": "custom-banner-section",
-      "name": "Custom Banner Section",
-      "settings": {
-        "media_type": "video",
-        "image_alt": "Nikah Wedding Invitation",
-        "image_alt_mobile": "Nikah Wedding Invitation - Mobile",
-        "invitation_video": "https://cdn.shopify.com/videos/c/o/v/9fc11c792a8443e697c58ed55bb6c502.mp4",
-        "video_poster": "shopify://shop_images/WhatsApp_Image_2025-09-16_at_17.59.19_5002679c.jpg",
-        "video_autoplay": true,
-        "video_loop": true,
-        "video_muted": false,
-        "video_controls": true,
-        "media_link": "shopify://pages/little-ummah",
-        "open_in_new_tab": false,
-        "title": "Little Ummah",
-        "subtitle": "",
-        "heading_color": "#ffffff",
-        "subheading_color": "#ffffff",
-        "button_text": "Explore Togetherness",
-        "button_link": "shopify://pages/little-ummah",
-        "button_open_new_tab": false,
-        "button_bg_color": "#ffffffe6",
-        "button_text_color": "#000000",
-        "button_border_color": "#ffffff4d",
-        "button_hover_bg_color": "#ffffff",
-        "button_hover_text_color": "#000000"
-      }
-    },
     "main": {
       "type": "main-page",
       "disabled": true,
@@ -46,55 +17,106 @@
         "padding_bottom": 28
       }
     },
-    "image_with_text_4VPCAm": {
-      "type": "image-with-text",
+    "featured_product_qx3XW8": {
+      "type": "featured-product",
       "blocks": {
-        "heading_MaJ6Kc": {
-          "type": "heading",
+        "text_c8ikT9": {
+          "type": "text",
+          "disabled": true,
           "settings": {
-            "heading": "Make Islam",
+            "text": "{{ section.settings.product.vendor }}",
+            "text_style": "uppercase"
+          }
+        },
+        "title_cKQDTY": {
+          "type": "title",
+          "settings": {
             "heading_size": "h1"
           }
         },
-        "text_mc4VWt": {
-          "type": "text",
+        "price_CDkRRn": {
+          "type": "price",
+          "settings": {}
+        },
+        "variant_picker_Xm34LB": {
+          "type": "variant_picker",
           "settings": {
-            "text": "<p>Fun For Your  Little Ummah!</p>",
-            "text_style": "body"
+            "picker_type": "button",
+            "swatch_shape": "circle"
           }
         },
-        "button_H7gGGh": {
-          "type": "button",
+        "quantity_selector_863dPG": {
+          "type": "quantity_selector",
+          "settings": {}
+        },
+        "buy_buttons_JkBQEk": {
+          "type": "buy_buttons",
           "settings": {
-            "button_label": "Button label",
-            "button_link": "shopify://pages/little-ummah",
-            "button_style_secondary": false
+            "show_dynamic_checkout": false,
+            "show_gift_card_recipient": true
+          }
+        },
+        "share_zQfDip": {
+          "type": "share",
+          "settings": {
+            "share_label": "Share"
           }
         }
       },
       "block_order": [
-        "heading_MaJ6Kc",
-        "text_mc4VWt",
-        "button_H7gGGh"
+        "text_c8ikT9",
+        "title_cKQDTY",
+        "price_CDkRRn",
+        "variant_picker_Xm34LB",
+        "quantity_selector_863dPG",
+        "buy_buttons_JkBQEk",
+        "share_zQfDip"
       ],
-      "name": "t:sections.image-with-text.presets.name",
+      "name": "t:sections.featured-product.presets.name",
       "settings": {
-        "image": "shopify://shop_images/WhatsApp_Image_2025-09-16_at_17.59.19_5002679c.jpg",
-        "height": "adapt",
-        "desktop_image_width": "medium",
-        "layout": "image_first",
-        "desktop_content_position": "middle",
-        "desktop_content_alignment": "center",
-        "content_layout": "no-overlap",
-        "section_color_scheme": "",
+        "product": "basic-islam-for-little-ummah",
         "color_scheme": "",
-        "image_behavior": "none",
-        "mobile_content_alignment": "left",
+        "secondary_background": false,
+        "media_size": "medium",
+        "constrain_to_viewport": true,
+        "media_fit": "contain",
+        "media_position": "left",
+        "image_zoom": "lightbox",
+        "hide_variants": false,
+        "enable_video_looping": false,
         "padding_top": 36,
         "padding_bottom": 36
       }
     },
-    "recently_viewed_products_ngfjQm": {
+    "custom_banner_section_BbK74M": {
+      "type": "custom-banner-section",
+      "name": "Custom Banner Section",
+      "settings": {
+        "media_type": "video",
+        "image_alt": "Nikah Wedding Invitation",
+        "image_alt_mobile": "Nikah Wedding Invitation - Mobile",
+        "invitation_video": "https://cdn.shopify.com/videos/c/o/v/9fc11c792a8443e697c58ed55bb6c502.mp4",
+        "video_autoplay": true,
+        "video_loop": true,
+        "video_muted": false,
+        "video_controls": true,
+        "media_link": "",
+        "open_in_new_tab": false,
+        "title": "Little Ummah",
+        "subtitle": "",
+        "heading_color": "#ffffff",
+        "subheading_color": "#ffffff",
+        "button_text": "Explore Togetherness",
+        "button_link": "https://www.thesunnah.store/products/little-ummah",
+        "button_open_new_tab": false,
+        "button_bg_color": "#ffffffe6",
+        "button_text_color": "#000000",
+        "button_border_color": "#ffffff4d",
+        "button_hover_bg_color": "#ffffff",
+        "button_hover_text_color": "#000000"
+      }
+    },
+    "recently_viewed_products_Wy4Nyy": {
       "type": "recently-viewed-products",
       "name": "Recently Viewed Products",
       "settings": {
@@ -104,33 +126,44 @@
         "selected_products": [
           "arabic-alphabets-flashcards",
           "amazing-electricity-biggan-baksho",
-          "children-s-story-of-empathy-kids-books",
           "focus-challenge-smart-kit",
           "fun-with-measurement-biggan-baksho",
           "is-he-the-messenger",
           "kids-brain-boosting-book",
           "kids-iman-series-books",
+          "basic-islam-for-little-ummah",
           "little-ummah-01-package-premium-gift-box",
           "little-ummah-02-package-premium-gift-box",
           "magic-of-magnet-biggan-baksho",
           "moral-stories-for-children-kids-books",
           "mystery-of-chemistry-biggan-baksho",
+          "pocket-quran-colour-coded-tajweed-rules",
+          "quran-made-easy",
+          "ramadan-resolution-journal",
           "আর-রাহিকুল-মাখতুম",
-          "কুরআন-অনুধাবন-পদ্ধতি-ও-সতর্কতা",
+          "এখন-যৌবন-যার",
           "কারবালার-প্রকৃত-ইতিহাস",
-          "দ্বীনের-পথে-যাত্রা",
+          "কুরআন-অনুধাবন-পদ্ধতি-ও-সতর্কতা",
+          "গল্প-নয়-একমুঠো-আলো",
+          "তিনিই-আমার-রব",
+          "দলিলসহ-কুরবানীর-মাসায়েল",
           "নারীজীবনের-সুখ-সংগ্রাম",
           "পর্দা-গাইডলাইন",
+          "ফেরা",
+          "দ্বীনের-পথে-যাত্রা",
+          "ফেরা-২",
           "বাইতুল্লাহ-প্রস্তুতি-বিধান-ও-সফরনামা",
           "বাইতুল্লাহ-প্যাকেজ-baitullah-package",
-          "মা-মা-মা-এবং-বাবা",
+          "বিয়ের-আগে-ফ্যান্টাসি-নয়-হোক-বাস্তব-প্রস্তুতি",
           "ভালো-মা-বাবার-দুষ্টু-বাচ্চা",
+          "মা-মা-মা-এবং-বাবা",
           "মা-মা-মা-এবং-বাবা-দ্বিতীয়-খণ্ড",
-          "স্টেপ-বাই-স্টেপ-হজ-গাইডলাইন",
-          "সিরাতে-ইবনে-হিশাম",
-          "সালাফের-জীবন-থেকে",
+          "মুসলিম-জাতির-ইতিহাস",
+          "রিক্লেইম-ইয়োর-হার্ট",
           "শিকড়ের-সন্ধানে",
-          "রিক্লেইম-ইয়োর-হার্ট"
+          "সালাফের-জীবন-থেকে",
+          "সিরাতে-ইবনে-হিশাম",
+          "স্টেপ-বাই-স্টেপ-হজ-গাইডলাইন"
         ],
         "add_to_cart_text": "+",
         "sold_out_text": "Sold Out",
@@ -144,9 +177,9 @@
     }
   },
   "order": [
-    "custom_banner_section_EdaHmY",
     "main",
-    "image_with_text_4VPCAm",
-    "recently_viewed_products_ngfjQm"
+    "featured_product_qx3XW8",
+    "custom_banner_section_BbK74M",
+    "recently_viewed_products_Wy4Nyy"
   ]
 }

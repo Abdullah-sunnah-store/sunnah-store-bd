@@ -13,14 +13,14 @@
       "type": "main-collection-banner",
       "disabled": true,
       "settings": {
-        "show_collection_description": false,
-        "show_collection_image": true,
+        "show_collection_description": true,
+        "show_collection_image": false,
         "color_scheme": "scheme-1"
       }
     },
-    "elegant_banner_hP66xw": {
-      "type": "elegant-banner",
-      "name": "Elegant Banner",
+    "collection_banner_image_BzjaUH": {
+      "type": "collection-banner-image",
+      "name": "Collection Banner Image",
       "settings": {
         "collection": "",
         "banner_height": 300,
@@ -31,8 +31,8 @@
         "show_collection_list": false,
         "text_alignment": "center",
         "color_scheme": "background-1",
-        "text_color": "#ffffffe6",
-        "show_overlay": true,
+        "text_color": "#ffffff",
+        "show_overlay": false,
         "overlay_opacity": 0
       }
     },
@@ -59,7 +59,7 @@
   },
   "order": [
     "banner",
-    "elegant_banner_hP66xw",
+    "collection_banner_image_BzjaUH",
     "product-grid"
   ]
 }

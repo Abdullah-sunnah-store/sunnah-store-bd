@@ -129,7 +129,7 @@
     "currency_code_enabled": true,
     "cart_type": "drawer",
     "show_vendor": false,
-    "show_cart_note": false,
+    "show_cart_note": true,
     "cart_drawer_collection": "",
     "cart_color_scheme": "scheme-1",
     "sections": {
@@ -194,9 +194,19 @@
         "disabled": false,
         "settings": {}
       },
-      "14634609474538694927": {
-        "type": "shopify://apps/fether/blocks/widget-embed/f96a0d1a-35b8-40ef-ad54-1cb7fb011e11",
-        "disabled": true,
+      "6174324309569838175": {
+        "type": "shopify://apps/smile-io/blocks/smile-shopify-app/2fae4e25-1841-4ea2-bc02-bd548478c4f6",
+        "disabled": false,
+        "settings": {}
+      },
+      "14060646107696862457": {
+        "type": "shopify://apps/judge-me-reviews/blocks/judgeme_core/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+        "disabled": false,
+        "settings": {}
+      },
+      "855628211100114053": {
+        "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/klaviyo-onsite-embed/2632fe16-c075-4321-a88b-50b567f42507",
+        "disabled": false,
         "settings": {}
       }
     },

@@ -1,218 +1,4 @@
 <style>
-/* Compact Progress Bar */
-  .achievement-progress {
-    width: calc(100% + 32px);
-    margin: 10px -16px;
-    padding: 12px 16px;
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .achievement-title {
-    color: #FFB030;
-    font-family: Inter, sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    text-align: center;
-    margin: 0 0 8px 0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-   .progress-track {
-    position: relative;
-    height: 6px;
-    {% comment %} background: linear-gradient(90deg, #4CAF50 0%, #FF6B6B 0%); {% endcomment %}
-    border-radius: 10px;
-    margin: 10px 0;
-    overflow: visible;
-    transition: background 0.6s ease;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4CAF50 0%, #FFB030 50%, #FFC361 100%);
-    border-radius: 10px;
-    transition: width 0.6s ease, background 0.6s ease;
-    position: relative;
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
-  }
-  
-  .progress-fill.level-1 {
-    background: linear-gradient(90deg, #66BB6A 0%, #81C784 100%);
-    box-shadow: 0 0 10px rgba(102, 187, 106, 0.6);
-  }
-  
-  .progress-fill.level-2 {
-    background: linear-gradient(90deg, #4CAF50 0%, #66BB6A 100%);
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
-  }
-  
-  .progress-fill.level-3 {
-    background: linear-gradient(90deg, #FFA726 0%, #FFB74D 100%);
-    box-shadow: 0 0 10px rgba(255, 167, 38, 0.6);
-  }
-  
-  .progress-fill.level-4 {
-    background: linear-gradient(90deg, #FF9800 0%, #FFA726 100%);
-    box-shadow: 0 0 12px rgba(255, 152, 0, 0.6);
-  }
-  
-  .progress-fill.level-5 {
-    background: linear-gradient(90deg, #FF6F00 0%, #FF8F00 100%);
-    box-shadow: 0 0 12px rgba(255, 111, 0, 0.7);
-  }
-  
-  .progress-fill.level-6 {
-    background: linear-gradient(90deg, #D84315 0%, #FF6F00 100%);
-    box-shadow: 0 0 15px rgba(216, 67, 21, 0.8);
-  }
-  
-  .progress-fill.max-level {
-    background: linear-gradient(90deg, #FFD700 0%, #FFA500 50%, #FF6347 100%);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
-    animation: shimmer 2s infinite;
-  }
-  
-  @keyframes shimmer {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.2); }
-  }
-
-  .progress-fill::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 12px;
-    height: 12px;
-    background: #FFB030;
-    border-radius: 50%;
-    border: 2px solid #1a1a1a;
-    box-shadow: 0 0 10px rgba(253, 180, 60, 0.8);
-  }
-
-  .milestones {
-    display: flex;
-    justify-content: space-between;
-    margin-top: -3px;
-    margin-bottom: 8px;
-  }
-
-  .milestone {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-  }
-
-  .milestone-marker {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    border: 2px solid #2d2d2d;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    z-index: 2;
-    margin-top: -14px;
-  }
-
-  .milestone.active .milestone-marker {
-    background: linear-gradient(135deg, #FDB43C 0%, #FFB030 100%);
-    border-color: #FFB030;
-    animation: pulse 1.5s infinite;
-    box-shadow: 0 0 15px rgba(253, 180, 60, 0.6);
-  }
-
-  .milestone.completed .milestone-marker {
-    background: #4CAF50;
-    border-color: #4CAF50;
-    box-shadow: 0 0 12px rgba(76, 175, 80, 0.5);
-  }
-
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
-  }
-
-  .milestone-amount {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 9px;
-    font-weight: 600;
-    margin-top: 4px;
-    font-family: Inter, sans-serif;
-  }
-
-  .milestone.active .milestone-amount {
-    color: #FFB030;
-    font-weight: 700;
-  }
-
-  .milestone.completed .milestone-amount {
-    color: #4CAF50;
-  }
-
-  .current-amount {
-    text-align: center;
-    color: #fff;
-    font-size: 11px;
-    margin-top: 6px;
-    font-family: Inter, sans-serif;
-    line-height: 1.4;
-  }
-
-  .current-amount .amount {
-    font-weight: 700;
-    font-size: 13px;
-  }
-
-  .next-goal {
-    color: rgba(255, 255, 255, 0.65);
-    font-size: 10px;
-    margin-top: 3px;
-  }
-
-  @media screen and (max-width: 767px) {
-    .achievement-progress {
-      padding: 10px 12px;
-      margin: 8px -16px;
-    }
-    
-    .achievement-title {
-      font-size: 11px;
-      margin-bottom: 6px;
-    }
-    
-    .milestone-marker {
-      width: 24px;
-      height: 24px;
-      font-size: 12px;
-      margin-top: -12px;
-    }
-    
-    .milestone-amount {
-      font-size: 8px;
-      margin-top: 3px;
-    }
-    
-    .current-amount {
-      font-size: 10px;
-    }
-    
-    .current-amount .amount {
-      font-size: 12px;
-    }
-    
-    .next-goal {
-      font-size: 9px;
-    }
-  }
   .cart-drawer__empty-content .button {
     color: #fff !important;
 }
@@ -260,7 +46,7 @@
            font-size: 14px;
      }
    }
-  
+
 </style>
 
 
@@ -740,53 +526,6 @@
           <div id="CartDrawer-CartErrors" role="alert"></div>
         </form>
       </cart-drawer-items>
-      <!-- Compact Progress Bar HTML -->
-      <div class="achievement-progress">
-        <div class="achievement-title">
-          ⭐ ACHIEVE TARGET AND GET GIFT
-        </div>
-        
-        <div class="progress-track">
-          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-        </div>
-        
-        <div class="milestones">
-          <div class="milestone" data-target="1000">
-            <div class="milestone-marker">?</div>
-            <div class="milestone-amount">1K</div>
-          </div>
-          
-          <div class="milestone" data-target="2000">
-            <div class="milestone-marker">?</div>
-            <div class="milestone-amount">2K</div>
-          </div>
-          
-          <div class="milestone" data-target="3000">
-            <div class="milestone-marker">?</div>
-            <div class="milestone-amount">3K</div>
-          </div>
-          
-          <div class="milestone" data-target="5000">
-            <div class="milestone-marker">?</div>
-            <div class="milestone-amount">5K</div>
-          </div>
-          
-          <div class="milestone" data-target="7000">
-            <div class="milestone-marker">?</div>
-            <div class="milestone-amount">7K</div>
-          </div>
-          
-          <div class="milestone" data-target="10000">
-            <div class="milestone-marker">?</div>
-            <div class="milestone-amount">10K</div>
-          </div>
-        </div>
-        
-        <div class="current-amount">
-          <div><span class="amount" id="currentAmount">৳0</span> / <span id="remainingAmount">৳10,000</span></div>
-          <div class="next-goal" id="nextGoal">Start shopping to unlock gifts!</div>
-        </div>
-      </div>
       <div class="drawer__footer">
         {%- if settings.show_cart_note -%}
           <details id="Details-CartDrawer">
@@ -895,163 +634,32 @@
   </div>
 </cart-drawer>
 <script>
-(function() {
-  const achievements = [
-    { target: 1000, reward: 'Get a Lid', icon: '🎁' },
-    { target: 2000, reward: 'Get a Notebook', icon: '📓' },
-    { target: 3000, reward: 'Get a Mug', icon: '☕' },
-    { target: 5000, reward: 'Get a Tote Bag', icon: '🛍️' },
-    { target: 7000, reward: 'Get a Journal', icon: '📔' },
-    { target: 10000, reward: 'Premium Gift', icon: '🎀' }
-  ];
+    // Enhanced cart drawer closing functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const cartDrawer = document.querySelector('cart-drawer');
+      const cartDrawerInner = document.querySelector('.drawer__inner');
 
-  function updateProgressBar() {
-    fetch('/cart.js')
-      .then(response => response.json())
-      .then(cart => {
-        const currentTotal = cart.total_price / 100;
-        performUpdate(currentTotal);
-      })
-      .catch(err => console.error('Cart fetch error:', err));
-  }
-  
-  function performUpdate(currentTotal) {
-    const maxTarget = 10000;
-    
-    const currentAmountEl = document.getElementById('currentAmount');
-    if (currentAmountEl) {
-      currentAmountEl.innerHTML = `<span style="color: #4CAF50;">৳${Math.round(currentTotal)}</span>`;
-    }
-    
-    const progressPercentage = Math.min((currentTotal / maxTarget) * 100, 100);
-    const progressFillEl = document.getElementById('progressFill');
-    if (progressFillEl) {
-      progressFillEl.style.width = progressPercentage + '%';
-      
-      // Remove all level classes
-      progressFillEl.className = 'progress-fill';
-      
-      // Add dynamic color class based on amount
-      if (currentTotal >= 10000) {
-        progressFillEl.classList.add('max-level');
-      } else if (currentTotal >= 7000) {
-        progressFillEl.classList.add('level-6');
-      } else if (currentTotal >= 5000) {
-        progressFillEl.classList.add('level-5');
-      } else if (currentTotal >= 3000) {
-        progressFillEl.classList.add('level-4');
-      } else if (currentTotal >= 2000) {
-        progressFillEl.classList.add('level-3');
-      } else if (currentTotal >= 1000) {
-        progressFillEl.classList.add('level-2');
-      } else if (currentTotal > 0) {
-        progressFillEl.classList.add('level-1');
-      }
-    }
-    
-    const remainingAmountEl = document.getElementById('remainingAmount');
-    if (remainingAmountEl) {
-      const remaining = Math.max(0, maxTarget - currentTotal);
-      remainingAmountEl.innerHTML = `<span style="color: #FF6B6B;">৳${Math.round(remaining)}</span>`;
-    }
-    
-    const milestones = document.querySelectorAll('.milestone');
-    let nextGoalText = '';
-    let hasActiveGoal = false;
-    
-    milestones.forEach((milestone, index) => {
-      if (index >= achievements.length) return;
-      
-      const target = achievements[index].target;
-      const marker = milestone.querySelector('.milestone-marker');
-      const amount = milestone.querySelector('.milestone-amount');
-      
-      if (!marker) return;
-      
-      milestone.classList.remove('active', 'completed');
-      
-      if (currentTotal >= target) {
-        milestone.classList.add('completed');
-        marker.textContent = achievements[index].icon;
-        if (amount) amount.style.color = '#4CAF50';
-      } else if (!hasActiveGoal && currentTotal >= target * 0.7) {
-        milestone.classList.add('active');
-        hasActiveGoal = true;
-        const remaining = target - currentTotal;
-        nextGoalText = `${Math.round(remaining)}৳ more for ${achievements[index].reward}`;
-        if (amount) amount.style.color = '#FFB030';
-      } else {
-        marker.textContent = '?';
-        if (amount) amount.style.color = 'rgba(255, 255, 255, 0.5)';
-      }
-    });
-    
-    if (currentTotal >= maxTarget) {
-      nextGoalText = '🎉 All goals unlocked!';
-    } else if (!hasActiveGoal) {
-      const nextTarget = achievements.find(a => a.target > currentTotal);
-      if (nextTarget) {
-        const remaining = nextTarget.target - currentTotal;
-        nextGoalText = `${Math.round(remaining)}৳ more for ${nextTarget.reward}`;
-      }
-    }
-    
-    const nextGoalEl = document.getElementById('nextGoal');
-    if (nextGoalEl) {
-      nextGoalEl.textContent = nextGoalText;
-    }
-  }
+      if (cartDrawer) {
+        // Close drawer when clicking outside the drawer content
+        cartDrawer.addEventListener('click', function(e) {
+          if (e.target === cartDrawer || e.target.classList.contains('cart-drawer__overlay')) {
+            cartDrawer.close();
+          }
+        });
 
-  function init() {
-    updateProgressBar();
-    
-    if (typeof Shopify !== 'undefined') {
-      document.addEventListener('shopify:section:load', updateProgressBar);
-      document.addEventListener('shopify:section:reorder', updateProgressBar);
-    }
-    
-    document.addEventListener('cart:updated', updateProgressBar);
-    document.addEventListener('cart:refresh', updateProgressBar);
-    
-    const originalFetch = window.fetch;
-    window.fetch = function(...args) {
-      const url = args[0];
-      if (typeof url === 'string' && (url.includes('/cart/') || url.includes('/cart.js'))) {
-        return originalFetch.apply(this, args).then(response => {
-          setTimeout(updateProgressBar, 100);
-          return response;
+        // Prevent closing when clicking inside the drawer content
+        if (cartDrawerInner) {
+          cartDrawerInner.addEventListener('click', function(e) {
+            e.stopPropagation();
+          });
+        }
+
+        // Close drawer with ESC key
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && cartDrawer.hasAttribute('open')) {
+            cartDrawer.close();
+          }
         });
       }
-      return originalFetch.apply(this, args);
-    };
-    
-    document.addEventListener('click', function(e) {
-      const quantityBtn = e.target.closest('.quantity__button');
-      const removeBtn = e.target.closest('cart-remove-button');
-      
-      if (quantityBtn || removeBtn) {
-        setTimeout(updateProgressBar, 500);
-      }
     });
-    
-    document.addEventListener('change', function(e) {
-      if (e.target.classList.contains('quantity__input')) {
-        setTimeout(updateProgressBar, 500);
-      }
-    });
-    
-    setInterval(function() {
-      const cartDrawer = document.querySelector('cart-drawer[open]');
-      if (cartDrawer) {
-        updateProgressBar();
-      }
-    }, 2000);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
+  </script>

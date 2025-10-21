@@ -1,11 +1,11 @@
 <!-- Brand Logo Auto-Slider Section with Dual Rows (Desktop) / Single Row (Mobile) -->
-<div class="brand-slider-container" style="background: {{ section.settings.background_color }};" data-auto-scroll="{{ section.settings.auto_scroll }}">
+<div class="brand-slider-container" style="background: {{ section.settings.background_color }};">
   <!-- First Row - Slides Left to Right -->
   <div class="brand-slider-wrapper">
     <div class="brand-slider-track" style="--desktop-speed: {{ section.settings.desktop_animation_speed }}s; --mobile-speed: {{ section.settings.mobile_animation_speed }}s;">
       <!-- First set of logos -->
       {% for block in section.blocks %}
-        <div class="brand-logo" data-show-text-bg="{{ block.settings.show_text_background }}">
+        <div class="brand-logo">
           {% if block.settings.show_image and block.settings.logo %}
             <img src="{{ block.settings.logo | img_url: '200x' }}" alt="Brand Logo {{ forloop.index }}" loading="lazy">
           {% endif %}
@@ -18,7 +18,7 @@
       {% endfor %}
       <!-- Second set for seamless loop -->
       {% for block in section.blocks %}
-        <div class="brand-logo" data-show-text-bg="{{ block.settings.show_text_background }}">
+        <div class="brand-logo">
           {% if block.settings.show_image and block.settings.logo %}
             <img src="{{ block.settings.logo | img_url: '200x' }}" alt="Brand Logo {{ forloop.index }}" loading="lazy">
           {% endif %}
@@ -31,7 +31,7 @@
       {% endfor %}
       <!-- Third set for extra seamless coverage -->
       {% for block in section.blocks %}
-        <div class="brand-logo" data-show-text-bg="{{ block.settings.show_text_background }}">
+        <div class="brand-logo">
           {% if block.settings.show_image and block.settings.logo %}
             <img src="{{ block.settings.logo | img_url: '200x' }}" alt="Brand Logo {{ forloop.index }}" loading="lazy">
           {% endif %}
@@ -51,7 +51,7 @@
       <div class="brand-slider-track brand-slider-track-reverse" style="--desktop-speed: {{ section.settings.desktop_animation_speed }}s; --mobile-speed: {{ section.settings.mobile_animation_speed }}s;">
         <!-- First set of logos -->
         {% for block in section.blocks %}
-          <div class="brand-logo" data-show-text-bg="{{ block.settings.show_text_background }}">
+          <div class="brand-logo">
             {% if block.settings.show_image and block.settings.logo %}
               <img src="{{ block.settings.logo | img_url: '200x' }}" alt="Brand Logo {{ forloop.index }}" loading="lazy">
             {% endif %}
@@ -64,7 +64,7 @@
         {% endfor %}
         <!-- Second set for seamless loop -->
         {% for block in section.blocks %}
-          <div class="brand-logo" data-show-text-bg="{{ block.settings.show_text_background }}">
+          <div class="brand-logo">
             {% if block.settings.show_image and block.settings.logo %}
               <img src="{{ block.settings.logo | img_url: '200x' }}" alt="Brand Logo {{ forloop.index }}" loading="lazy">
             {% endif %}
@@ -77,7 +77,7 @@
         {% endfor %}
         <!-- Third set for extra seamless coverage -->
         {% for block in section.blocks %}
-          <div class="brand-logo" data-show-text-bg="{{ block.settings.show_text_background }}">
+          <div class="brand-logo">
             {% if block.settings.show_image and block.settings.logo %}
               <img src="{{ block.settings.logo | img_url: '200x' }}" alt="Brand Logo {{ forloop.index }}" loading="lazy">
             {% endif %}
@@ -97,7 +97,7 @@
 .brand-slider-container {
   width: 100%;
   overflow: hidden;
-  padding: 10px 0 10px;
+  padding: 10px 0 40px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -106,6 +106,8 @@
 
 .brand-slider-wrapper {
   width: 100%;
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
   margin: 0 auto;
 }
 
@@ -138,11 +140,6 @@
 
 .brand-logo:hover {
   opacity: 1;
-}
-
-.brand-text a {
-  text-decoration: none;
-  color: #000;
 }
 
 .brand-logo img {
@@ -181,8 +178,8 @@
   margin-top: 8px;
 }
 
-/* Text only styling with background */
-.brand-logo:not(:has(img))[data-show-text-bg="true"] .brand-text {
+/* Text only styling */
+.brand-logo:not(:has(img)) .brand-text {
   font-size: 16px;
   font-weight: 500;
   padding: 5px 5px;
@@ -191,21 +188,8 @@
   transition: background 0.3s ease;
 }
 
-.brand-logo:not(:has(img))[data-show-text-bg="true"]:hover .brand-text {
+.brand-logo:not(:has(img)):hover .brand-text {
   background: linear-gradient(135deg, rgba(174, 174, 174, 0.9), rgba(187, 225, 234, 0.53));
-}
-
-/* Text only styling without background */
-.brand-logo:not(:has(img))[data-show-text-bg="false"] .brand-text {
-  font-size: 16px;
-  font-weight: 500;
-  padding: 5px 5px;
-  background: transparent;
-  transition: color 0.3s ease;
-}
-
-.brand-logo:not(:has(img))[data-show-text-bg="false"]:hover .brand-text {
-  color: #666;
 }
 
 @keyframes slide {
@@ -226,44 +210,9 @@
   }
 }
 
-/* Auto-scroll control */
-.brand-slider-container[data-auto-scroll="false"] .brand-slider-track {
+/* Pause animation on hover */
+.brand-slider-container:hover .brand-slider-track {
   animation-play-state: paused;
-}
-
-.brand-slider-container[data-auto-scroll="true"] .brand-slider-track {
-  animation-play-state: running;
-}
-
-/* Pause animation on hover (only if auto-scroll is enabled) */
-.brand-slider-container[data-auto-scroll="true"]:hover .brand-slider-track {
-  animation-play-state: paused;
-}
-
-/* Mobile scrollable when auto-scroll is off */
-@media (max-width: 768px) {
-  .brand-slider-container[data-auto-scroll="false"] .brand-slider-wrapper {
-    mask-image: none;
-    -webkit-mask-image: none;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  
-  .brand-slider-container[data-auto-scroll="false"] .brand-slider-wrapper::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .brand-slider-container[data-auto-scroll="false"] .brand-slider-track {
-    justify-content: flex-start;
-    padding: 0 20px;
-  }
-  
-  .brand-slider-container[data-auto-scroll="false"] .brand-slider-wrapper {
-    padding-bottom: 10px;
-  }
 }
 
 /* Mobile responsive adjustments - Hide second row on mobile */
@@ -298,7 +247,7 @@
   
   .brand-text {
     font-size: 12px;
-    max-width: 100%;
+    max-width: 250px;
   }
 }
 
@@ -323,7 +272,7 @@
   
   .brand-text {
     font-size: 11px;
-    max-width: 100%;
+    max-width: 200px;
   }
 }
 </style>
@@ -332,13 +281,6 @@
 {
   "name": "Brand Logo Slider",
   "settings": [
-    {
-      "type": "checkbox",
-      "id": "auto_scroll",
-      "label": "Enable Auto Scroll",
-      "default": true,
-      "info": "Enable automatic scrolling animation"
-    },
     {
       "type": "checkbox",
       "id": "show_second_row",
@@ -400,13 +342,6 @@
           "id": "rich_text",
           "label": "Brand Text",
           "default": "<p>Brand Name</p>"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_text_background",
-          "label": "Show Text Background",
-          "default": true,
-          "info": "Add gradient background to text-only items"
         }
       ]
     }
@@ -420,24 +355,21 @@
           "type": "logo",
           "settings": {
             "show_image": true,
-            "show_text": false,
-            "show_text_background": true
+            "show_text": false
           }
         },
         {
           "type": "logo",
           "settings": {
             "show_image": true,
-            "show_text": false,
-            "show_text_background": true
+            "show_text": false
           }
         },
         {
           "type": "logo",
           "settings": {
             "show_image": true,
-            "show_text": false,
-            "show_text_background": true
+            "show_text": false
           }
         }
       ]

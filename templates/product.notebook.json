@@ -23,10 +23,6 @@
           "type": "title",
           "settings": {}
         },
-        "judge_me_reviews_preview_badge_eAnaya": {
-          "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-          "settings": {}
-        },
         "price": {
           "type": "price",
           "settings": {}
@@ -81,7 +77,6 @@
       "block_order": [
         "vendor",
         "title",
-        "judge_me_reviews_preview_badge_eAnaya",
         "price",
         "variant_picker",
         "quantity_selector",
@@ -119,7 +114,7 @@
           "type": "price",
           "settings": {}
         },
-        "judge_me_reviews_preview_badge_QgMnCW": {
+        "judge_me_reviews_preview_badge_JrWi9Y": {
           "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
           "settings": {}
         },
@@ -166,7 +161,7 @@
         "text_tBnkca": {
           "type": "text",
           "settings": {
-            "text": "Click here to get ✦ <a href=\"/collections/hijab-package\" title=\"Hijab Package\">Free Gift Box & Perfume </a>",
+            "text": "Click here to get ✦ <a href=\"/collections/hijab-package\" title=\"Hijab Package\">Free Gift Box & Perfume</a>",
             "text_style": "body"
           }
         },
@@ -267,7 +262,7 @@
       "block_order": [
         "title_6YrQz7",
         "price_Wf6TM8",
-        "judge_me_reviews_preview_badge_QgMnCW",
+        "judge_me_reviews_preview_badge_JrWi9Y",
         "variant_picker_9qUHTK",
         "quantity_selector_hzhn9U",
         "custom_property_input_faC6Bj",
@@ -297,10 +292,10 @@
         "padding_bottom": 36
       }
     },
-    "1759899407181b982d": {
+    "17598998806afe1677": {
       "type": "apps",
       "blocks": {
-        "judge_me_reviews_review_widget_DnHUjX": {
+        "judge_me_reviews_review_widget_QdxB3G": {
           "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
           "settings": {
             "review_data": "sample_data",
@@ -311,10 +306,26 @@
         }
       },
       "block_order": [
-        "judge_me_reviews_review_widget_DnHUjX"
+        "judge_me_reviews_review_widget_QdxB3G"
       ],
       "settings": {
         "include_margins": true
+      }
+    },
+    "video_rGA3fR": {
+      "type": "video",
+      "name": "t:sections.video.presets.name",
+      "settings": {
+        "heading": "যা পড়েন সব ভুলে যান?",
+        "heading_size": "h2",
+        "enable_video_looping": false,
+        "video_url": "https://www.youtube.com/watch?v=E4JEK4-qaAA",
+        "cover_image": "shopify://shop_images/maxresdefault.jpg",
+        "description": "",
+        "full_width": false,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
       }
     },
     "related-products": {
@@ -477,46 +488,31 @@
         "title": "Best Selling",
         "products_to_show": 20,
         "selected_products": [
-          "masnoon-dua-cards-version-1",
-          "masnoon-dua-cards-version-2",
-          "blessed-alhamdulillah-gold-foiled-notebook",
-          "leather-covered-holy-quran-color-coded-tajweed-rules",
-          "if-the-light-is-in-your-heart-you-will-find-your-way-home-notebook",
-          "start-with-bismillah-floral-frame",
-          "zikr-minimal-glass-frame",
-          "asma-ul-husna-regular-glass-frame",
-          "ayatul-kursi-calligraphy-metal-engraved-frame",
-          "surah-yousuf-ayaat-87-english-frame-never-give-up-hope-of-allahs-soothing-mercy",
-          "fajr-daily-reminder-mug",
-          "blessed-daily-reminder-mug",
-          "dua-mug",
-          "father-mug-version-2",
-          "mother-mug-version-2",
-          "sister-mug",
-          "brother-mug",
-          "baby-boy-mug",
-          "bismillah-calligraphy-mug",
-          "dua-gift-box",
-          "parents-package-premium-gift-box",
-          "inspired-muslimah-gift-box",
-          "kids-package-premium-gift-box",
-          "little-ummah-01-package-premium-gift-box",
-          "oud-mastry",
-          "spiced-oud",
-          "dark-oud",
-          "rabbana-dua-cards",
+          "dhikr-zikr-calligraphy-mug",
+          "four-quls-metal-calligraphy-frame",
+          "grow-through-what-you-go-through-gold-foiled-notebook",
+          "hajj-dua-card-version-2",
+          "her-deen-mug",
+          "horsemen-driftpack-mens-waist-bag",
           "jar-of-duas",
-          "ruqyah-cards-bangla",
-          "memory-assistant-notebook-professional-edition",
-          "memory-assistant-notebook-student-edition",
-          "allah-is-the-best-of-planners-notebook",
-          "hajj-journal-bangla-version-2",
-          "hijab-gift-hamper-pashmina-04",
-          "hijab-gift-hamper-pashmina-02",
-          "hijab-gift-hamper-pashmina-01",
-          "hijab-gift-hamper-pashmina-07",
-          "hijab-gift-hamper-pashmina-08",
-          "hijab-gift-hamper-pashmina-06"
+          "kids-frame-pink-cloud",
+          "knowledge-calligraphy-mug",
+          "love-gold-foiled-notebook",
+          "masnoon-dua-cards-version-1",
+          "miswak-with-cover-black",
+          "moon-calligraphy-metal-showpiece",
+          "nikah-nama-03-frame",
+          "parents-mug-signature-combo",
+          "rabbi-zidni-ilma-blue-notebook",
+          "ramadan-mubarak-calligraphy-themed-mug-v-2",
+          "shire-horsemen-wallet-dandelion-tan",
+          "star-calligraphy-metal-showpiece",
+          "surah-ikhlas-arabic-english-frame",
+          "sword-calligraphy-metal-showpiece",
+          "আর-রাহিকুল-মাখতুম",
+          "ফেরা",
+          "রিক্লেইম-ইয়োর-হার্ট",
+          "asma-ul-husna-metal-calligraphy-frame"
         ],
         "add_to_cart_text": "+",
         "sold_out_text": "Sold Out",
@@ -604,7 +600,8 @@
   "order": [
     "main",
     "main_product_panjabi_supreme_LnqLLg",
-    "1759899407181b982d",
+    "17598998806afe1677",
+    "video_rGA3fR",
     "related-products",
     "custom_review_section_PbBT43",
     "featured_collection_drop_GxcjfP",

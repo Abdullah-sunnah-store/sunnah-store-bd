@@ -11,7 +11,9 @@
       "Bash(gh auth:*)",
       "Bash(git config:*)",
       "Bash(git init:*)",
-      "Bash(git remote add:*)"
+      "Bash(git remote add:*)",
+      "Bash(cmdkey:*)",
+      "Bash(git credential-manager:*)"
     ],
     "deny": [],
     "ask": []

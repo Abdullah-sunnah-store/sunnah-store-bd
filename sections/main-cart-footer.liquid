@@ -22,45 +22,6 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
-
-  .progress-bar__wrapper {
-    position: relative;
-  }
-
-  .progress-bar__value {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    width: 100%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  .progress {
-    width: 100%;
-    height: 30px;
-    border-radius: 25px;
-    background-color: {{ block.settings.discount_label_background }};
-    margin-bottom: 20px;
-  }
-
-  .progress[value]::-webkit-progress-bar {
-    border-radius: 25px;
-    background-color: {{ block.settings.discount_label_background }};
-  }
-
-  .progress[value]::-webkit-progress-value {
-    border-radius: 25px;
-    background-color: {{ block.settings.border_cart_color_accent }};
-  }
-
-  /* Firefox specific styling */
-  .progress[value]::-moz-progress-bar {
-    border-radius: 25px;
-    background-color: {{ block.settings.border_cart_color_accent }};
-  }
 {%- endstyle -%}
 
 <div
@@ -89,24 +50,6 @@
             {%- when '@app' -%}
               {% render block %}
             {%- when 'subtotal' -%}
-              {%- comment -%} PROGRESS BAR SECTION - Added before subtotal {%- endcomment -%}
-              {%- when 'progress_bar' -%}
-                {%- assign discount_label_color = block.settings.border_cart_color_accent -%}
-                {%- assign discount_label_background = block.settings.discount_label_background -%}
-                {%- assign total = cart.total_price | divided_by: 100.00 -%}
-                {%- assign difference = 1600 | minus: total -%}
-                <div class="progress-bar" {{ block.shopify_attributes }}>
-                  {%- if difference <= 0 -%}
-                    <div>Applicable for <b>free shipping.</b></div>
-                  {%- else -%}
-                    <div> Add <b>{{ difference }}</b> More for <b>Get Discount.</b> </div>
-                  {%- endif -%}
-                  <div class="progress-bar__wrapper">
-                    <progress id="progress-bar" value="{{ total }}" max="1600"></progress>
-                  </div>
-                </div>
-              {%- comment -%} END PROGRESS BAR SECTION {%- endcomment -%}
-
               <div class="js-contents" {{ block.shopify_attributes }}>
                 <div>
                   {%- if cart.cart_level_discount_applications.size > 0 -%}
@@ -230,25 +173,6 @@
     }
   ],
   "blocks": [
-    {
-      "type": "progress_bar",
-      "name": "Progress bar",
-      "limit": 1,
-      "settings": [
-        {
-          "type": "color",
-          "id": "border_cart_color_accent",
-          "label": "Progress bar fill color",
-          "default": "#108043"
-        },
-        {
-          "type": "color",
-          "id": "discount_label_background",
-          "label": "Progress bar background color",
-          "default": "#e6f2ec"
-        }
-      ]
-    },
     {
       "type": "subtotal",
       "name": "t:sections.main-cart-footer.blocks.subtotal.name",

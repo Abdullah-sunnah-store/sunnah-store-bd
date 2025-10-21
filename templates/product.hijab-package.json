@@ -114,6 +114,10 @@
           "type": "price",
           "settings": {}
         },
+        "judge_me_reviews_preview_badge_jY9yhQ": {
+          "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {}
+        },
         "variant_picker_9qUHTK": {
           "type": "variant_picker",
           "settings": {
@@ -139,6 +143,13 @@
             "help_text": ""
           }
         },
+        "text_p8Vcn4": {
+          "type": "text",
+          "settings": {
+            "text": "<strong>Most Popular: </strong>One Gift Box-249৳ (<strong>Free</strong>) & Mysterious Melody Spray Perfume-299৳ (<strong>Free</strong>)",
+            "text_style": "body"
+          }
+        },
         "buy_buttons_UMeeWm": {
           "type": "buy_buttons",
           "settings": {
@@ -157,7 +168,11 @@
         "product_addons_gcJUM9": {
           "type": "product-addons",
           "settings": {
-            "product_addon": [],
+            "product_addon": [
+              "enjoy-little-things-box-black",
+              "the-starry-night-gift-box-small-black",
+              "the-starry-night-gift-box-small-blue"
+            ],
             "addon_bg": "rgba(0,0,0,0)",
             "checkbox_active_color": "#000000",
             "checkbox_size": 20,
@@ -172,16 +187,33 @@
             "free_gift_info": "👉 Claim free gift",
             "title_color": "#121212",
             "price_color": "#121212",
-            "price_opacity": 0.7
+            "price_opacity": 1
           }
         },
         "product_addons_v2_g7eKCY": {
           "type": "product-addons-v2",
+          "disabled": true,
           "settings": {
             "custom_heading_text": "",
             "product_addon": [
-              "pashmina-hijab",
-              "cherry-hijab"
+              "arabian-platinum-thobe-caramel-brown",
+              "arabian-platinum-thobe-copper-brown",
+              "arabian-platinum-thobe-cornflower-blue",
+              "arabian-platinum-thobe-hunter-green",
+              "arabian-platinum-thobe-jade-black",
+              "arabian-platinum-thobe-olive-gray",
+              "arabian-platinum-thobe-smoke-gray",
+              "arabian-platinum-thobe-soft-space-blue",
+              "platinum-panjabi-chestnut-brown",
+              "platinum-panjabi-dove-white",
+              "platinum-panjabi-graphite-gray",
+              "platinum-panjabi-latte-brown",
+              "platinum-panjabi-moss-green",
+              "platinum-panjabi-obsidian-black",
+              "platinum-panjabi-teal-blue",
+              "horsemen-punjabi-tropical-suiting-twill-fabric-taupe-brown",
+              "premium-panjabi-beach-brown",
+              "premium-panjabi-sky-blue"
             ],
             "addon_bg": "rgba(0,0,0,0)",
             "checkbox_active_color": "#000000",
@@ -195,8 +227,8 @@
             "price_size": 14,
             "price_size_mb": 12,
             "free_gift_info": "👉 Claim free gift",
-            "title_color": "#121212",
-            "price_color": "#121212",
+            "title_color": "#ffffff",
+            "price_color": "#ffffff",
             "price_opacity": 0.7
           }
         },
@@ -222,6 +254,7 @@
         },
         "text_tBnkca": {
           "type": "text",
+          "disabled": true,
           "settings": {
             "text": "✦ <a href=\"/collections/hijab\" title=\"Hijab\">Free Gift Box & Perfume</a>",
             "text_style": "body"
@@ -237,9 +270,11 @@
       "block_order": [
         "title_6YrQz7",
         "price_Wf6TM8",
+        "judge_me_reviews_preview_badge_jY9yhQ",
         "variant_picker_9qUHTK",
         "quantity_selector_hzhn9U",
         "custom_property_input_faC6Bj",
+        "text_p8Vcn4",
         "buy_buttons_UMeeWm",
         "favorite_button_4RtPCm",
         "description_XHwNxM",
@@ -255,7 +290,7 @@
         "color_scheme": "",
         "media_size": "large",
         "constrain_to_viewport": true,
-        "media_fit": "cover",
+        "media_fit": "contain",
         "gallery_layout": "thumbnail_slider",
         "media_position": "left",
         "image_zoom": "hover",
@@ -266,12 +301,13 @@
         "padding_bottom": 36
       }
     },
-    "video_L3QPty": {
+    "video_rGA3fR": {
       "type": "video",
+      "disabled": true,
       "name": "t:sections.video.presets.name",
       "settings": {
         "heading": "যা পড়েন সব ভুলে যান?",
-        "heading_size": "h1",
+        "heading_size": "h2",
         "enable_video_looping": false,
         "video_url": "https://www.youtube.com/watch?v=E4JEK4-qaAA",
         "cover_image": "shopify://shop_images/maxresdefault.jpg",
@@ -280,6 +316,26 @@
         "color_scheme": "",
         "padding_top": 36,
         "padding_bottom": 36
+      }
+    },
+    "175989980931dc4c96": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_review_widget_XWU3jb": {
+          "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "review_data": "sample_data",
+            "show_shop_reviews": false,
+            "empty_state": "empty_widget",
+            "max_width": 1200
+          }
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_review_widget_XWU3jb"
+      ],
+      "settings": {
+        "include_margins": true
       }
     },
     "related-products": {
@@ -439,13 +495,10 @@
       "name": "Recently Viewed Products",
       "settings": {
         "show_title": true,
-        "title": "Recently Viewed",
+        "title": "Best Selling",
         "products_to_show": 20,
         "selected_products": [
-          "dhikr-zikr-calligraphy-mug",
-          "four-quls-metal-calligraphy-frame",
           "grow-through-what-you-go-through-gold-foiled-notebook",
-          "hajj-dua-card-version-2",
           "her-deen-mug",
           "horsemen-driftpack-mens-waist-bag",
           "jar-of-duas",
@@ -453,20 +506,38 @@
           "knowledge-calligraphy-mug",
           "love-gold-foiled-notebook",
           "masnoon-dua-cards-version-1",
-          "miswak-with-cover-black",
-          "moon-calligraphy-metal-showpiece",
-          "nikah-nama-03-frame",
-          "parents-mug-signature-combo",
           "rabbi-zidni-ilma-blue-notebook",
           "ramadan-mubarak-calligraphy-themed-mug-v-2",
           "shire-horsemen-wallet-dandelion-tan",
-          "star-calligraphy-metal-showpiece",
           "surah-ikhlas-arabic-english-frame",
-          "sword-calligraphy-metal-showpiece",
-          "আর-রাহিকুল-মাখতুম",
           "ফেরা",
-          "রিক্লেইম-ইয়োর-হার্ট",
-          "asma-ul-husna-metal-calligraphy-frame"
+          "awra-package-cherry-gift-package",
+          "cherry-hijab-black",
+          "cherry-hijab-blue",
+          "cherry-hijab-bottle-green",
+          "cherry-hijab-cherry-red",
+          "hijab-gift-hamper-pashmina-01",
+          "hijab-gift-hamper-pashmina-02",
+          "hijab-gift-hamper-pashmina-03",
+          "hijab-gift-hamper-pashmina-04",
+          "hijab-gift-hamper-pashmina-05",
+          "hijab-gift-hamper-pashmina-06",
+          "hijab-gift-hamper-pashmina-07",
+          "hijab-gift-hamper-pashmina-08",
+          "pashmina-hijab-royal-blue",
+          "pashmina-hijab-blood-red",
+          "pashmina-hijab-canon-pink",
+          "pashmina-hijab-carob-brown",
+          "pashmina-hijab-dark-maroon",
+          "pashmina-hijab-emerald-green",
+          "cherry-hijab-japanese-violet",
+          "cherry-hijab-mint",
+          "hijab-gift-hamper-cherry-01",
+          "hijab-gift-hamper-cherry-02",
+          "hijab-gift-hamper-cherry-03",
+          "hijab-gift-hamper-cherry-06",
+          "hijab-gift-hamper-cherry-07",
+          "hijab-gift-hamper-cherry-05"
         ],
         "add_to_cart_text": "+",
         "sold_out_text": "Sold Out",
@@ -554,7 +625,8 @@
   "order": [
     "main",
     "main_product_panjabi_supreme_LnqLLg",
-    "video_L3QPty",
+    "video_rGA3fR",
+    "175989980931dc4c96",
     "related-products",
     "custom_review_section_PbBT43",
     "featured_collection_drop_GxcjfP",

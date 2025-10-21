@@ -593,3 +593,37 @@
     clip-path: polygon(var(--shape--blob-5));
   }
 }
+
+/* Autumn Clearance Sale Discount Badge */
+.autumn-discount-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #040404;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 15px;
+  z-index: 2;
+  line-height: 1.2;
+  animation: zoomInOut 1.5s ease-in-out infinite;
+}
+
+@keyframes zoomInOut {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .autumn-discount-badge {
+    font-size: 12px;
+    padding: 5px 10px;
+    top: 8px;
+    left: 8px;
+  }
+}

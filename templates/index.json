@@ -14,29 +14,29 @@
       "name": "Custom Banner Section",
       "settings": {
         "media_type": "image",
-        "invitation_image": "shopify://shop_images/hijabwebsitecover.jpg",
+        "invitation_image": "shopify://shop_images/Book_cover_fb_3x_2.jpg",
         "image_alt": "Nikah Wedding Invitation",
-        "invitation_image_mobile": "shopify://shop_images/phone_Web_pic_2.jpg",
+        "invitation_image_mobile": "shopify://shop_images/Book_cover_fb_3x_2.jpg",
         "image_alt_mobile": "Nikah Wedding Invitation - Mobile",
         "invitation_video": "",
         "video_autoplay": true,
         "video_loop": true,
         "video_muted": true,
         "video_controls": false,
-        "media_link": "shopify://collections/all",
+        "media_link": "shopify://products/basic-islam-for-little-ummah",
         "open_in_new_tab": false,
         "title": "SPREAD YOUR DEEN.",
-        "subtitle": "<p><em><strong>Every box we curate carries love, faith & beauty.</strong></em></p>",
+        "subtitle": "<p><em><strong>The Beautiful Book of Islam: Stories for Little Ummah</strong></em></p>",
         "heading_color": "#fafafa",
-        "subheading_color": "#fafafa",
-        "button_text": "Explore",
-        "button_link": "shopify://collections/all",
+        "subheading_color": "#121212",
+        "button_text": "Pre Order Now",
+        "button_link": "shopify://products/basic-islam-for-little-ummah",
         "button_open_new_tab": false,
-        "button_bg_color": "#fafafa",
-        "button_text_color": "#000000",
-        "button_border_color": "#ffffff4d",
-        "button_hover_bg_color": "#ffffff",
-        "button_hover_text_color": "#000000"
+        "button_bg_color": "#121212",
+        "button_text_color": "#fafafa",
+        "button_border_color": "#121212",
+        "button_hover_bg_color": "#121212",
+        "button_hover_text_color": "#fafafa"
       }
     },
     "custom_banner_section_NAaahQ": {
@@ -50,7 +50,7 @@
         "video_autoplay": true,
         "video_loop": true,
         "video_muted": true,
-        "video_controls": false,
+        "video_controls": true,
         "media_link": "shopify://collections/home-accessories",
         "open_in_new_tab": false,
         "title": "Personalized Prayer Mat",
@@ -84,7 +84,7 @@
         "product_3zk3EQ": {
           "type": "product",
           "settings": {
-            "product_image": "shopify://shop_images/Rabbana_Dua_Card_1.jpg",
+            "product_image": "shopify://shop_images/Dua_Jar_1.jpg",
             "product_title": "Shop Dua Card",
             "product_description": "",
             "product_link": "shopify://collections/dua-cards",
@@ -170,10 +170,10 @@
         "category_GyWfwG": {
           "type": "category",
           "settings": {
-            "category_image": "shopify://shop_images/Bismillah_Calligraphy_Mug-1.jpg",
+            "category_image": "shopify://shop_images/Rizq_Mug-4.jpg",
             "category_title": "",
             "category_subtitle": "",
-            "cta_text": "Bismillah Calligraphy",
+            "cta_text": "Rizq Calligraphy",
             "category_link": "shopify://collections/calligraphy-mugs"
           }
         },
@@ -301,125 +301,92 @@
     "brand_logo_slider_YignaH": {
       "type": "brand-logo-slider",
       "blocks": {
-        "logo_FaBExY": {
-          "type": "logo",
-          "settings": {
-            "show_image": true,
-            "logo": "shopify://shop_images/Logo_Text-01.png",
-            "show_text": false,
-            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/foods\" title=\"https://www.thesunnah.store/collections/foods\">Life</a></h2>",
-            "show_text_background": false
-          }
-        },
         "logo_T9HPXY": {
           "type": "logo",
           "settings": {
             "show_image": true,
-            "logo": "shopify://shop_images/Logo_Text-05_c2f98f26-05bc-4267-81a9-0bd85088772c.png",
+            "logo": "shopify://shop_images/Horsemen_new_logo-01.png",
             "show_text": false,
-            "rich_text": "<h2><a href=\"https://wearehorsemen.com/\" title=\"https://wearehorsemen.com/\">Horsemen</a></h2>",
-            "show_text_background": false
+            "rich_text": "<p>Brand Name</p>"
           }
         },
-        "logo_nyBJQE": {
+        "logo_amD7ge": {
           "type": "logo",
           "settings": {
             "show_image": true,
-            "logo": "shopify://shop_images/Logo_Text-02_df801956-0f40-494b-9f55-4070de804b2f.png",
+            "logo": "shopify://shop_images/Studio_Pillars_DP.png",
             "show_text": false,
-            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/all\" title=\"https://www.thesunnah.store/collections/all\">Studio Pillars</a></h2>",
-            "show_text_background": false
+            "rich_text": "<p>Brand Name</p>"
           }
         },
         "logo_JxXrMh": {
           "type": "logo",
           "settings": {
             "show_image": true,
-            "logo": "shopify://shop_images/Logo_Text-04.png",
+            "logo": "shopify://shop_images/Sunnah_Academy_Logo.png",
             "show_text": false,
-            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/books\" title=\"https://www.thesunnah.store/collections/books\">Sunnah Academy</a></h2>",
-            "show_text_background": false
+            "rich_text": "<p>Brand Name</p>"
           }
         },
         "logo_w7zfR6": {
           "type": "logo",
           "settings": {
             "show_image": true,
-            "logo": "shopify://shop_images/Logo_Text-03_dea1f5a9-1de1-471d-8ad5-afcabf22b186.png",
-            "show_text": false,
-            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/hijab\" title=\"https://www.thesunnah.store/collections/hijab\">Qloset</a></h2>",
-            "show_text_background": false
-          }
-        },
-        "logo_N4VHRb": {
-          "type": "logo",
-          "settings": {
-            "show_image": false,
-            "show_text": true,
-            "rich_text": "<h2><a href=\"https://thesunnahstore.co.uk/\" title=\"https://thesunnahstore.co.uk/\">The Sunnah Store UK</a></h2>",
-            "show_text_background": false
-          }
-        },
-        "logo_VaiG4Y": {
-          "type": "logo",
-          "disabled": true,
-          "settings": {
-            "show_image": false,
-            "logo": "shopify://shop_images/Horsemen_new_logo-01.png",
-            "show_text": true,
-            "rich_text": "<h2><a href=\"https://wearehorsemen.com/\" title=\"https://wearehorsemen.com/\">Horsemen</a></h2>",
-            "show_text_background": false
-          }
-        },
-        "logo_amD7ge": {
-          "type": "logo",
-          "disabled": true,
-          "settings": {
-            "show_image": false,
-            "logo": "shopify://shop_images/Studio_Pillars_DP.png",
-            "show_text": true,
-            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/all\" title=\"https://www.thesunnah.store/collections/all\">Studio Pillars</a></h2>",
-            "show_text_background": false
-          }
-        },
-        "logo_N3T7QD": {
-          "type": "logo",
-          "disabled": true,
-          "settings": {
-            "show_image": false,
-            "logo": "shopify://shop_images/Sunnah_Academy_Logo.png",
-            "show_text": true,
-            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/books\" title=\"https://www.thesunnah.store/collections/books\">Sunnah Academy</a></h2>",
-            "show_text_background": false
-          }
-        },
-        "logo_fX9V8w": {
-          "type": "logo",
-          "disabled": true,
-          "settings": {
-            "show_image": false,
             "logo": "shopify://shop_images/Clean_Elegant_Typography_Brand_Logo_1.png",
-            "show_text": true,
-            "rich_text": "<h2><a href=\"https://www.thesunnah.store/collections/hijab\" title=\"https://www.thesunnah.store/collections/hijab\">Qloset</a></h2>",
-            "show_text_background": false
+            "show_text": false,
+            "rich_text": "<p>Brand Name</p>"
+          }
+        },
+        "logo_dEWNVb": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "logo": "shopify://shop_images/Horsemen_new_logo-01.png",
+            "show_text": false,
+            "rich_text": "<p>Brand Name</p>"
+          }
+        },
+        "logo_d6TFnF": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "logo": "shopify://shop_images/Studio_Pillars_DP.png",
+            "show_text": false,
+            "rich_text": "<p>Brand Name</p>"
+          }
+        },
+        "logo_C8CQUN": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "logo": "shopify://shop_images/Sunnah_Academy_Logo.png",
+            "show_text": false,
+            "rich_text": "<p>Brand Name</p>"
+          }
+        },
+        "logo_cm7UbY": {
+          "type": "logo",
+          "settings": {
+            "show_image": true,
+            "logo": "shopify://shop_images/Clean_Elegant_Typography_Brand_Logo_1.png",
+            "show_text": false,
+            "rich_text": "<p>Brand Name</p>"
           }
         }
       },
       "block_order": [
-        "logo_FaBExY",
         "logo_T9HPXY",
-        "logo_nyBJQE",
+        "logo_amD7ge",
         "logo_JxXrMh",
         "logo_w7zfR6",
-        "logo_N4VHRb",
-        "logo_VaiG4Y",
-        "logo_amD7ge",
-        "logo_N3T7QD",
-        "logo_fX9V8w"
+        "logo_dEWNVb",
+        "logo_d6TFnF",
+        "logo_C8CQUN",
+        "logo_cm7UbY"
       ],
+      "disabled": true,
       "name": "Brand Logo Slider",
       "settings": {
-        "auto_scroll": false,
         "show_second_row": false,
         "desktop_animation_speed": 40,
         "mobile_animation_speed": 20,
