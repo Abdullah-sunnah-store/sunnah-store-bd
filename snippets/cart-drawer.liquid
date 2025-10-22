@@ -145,10 +145,6 @@
             <h5> Ma Sha Allah! </h5>
             <P> Choices full of blessings!</P> 
           </div>
-      {%- comment -%} Progress Bar {%- endcomment -%}
-      {%- if cart != empty -%}
-        {%- render 'cart-progress-bar' -%}
-      {%- endif -%}
       <cart-drawer-items
         {% if cart == empty %}
           class=" is-empty"
