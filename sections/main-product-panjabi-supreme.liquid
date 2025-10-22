@@ -1,6 +1,5 @@
 <style>
-.product .price .badge {
-  margin-bottom: 0.5rem;
+  .product .price .badge {
   margin-left: 10px;
 }
   .product-form__input {
@@ -500,8 +499,6 @@ function toggleProductDescription() {
                   </button>
                 </div>
                 {%- endif -%}
-              {%- when 'product-tabs' -%}
-              {% render 'product-tabs' %}
               {%- when 'sku' -%}
                 <p
                   class="product__sku{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}{% if product.selected_or_first_available_variant.sku.size == 0 %} visibility-hidden{% endif %}"
@@ -1824,81 +1821,6 @@ function toggleProductDescription() {
         }
       ]
     },
-    {
-  "type": "product-tabs",
-  "name": "Product Tabs",
-  "limit": 1,
-  "settings": [
-    {
-      "type": "header",
-      "content": "Tab Titles"
-    },
-    {
-      "type": "text",
-      "id": "tab_1_title",
-      "label": "Tab 1 Title",
-      "default": "DESCRIPTION"
-    },
-    {
-      "type": "text",
-      "id": "tab_2_title",
-      "label": "Tab 2 Title",
-      "default": "DETAILS"
-    },
-    {
-      "type": "text",
-      "id": "tab_3_title",
-      "label": "Tab 3 Title",
-      "default": "SPECIFICATIONS"
-    },
-    {
-      "type": "text",
-      "id": "tab_4_title",
-      "label": "Tab 4 Title",
-      "default": "DELIVERY"
-    },
-    {
-      "type": "header",
-      "content": "Default Content"
-    },
-    {
-      "type": "richtext",
-      "id": "default_description",
-      "label": "Default Description"
-    },
-    {
-      "type": "richtext",
-      "id": "default_details",
-      "label": "Default Details"
-    },
-    {
-      "type": "richtext",
-      "id": "default_specifications",
-      "label": "Default Specifications"
-    },
-    {
-      "type": "richtext",
-      "id": "default_delivery",
-      "label": "Default Delivery Info"
-    },
-    {
-      "type": "header",
-      "content": "Badge Settings"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_badge",
-      "label": "Show 'Designed in' badge",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "badge_text",
-      "label": "Badge text",
-      "default": "Designed in New York City"
-    }
-  ]
-},
     {
       "type": "custom_liquid",
       "name": "t:sections.custom-liquid.name",
