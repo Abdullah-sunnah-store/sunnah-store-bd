@@ -159,6 +159,22 @@
           "type": "favorite-button",
           "settings": {}
         },
+        "product_tabs_TPtxnJ": {
+          "type": "product-tabs",
+          "disabled": true,
+          "settings": {
+            "tab_1_title": "DESCRIPTION",
+            "tab_2_title": "DETAILS",
+            "tab_3_title": "SPECIFICATIONS",
+            "tab_4_title": "DELIVERY",
+            "default_description": "",
+            "default_details": "",
+            "default_specifications": "",
+            "default_delivery": "",
+            "show_badge": true,
+            "badge_text": "Designed in New York City"
+          }
+        },
         "description_XHwNxM": {
           "type": "description",
           "settings": {}
@@ -273,6 +289,7 @@
         "custom_property_input_faC6Bj",
         "buy_buttons_UMeeWm",
         "favorite_button_4RtPCm",
+        "product_tabs_TPtxnJ",
         "description_XHwNxM",
         "text_tBnkca",
         "product_addons_gcJUM9",
@@ -285,8 +302,8 @@
         "enable_sticky_info": true,
         "color_scheme": "",
         "media_size": "large",
-        "constrain_to_viewport": true,
-        "media_fit": "cover",
+        "constrain_to_viewport": false,
+        "media_fit": "contain",
         "gallery_layout": "thumbnail_slider",
         "media_position": "left",
         "image_zoom": "hover",
