@@ -1,0 +1,243 @@
+<!-- snippets/product-tabs.liquid -->
+
+<style>
+  .product-tabs {
+    margin-top: 2rem;
+  }
+
+  .tab-buttons {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .tab-button {
+    background: transparent;
+    border: none;
+    padding: 0.75rem 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    color: #666;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+
+  .tab-button::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #000;
+    transition: width 0.3s ease;
+  }
+
+  .tab-button:hover {
+    color: #000;
+  }
+
+  .tab-button:hover::after {
+    width: 100%;
+  }
+
+  .tab-button.active {
+    color: #000;
+  }
+
+  .tab-button.active::after {
+    width: 100%;
+  }
+
+  .tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .tab-content p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .tab-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .feature-icon {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .feature-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+</style>
+
+{%- comment -%} Get block settings {%- endcomment -%}
+{%- assign tab_1_title = block.settings.tab_1_title | default: 'DESCRIPTION' -%}
+{%- assign tab_2_title = block.settings.tab_2_title | default: 'DETAILS' -%}
+{%- assign tab_3_title = block.settings.tab_3_title | default: 'SPECIFICATIONS' -%}
+{%- assign tab_4_title = block.settings.tab_4_title | default: 'DELIVERY' -%}
+
+{%- comment -%} Check if each tab has content {%- endcomment -%}
+{%- assign has_description = false -%}
+{%- assign has_details = false -%}
+{%- assign has_specifications = false -%}
+{%- assign has_delivery = false -%}
+
+{%- if product.metafields.custom.tab_description != blank or block.settings.default_description != blank -%}
+  {%- assign has_description = true -%}
+{%- endif -%}
+
+{%- if product.metafields.custom.tab_details != blank or block.settings.default_details != blank -%}
+  {%- assign has_details = true -%}
+{%- endif -%}
+
+{%- if product.metafields.custom.tab_specifications != blank or block.settings.default_specifications != blank -%}
+  {%- assign has_specifications = true -%}
+{%- endif -%}
+
+{%- if product.metafields.custom.tab_delivery != blank or block.settings.default_delivery != blank -%}
+  {%- assign has_delivery = true -%}
+{%- endif -%}
+
+{%- comment -%} Only show tabs if at least one has content {%- endcomment -%}
+{%- if has_description or has_details or has_specifications or has_delivery -%}
+
+<div class="product-tabs">
+  <div class="tab-buttons">
+    {%- if has_description -%}
+      <button class="tab-button active" data-tab="description">{{ tab_1_title }}</button>
+    {%- endif -%}
+    
+    {%- if has_details -%}
+      <button class="tab-button{% unless has_description %} active{% endunless %}" data-tab="details">{{ tab_2_title }}</button>
+    {%- endif -%}
+    
+    {%- if has_specifications -%}
+      <button class="tab-button{% unless has_description or has_details %} active{% endunless %}" data-tab="specifications">{{ tab_3_title }}</button>
+    {%- endif -%}
+    
+    {%- if has_delivery -%}
+      <button class="tab-button{% unless has_description or has_details or has_specifications %} active{% endunless %}" data-tab="delivery">{{ tab_4_title }}</button>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} TAB 1: DESCRIPTION {%- endcomment -%}
+  {%- if has_description -%}
+    <div class="tab-content active" id="description">
+      {%- if product.metafields.custom.tab_description != blank -%}
+        {%- if product.metafields.custom.tab_description.type == 'rich_text_field' -%}
+          {{ product.metafields.custom.tab_description | metafield_tag }}
+        {%- else -%}
+          {{ product.metafields.custom.tab_description }}
+        {%- endif -%}
+      {%- elsif block.settings.default_description != blank -%}
+        {{ block.settings.default_description }}
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} TAB 2: DETAILS {%- endcomment -%}
+  {%- if has_details -%}
+    <div class="tab-content{% unless has_description %} active{% endunless %}" id="details">
+      {%- if product.metafields.custom.tab_details != blank -%}
+        {%- if product.metafields.custom.tab_details.type == 'rich_text_field' -%}
+          {{ product.metafields.custom.tab_details | metafield_tag }}
+        {%- else -%}
+          {{ product.metafields.custom.tab_details }}
+        {%- endif -%}
+      {%- elsif block.settings.default_details != blank -%}
+        {{ block.settings.default_details }}
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} TAB 3: SPECIFICATIONS {%- endcomment -%}
+  {%- if has_specifications -%}
+    <div class="tab-content{% unless has_description or has_details %} active{% endunless %}" id="specifications">
+      {%- if product.metafields.custom.tab_specifications != blank -%}
+        {%- if product.metafields.custom.tab_specifications.type == 'rich_text_field' -%}
+          {{ product.metafields.custom.tab_specifications | metafield_tag }}
+        {%- else -%}
+          {{ product.metafields.custom.tab_specifications }}
+        {%- endif -%}
+      {%- elsif block.settings.default_specifications != blank -%}
+        {{ block.settings.default_specifications }}
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} TAB 4: DELIVERY {%- endcomment -%}
+  {%- if has_delivery -%}
+    <div class="tab-content{% unless has_description or has_details or has_specifications %} active{% endunless %}" id="delivery">
+      {%- if product.metafields.custom.tab_delivery != blank -%}
+        {%- if product.metafields.custom.tab_delivery.type == 'rich_text_field' -%}
+          {{ product.metafields.custom.tab_delivery | metafield_tag }}
+        {%- else -%}
+          {{ product.metafields.custom.tab_delivery }}
+        {%- endif -%}
+      {%- elsif block.settings.default_delivery != blank -%}
+        {{ block.settings.default_delivery }}
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- if block.settings.show_badge -%}
+    <div class="feature-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+      {{ block.settings.badge_text | default: 'Designed in New York City' }}
+    </div>
+  {%- endif -%}
+</div>
+
+<script>
+  (function() {
+    const tabButtons = document.querySelectorAll('.product-tabs .tab-button');
+    const tabContents = document.querySelectorAll('.product-tabs .tab-content');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const targetTab = this.getAttribute('data-tab');
+
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+
+        this.classList.add('active');
+        const targetContent = document.getElementById(targetTab);
+        if (targetContent) {
+          targetContent.classList.add('active');
+        }
+      });
+    });
+  })();
+</script>
+
+{%- endif -%}
