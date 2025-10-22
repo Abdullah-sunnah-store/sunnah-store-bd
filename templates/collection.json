@@ -32,8 +32,8 @@
         "text_alignment": "center",
         "color_scheme": "background-1",
         "text_color": "#ffffff",
-        "show_overlay": false,
-        "overlay_opacity": 0
+        "show_overlay": true,
+        "overlay_opacity": 40
       }
     },
     "product-grid": {
