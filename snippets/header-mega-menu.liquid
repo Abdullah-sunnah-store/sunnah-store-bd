@@ -11,6 +11,18 @@
     font-weight: 600;
     margin-top: 20px;
 }
+
+  /* Style for 60% OFF menu item with image */
+  #HeaderMenu-60-off .menu-item-image {
+    display: inline-block;
+    height: 20px;
+    width: auto;
+    vertical-align: middle;
+  }
+  
+  #HeaderMenu-60-off span {
+    display: none;
+  }
 </style>
 
 
@@ -33,6 +45,9 @@
                 class="header__menu-item list-menu__item link focus-inset"
                  onclick="window.location.href='{{ link.url }}'" 
               >
+                {%- if link.handle == '60-off' -%}
+                  <img src="https://cdn.shopify.com/s/files/1/0737/6525/7459/files/up-60-prevhjkhliew.png?v=1761566601" alt="60% OFF" class="menu-item-image">
+                {%- endif -%}
                 <span
                   {%- if link.child_active %}
                     class="header__active-menu-item"
@@ -96,6 +111,9 @@
               aria-current="page"
             {% endif %}
           >
+            {%- if link.handle == '60-off' -%}
+              <img src="https://cdn.shopify.com/s/files/1/0737/6525/7459/files/up-60-prevhjkhliew.png?v=1761566601" alt="60% OFF" class="menu-item-image">
+            {%- endif -%}
             <span
               {%- if link.current %}
                 class="header__active-menu-item"
