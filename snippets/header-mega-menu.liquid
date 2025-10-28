@@ -18,10 +18,23 @@
     height: 20px;
     width: auto;
     vertical-align: middle;
+    animation: blinkZoom 1.5s ease-in-out infinite;
   }
   
   #HeaderMenu-60-off span {
     display: none;
+  }
+
+  /* Blinking and zoom animation */
+  @keyframes blinkZoom {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.3;
+      transform: scale(1.15);
+    }
   }
 </style>
 
