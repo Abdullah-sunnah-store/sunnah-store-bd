@@ -251,29 +251,32 @@
         <div id="giftBoxGrid" class="product-grid">
           {% assign gift_box_collection = collections['gift-box'] %}
           {% for product in gift_box_collection.products %}
-            {% assign gift_price = product.price | divided_by: 100.0 | round %}
-            <div class="product-card"
-               data-id="{{ product.variants.first.id }}"
-               data-title="{{ product.title | escape }}"
-               data-price="{{ gift_price }}"
-               data-collection="gift-box">
-      
-              <img src="{{ product.featured_image | img_url: '300x' }}" alt="{{ product.title }}">
-              <p class="product-title">{{ product.title }}</p>
-              <p class="product-price">৳{{ gift_price }}</p>
-              <button class="add-to-box-btn"
-                data-id="{{ product.variants.first.id }}"
-                data-title="{{ product.title | escape }}"
-                data-price="{{ gift_price }}"
-                data-image="{{ product.featured_image | img_url: '200x' }}">
-                Add +
-              </button>
-              <div class="cus-quantity-control" style="display: none;">
-              <button class="cus-qty-btn cus-decrease" data-id="${product.id}">-</button>
-              <span class="cus-qty">1</span>
-              <button class="cus-qty-btn cus-increase" data-id="${product.id}">Add +</button>
+            {% if product.available %}
+              {% assign gift_price = product.price | divided_by: 100.0 | round %}
+              <div class="product-card"
+                 data-id="{{ product.variants.first.id }}"
+                 data-title="{{ product.title | escape }}"
+                 data-price="{{ gift_price }}"
+                 data-collection="gift-box"
+                 data-available="{{ product.available }}">
+        
+                <img src="{{ product.featured_image | img_url: '300x' }}" alt="{{ product.title }}">
+                <p class="product-title">{{ product.title }}</p>
+                <p class="product-price">৳{{ gift_price }}</p>
+                <button class="add-to-box-btn"
+                  data-id="{{ product.variants.first.id }}"
+                  data-title="{{ product.title | escape }}"
+                  data-price="{{ gift_price }}"
+                  data-image="{{ product.featured_image | img_url: '200x' }}">
+                  Add +
+                </button>
+                <div class="cus-quantity-control" style="display: none;">
+                <button class="cus-qty-btn cus-decrease" data-id="${product.id}">-</button>
+                <span class="cus-qty">1</span>
+                <button class="cus-qty-btn cus-increase" data-id="${product.id}">Add +</button>
+                </div>
               </div>
-            </div>
+            {% endif %}
           {% endfor %}
         </div>
       </div>
