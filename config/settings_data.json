@@ -208,6 +208,11 @@
         "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/klaviyo-onsite-embed/2632fe16-c075-4321-a88b-50b567f42507",
         "disabled": false,
         "settings": {}
+      },
+      "7385302900728337613": {
+        "type": "shopify://apps/depo/blocks/app-embed/fa2b6a7a-29ea-4193-bcc4-3ecc583efe2e",
+        "disabled": false,
+        "settings": {}
       }
     },
     "color_schemes": {
