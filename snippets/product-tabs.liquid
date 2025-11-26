@@ -6,12 +6,16 @@
   }
 
   .tab-buttons {
-    display: flex;
-    gap: 2rem;
-    margin-bottom: 2rem;
-    overflow: hidden;
-    overflow-x: scroll;
-  }
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  overflow-x: scroll;
+  scrollbar-width: none; /* Firefox */
+}
+
+.tab-buttons::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
 
   .tab-button {
     background: transparent;
