@@ -166,10 +166,10 @@
             "tab_2_title": "DETAILS",
             "tab_3_title": "SPECIFICATIONS",
             "tab_4_title": "HIGHLIGHTS",
-            "default_description": "",
-            "default_details": "",
-            "default_specifications": "",
-            "default_delivery": "",
+            "default_description": "{{ product.metafields.custom.tab_description | metafield_tag }}",
+            "default_details": "{{ product.metafields.custom.tab_details | metafield_tag }}",
+            "default_specifications": "{{ product.metafields.custom.tab_specifications | metafield_tag }}",
+            "default_delivery": "{{ product.metafields.custom.tab_delivery | metafield_tag }}",
             "show_badge": true,
             "badge_text": "Designed in New York City"
           }
