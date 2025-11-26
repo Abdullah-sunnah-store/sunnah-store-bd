@@ -99,12 +99,14 @@
 {%- comment -%} Get block settings {%- endcomment -%}
 {%- assign tab_1_title = block.settings.tab_1_title | default: 'DESCRIPTION' -%}
 {%- assign tab_2_title = block.settings.tab_2_title | default: 'DETAILS' -%}
+{%- assign tab_5_title = block.settings.tab_5_title | default: 'ABOUT' -%}
 {%- assign tab_3_title = block.settings.tab_3_title | default: 'SPECIFICATIONS' -%}
 {%- assign tab_4_title = block.settings.tab_4_title | default: 'HIGHLIGHTS' -%}
 
 {%- comment -%} Check if each tab has content {%- endcomment -%}
 {%- assign has_description = false -%}
 {%- assign has_details = false -%}
+{%- assign has_about = false -%}
 {%- assign has_specifications = false -%}
 {%- assign has_delivery = false -%}
 
@@ -114,6 +116,10 @@
 
 {%- if product.metafields.custom.tab_details != blank or block.settings.default_details != blank -%}
   {%- assign has_details = true -%}
+{%- endif -%}
+
+{%- if product.metafields.custom.tab_about != blank or block.settings.default_about != blank -%}
+  {%- assign has_about = true -%}
 {%- endif -%}
 
 {%- if product.metafields.custom.tab_specifications != blank or block.settings.default_specifications != blank -%}
@@ -136,7 +142,11 @@
     {%- if has_details -%}
       <button class="tab-button{% unless has_description %} active{% endunless %}" data-tab="details">{{ tab_2_title }}</button>
     {%- endif -%}
-    
+
+    {%- if has_details -%}
+      <button class="tab-button{% unless has_description %} active{% endunless %}" data-tab="about">{{ tab_5_title }}</button>
+    {%- endif -%}
+
     {%- if has_specifications -%}
       <button class="tab-button{% unless has_description or has_details %} active{% endunless %}" data-tab="specifications">{{ tab_3_title }}</button>
     {%- endif -%}
@@ -176,9 +186,24 @@
     </div>
   {%- endif -%}
 
+{%- comment -%} TAB 5: ABOUT {%- endcomment -%}
+  {%- if has_about -%}
+    <div class="tab-content{% unless has_description %} active{% endunless %}" id="about">
+      {%- if product.metafields.custom.tab_about != blank -%}
+        {%- if product.metafields.custom.tab_about.type == 'rich_text_field' -%}
+          {{ product.metafields.custom.tab_about | metafield_tag }}
+        {%- else -%}
+          {{ product.metafields.custom.tab_about }}
+        {%- endif -%}
+      {%- elsif block.settings.default_about != blank -%}
+        {{ block.settings.default_about }}
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
   {%- comment -%} TAB 3: SPECIFICATIONS {%- endcomment -%}
   {%- if has_specifications -%}
-    <div class="tab-content{% unless has_description or has_details %} active{% endunless %}" id="specifications">
+    <div class="tab-content{% unless has_description or has_details or has_about %} active{% endunless %}" id="specifications">
       {%- if product.metafields.custom.tab_specifications != blank -%}
         {%- if product.metafields.custom.tab_specifications.type == 'rich_text_field' -%}
           {{ product.metafields.custom.tab_specifications | metafield_tag }}
@@ -193,7 +218,7 @@
 
   {%- comment -%} TAB 4: DELIVERY {%- endcomment -%}
   {%- if has_delivery -%}
-    <div class="tab-content{% unless has_description or has_details or has_specifications %} active{% endunless %}" id="delivery">
+    <div class="tab-content{% unless has_description or has_details or has_about or has_specifications %} active{% endunless %}" id="delivery">
       {%- if product.metafields.custom.tab_delivery != blank -%}
         {%- if product.metafields.custom.tab_delivery.type == 'rich_text_field' -%}
           {{ product.metafields.custom.tab_delivery | metafield_tag }}
