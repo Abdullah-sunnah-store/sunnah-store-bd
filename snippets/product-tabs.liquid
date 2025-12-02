@@ -194,7 +194,7 @@
 
 {%- comment -%} TAB 5: ABOUT {%- endcomment -%}
   {%- if has_about -%}
-    <div class="tab-content{% unless has_description %} active{% endunless %}" id="about">
+    <div class="tab-content{% unless has_description or has_details %} active{% endunless %}" id="about">
       {%- if product.metafields.custom.tab_about != blank -%}
         {%- if product.metafields.custom.tab_about.type == 'rich_text_field' -%}
           {{ product.metafields.custom.tab_about | metafield_tag }}
