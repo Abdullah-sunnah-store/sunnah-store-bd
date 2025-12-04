@@ -51,7 +51,7 @@
             <a href="{{ article.url }}" class="cus-blog-card-link">
               <div class="cus-blog-card-image">
                 {% if article.image %}
-                  <img src="{{ article.image | img_url: '400x250' }}" alt="{{ article.title }}" loading="lazy">
+                  <img src="{{ article.image | img_url: 'master' }}" alt="{{ article.title }}" loading="lazy">
                 {% else %}
                   <div class="cus-blog-placeholder-image">
                     {% case article.tags.first %}
