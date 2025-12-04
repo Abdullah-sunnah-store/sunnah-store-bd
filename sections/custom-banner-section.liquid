@@ -228,7 +228,7 @@
                {% unless section.settings.video_controls == false %}controls{% endunless %}
                playsinline
                preload="metadata"
-               {% if section.settings.video_poster %}poster="{{ section.settings.video_poster | img_url: '1200x' }}"{% endif %}>
+               {% if section.settings.video_poster %}poster="{{ section.settings.video_poster | img_url: 'master' }}"{% endif %}>
           
           {% comment %} MP4 source - Primary format for Firefox {% endcomment %}
           <source src="{{ section.settings.invitation_video }}" type="video/mp4">
