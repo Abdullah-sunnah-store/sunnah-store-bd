@@ -250,7 +250,7 @@
       {% elsif section.settings.media_type == 'image' and section.settings.invitation_image %}
         
         {% comment %} Desktop Image {% endcomment %}
-        <img src="{{ section.settings.invitation_image | img_url: '1200x' }}" 
+        <img src="{{ section.settings.invitation_image | img_url: 'master' }}" 
              alt="{{ section.settings.image_alt | default: 'Nikah Wedding Invitation' }}"
              class="custom-img-invitation-media custom-img-invitation-media-desktop"
              loading="lazy"
@@ -258,13 +258,13 @@
         
         {% comment %} Mobile Image (if provided, otherwise fallback to desktop image) {% endcomment %}
         {% if section.settings.invitation_image_mobile %}
-          <img src="{{ section.settings.invitation_image_mobile | img_url: '800x' }}" 
+          <img src="{{ section.settings.invitation_image_mobile | img_url: 'master' }}" 
                alt="{{ section.settings.image_alt_mobile | default: section.settings.image_alt | default: 'Nikah Wedding Invitation - Mobile' }}"
                class="custom-img-invitation-media custom-img-invitation-media-mobile"
                loading="lazy"
                onerror="this.style.display='none';">
         {% else %}
-          <img src="{{ section.settings.invitation_image | img_url: '800x' }}" 
+          <img src="{{ section.settings.invitation_image | img_url: 'master' }}" 
                alt="{{ section.settings.image_alt | default: 'Nikah Wedding Invitation' }}"
                class="custom-img-invitation-media custom-img-invitation-media-mobile"
                loading="lazy"
