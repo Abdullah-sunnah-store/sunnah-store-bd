@@ -39,7 +39,7 @@
           
           <div class="new-sports-category__image-wrapper">
             {% if block.settings.category_image != blank %}
-              {{ block.settings.category_image | image_url: width: 600 | image_tag: 
+              {{ block.settings.category_image | image_url: 'master' | image_tag: 
                  loading: 'lazy',
                  class: 'new-sports-category__image',
                  alt: block.settings.category_title }}
