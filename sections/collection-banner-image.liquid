@@ -236,11 +236,11 @@
   <div class="banner-media">
     {% if banner_media.type == 'image' or banner_media.media_type == 'image' %}
       <img 
-        src="{{ banner_media | image_url: width: 2000 }}"
-        srcset="{{ banner_media | image_url: width: 750 }} 750w,
-                {{ banner_media | image_url: width: 1100 }} 1100w,
-                {{ banner_media | image_url: width: 1500 }} 1500w,
-                {{ banner_media | image_url: width: 2000 }} 2000w"
+        src="{{ banner_media | img_url: 'master' }}"
+        srcset="{{ banner_media | img_url: 'master' }} 750w,
+                {{ banner_media | img_url: 'master' }} 1100w,
+                {{ banner_media | img_url: 'master' }} 1500w,
+                {{ banner_media | img_url: 'master' }} 2000w"
         sizes="100vw"
         alt="{{ banner_media.alt | default: display_title | escape }}"
         class="banner-image"
@@ -259,11 +259,11 @@
     {% else %}
       {%- comment -%} Fallback for direct image URL {%- endcomment -%}
       <img 
-        src="{{ banner_media | image_url: width: 2000 }}"
-        srcset="{{ banner_media | image_url: width: 750 }} 750w,
-                {{ banner_media | image_url: width: 1100 }} 1100w,
-                {{ banner_media | image_url: width: 1500 }} 1500w,
-                {{ banner_media | image_url: width: 2000 }} 2000w"
+        src="{{ banner_media | img_url: 'master' }}"
+        srcset="{{ banner_media | img_url: 'master' }} 750w,
+                {{ banner_media | img_url: 'master' }} 1100w,
+                {{ banner_media | img_url: 'master' }} 1500w,
+                {{ banner_media | img_url: 'master' }} 2000w"
         sizes="100vw"
         alt="{{ display_title | escape }}"
         class="banner-image"
