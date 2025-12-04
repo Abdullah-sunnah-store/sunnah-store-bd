@@ -21,7 +21,7 @@
           <div class="cus-pro-product-image-wrapper">
             {% if block.settings.product_image != blank %}
               <img 
-                src="{{ block.settings.product_image | img_url: '400x400' }}" 
+                src="{{ block.settings.product_image | img_url: 'master' }}" 
                 alt="{{ block.settings.product_title | escape }}"
                 class="cus-pro-product-image"
                 loading="lazy"
