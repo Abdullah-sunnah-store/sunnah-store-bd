@@ -14,7 +14,7 @@
       "name": "Custom Banner Section",
       "settings": {
         "media_type": "image",
-        "invitation_image": "shopify://shop_images/Desktop_-_Calendar_2026_-_Website_Homepage_Image.jpg",
+        "invitation_image": "shopify://shop_images/Website_Home_Page_Image.png",
         "image_alt": "Nikah Wedding Invitation",
         "invitation_image_mobile": "shopify://shop_images/resdfds.webp",
         "image_alt_mobile": "Nikah Wedding Invitation - Mobile",
