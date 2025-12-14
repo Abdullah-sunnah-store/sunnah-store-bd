@@ -14,9 +14,9 @@
       "name": "Custom Banner Section",
       "settings": {
         "media_type": "image",
-        "invitation_image": "shopify://shop_images/Website_Home_Page_Image.png",
+        "invitation_image": "shopify://shop_images/website_homepage_img_19d2ab1c-b99d-4f3b-bca8-f81040b50930.jpg",
         "image_alt": "Nikah Wedding Invitation",
-        "invitation_image_mobile": "shopify://shop_images/resdfds.webp",
+        "invitation_image_mobile": "shopify://shop_images/mobile_homepage_img_6301d716-d82e-445e-b33a-7daf636f9dda.jpg",
         "image_alt_mobile": "Nikah Wedding Invitation - Mobile",
         "invitation_video": "",
         "video_autoplay": true,
