@@ -148,6 +148,13 @@
             "help_text": ""
           }
         },
+        "text_xTfQnP": {
+          "type": "text",
+          "settings": {
+            "text": "ফ্রেম অর্ডার করতে হলে <strong>৫০% অগ্রিম পেমেন্ট বাধ্যতামূলক</strong>",
+            "text_style": "body"
+          }
+        },
         "buy_buttons_UMeeWm": {
           "type": "buy_buttons",
           "settings": {
@@ -289,6 +296,7 @@
         "variant_picker_9qUHTK",
         "quantity_selector_hzhn9U",
         "custom_property_input_faC6Bj",
+        "text_xTfQnP",
         "buy_buttons_UMeeWm",
         "favorite_button_4RtPCm",
         "product_tabs_TPtxnJ",
