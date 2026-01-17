@@ -187,6 +187,36 @@
             "category_link": "shopify://collections/calligraphy-frames"
           }
         },
+        "category_Y3mLb3": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/DSC8318.jpg",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Hijab",
+            "category_link": "shopify://collections/hijab"
+          }
+        },
+        "category_Pi9t9J": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/Combo_Flat_Lay.jpg",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Deen Calendar",
+            "category_link": "shopify://collections/cards"
+          }
+        },
+        "category_CwgHjk": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/Masala_Tea-5.jpg",
+            "category_title": "",
+            "category_subtitle": "",
+            "cta_text": "Masala Tea",
+            "category_link": "shopify://collections/foods"
+          }
+        },
         "category_TgwtdQ": {
           "type": "category",
           "settings": {
@@ -207,16 +237,6 @@
             "category_link": "shopify://collections/spray-perfume"
           }
         },
-        "category_Pi9t9J": {
-          "type": "category",
-          "settings": {
-            "category_image": "shopify://shop_images/ad478f08-Beard-Balm-Category-3.webp",
-            "category_title": "",
-            "category_subtitle": "",
-            "cta_text": "Beard Balm",
-            "category_link": "shopify://collections/beard-balm"
-          }
-        },
         "category_Q9QKY8": {
           "type": "category",
           "settings": {
@@ -225,26 +245,6 @@
             "category_subtitle": "",
             "cta_text": "Rabbana Dua",
             "category_link": "shopify://collections/dua-cards"
-          }
-        },
-        "category_Y3mLb3": {
-          "type": "category",
-          "settings": {
-            "category_image": "shopify://shop_images/480768501_961288146091359_2977023914217183221_n.jpg",
-            "category_title": "",
-            "category_subtitle": "",
-            "cta_text": "Hijab",
-            "category_link": "shopify://collections/hijab"
-          }
-        },
-        "category_CwgHjk": {
-          "type": "category",
-          "settings": {
-            "category_image": "shopify://shop_images/Masala_Tea-5.jpg",
-            "category_title": "",
-            "category_subtitle": "",
-            "cta_text": "Masala Tea",
-            "category_link": "shopify://collections/foods"
           }
         },
         "category_dPCcEj": {
@@ -271,12 +271,12 @@
       "block_order": [
         "category_GyWfwG",
         "category_kJV6R6",
+        "category_Y3mLb3",
+        "category_Pi9t9J",
+        "category_CwgHjk",
         "category_TgwtdQ",
         "category_MDwMAE",
-        "category_Pi9t9J",
         "category_Q9QKY8",
-        "category_Y3mLb3",
-        "category_CwgHjk",
         "category_dPCcEj",
         "category_XteHxz"
       ],
