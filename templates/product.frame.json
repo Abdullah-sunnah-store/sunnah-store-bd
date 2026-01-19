@@ -324,6 +324,69 @@
         "padding_bottom": 36
       }
     },
+    "video_carousel_custom_WwKNfB": {
+      "type": "video-carousel-custom",
+      "blocks": {
+        "video_QPEQm8": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/Flashcard.mp4",
+            "product": "arabic-alphabets-flashcards"
+          }
+        },
+        "video_CG4jMG": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/Gods 100 names- 011.mp4",
+            "product": "asma-ul-husna-wooden-engraved-frame"
+          }
+        },
+        "video_MAcndY": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/Heritage Calendar 2026_With Jacket.mp4",
+            "product": "deen-calendar-guardian-edition"
+          }
+        },
+        "video_N9TGxT": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/Leather Socks Fire Test - horsemen  Final 1.0.mp4",
+            "product": "leather-socks-brown"
+          }
+        },
+        "video_W46fT7": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/Rabbana Dua Daily Reel.mp4",
+            "product": "rabbana-dua-cards"
+          }
+        },
+        "video_axpYBN": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/Ramadan Mubarak Mug  website.mp4",
+            "product": "ramadan-mubarak-calligraphy-themed-mug-v-2"
+          }
+        }
+      },
+      "block_order": [
+        "video_QPEQm8",
+        "video_CG4jMG",
+        "video_MAcndY",
+        "video_N9TGxT",
+        "video_W46fT7",
+        "video_axpYBN"
+      ],
+      "name": "Video Carousel",
+      "settings": {
+        "heading": "",
+        "enable_autoplay": true,
+        "autoplay_speed": 10,
+        "bg_color": "rgba(0,0,0,0)",
+        "use_metafields": false
+      }
+    },
     "1759899407181b982d": {
       "type": "apps",
       "blocks": {
@@ -631,6 +694,7 @@
   "order": [
     "main",
     "main_product_panjabi_supreme_LnqLLg",
+    "video_carousel_custom_WwKNfB",
     "1759899407181b982d",
     "related-products",
     "custom_review_section_PbBT43",
