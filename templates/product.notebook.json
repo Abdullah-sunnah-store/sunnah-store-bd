@@ -154,6 +154,23 @@
           "type": "favorite-button",
           "settings": {}
         },
+        "product_tabs_FraGe8": {
+          "type": "product-tabs",
+          "settings": {
+            "tab_1_title": "DESCRIPTION",
+            "tab_2_title": "DETAILS",
+            "tab_5_title": "ABOUT",
+            "tab_3_title": "SPECIFICATIONS",
+            "tab_4_title": "HIGHLIGHTS",
+            "default_description": "{{ product.metafields.custom.tab_description | metafield_tag }}",
+            "default_details": "{{ product.metafields.custom.tab_details | metafield_tag }}",
+            "default_about": "{{ product.metafields.custom.tab_about | metafield_tag }}",
+            "default_specifications": "{{ product.metafields.custom.tab_specifications | metafield_tag }}",
+            "default_delivery": "{{ product.metafields.custom.tab_delivery | metafield_tag }}",
+            "show_badge": false,
+            "badge_text": "Designed in New York City"
+          }
+        },
         "description_XHwNxM": {
           "type": "description",
           "settings": {}
@@ -269,6 +286,7 @@
         "custom_property_input_faC6Bj",
         "buy_buttons_UMeeWm",
         "favorite_button_4RtPCm",
+        "product_tabs_FraGe8",
         "description_XHwNxM",
         "text_tBnkca",
         "product_addons_gcJUM9",
