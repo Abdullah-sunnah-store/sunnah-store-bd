@@ -150,7 +150,7 @@
             </span>
           {%- endif -%}
         </div>
-        {%- if collection.title == 'Autumn Clearance Sale' and card_product.compare_at_price > card_product.price and card_product.available -%}
+        {%- if collection.title == 'Sale' and card_product.compare_at_price > card_product.price and card_product.available -%}
           {%- assign discount_amount = card_product.compare_at_price | minus: card_product.price -%}
           {%- assign discount_percentage = discount_amount | times: 100.0 | divided_by: card_product.compare_at_price | round -%}
           <div class="autumn-discount-badge">
@@ -588,7 +588,7 @@
           </span>
         {%- endif -%}
       </div>
-      {%- if collection.title == 'Autumn Clearance Sale' and card_product.compare_at_price > card_product.price and card_product.available -%}
+      {%- if collection.title == 'Sale' and card_product.compare_at_price > card_product.price and card_product.available -%}
         {%- assign discount_amount = card_product.compare_at_price | minus: card_product.price -%}
         {%- assign discount_percentage = discount_amount | times: 100.0 | divided_by: card_product.compare_at_price | round -%}
         <div class="autumn-discount-badge">
