@@ -211,7 +211,7 @@
   /* Submit Button Styling */
   .priority-clients-form__submit {
     width: 100%;
-    background:rgb(7, 7, 7);
+    background: #2c5f2d;
     color: #fff;
     border: none;
     padding: 14px 24px;
@@ -225,7 +225,7 @@
   }
 
   .priority-clients-form__submit:hover:not(:disabled) {
-    background:rgb(0, 0, 0);
+    background: #234a24;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(44, 95, 45, 0.3);
   }
@@ -275,7 +275,7 @@
   .priority-clients-success__icon {
     width: 64px;
     height: 64px;
-    background:rgb(2, 2, 2);
+    background: #27ae60;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -473,19 +473,25 @@
     submitBtn.textContent = 'Submitting...';
 
     const formData = {
-      name: document.getElementById('clientName-' + id).value,
+      first_name: document.getElementById('clientName-' + id).value,
+      last_name: '',
+      customer_name: document.getElementById('clientName-' + id).value,
+      customer_email: document.getElementById('clientEmail-' + id).value,
       email: document.getElementById('clientEmail-' + id).value,
+      customer_phone: document.getElementById('clientPhone-' + id).value,
       phone: document.getElementById('clientPhone-' + id).value,
       timestamp: new Date().toISOString(),
-      date: new Date().toLocaleDateString(),
-      time: new Date().toLocaleTimeString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      dateSubmitted: new Date().toLocaleDateString(),
+      timeSubmitted: new Date().toLocaleTimeString(),
       source: 'Priority Clients Form',
       url: window.location.href
     };
 
     try {
       // Updated webhook URL - replace with your actual webhook
-      const webhookUrl = 'https://hook.eu1.make.com/587xwvjndenjock1o32ux66aofry7dvd';
+      const webhookUrl = 'https://hook.eu2.make.com/YOUR_WEBHOOK_ID_HERE';
       
       console.log('Submitting to webhook:', formData);
       
