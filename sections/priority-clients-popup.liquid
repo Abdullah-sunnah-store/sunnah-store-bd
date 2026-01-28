@@ -1,0 +1,582 @@
+{%- style -%}
+  /* Hide Country Dropdown */
+  .country-dropdown {
+    display: none !important;
+  }
+
+  /* Blinking and zoom animation */
+  @keyframes blinkZoom {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.3;
+      transform: scale(1.15);
+    }
+  }
+
+  /* Header Button Styles */
+  .header-priority-button {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 0px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 15px;
+  }
+
+  .header-priority-button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .header-priority-button svg {
+    width: 16px;
+    height: 16px;
+    display: none;
+  }
+
+  .header-priority-button .button-icon-img {
+    width: 100px;
+    height: 35px;
+    object-fit: contain;
+    display: block;
+    animation: blinkZoom 1.5s ease-in-out infinite;
+  }
+
+  @media screen and (max-width: 749px) {
+    .header-priority-button {
+      padding: 0px;
+      font-size: 12px;
+      margin-left: 10px;
+      background: transparent;
+    }
+    
+    .header-priority-button:hover {
+      background: transparent;
+      opacity: 0.8;
+    }
+    
+    .header-priority-button .button-icon-img {
+      width: 60px;
+      height: 35px;
+      animation: blinkZoom 1.5s ease-in-out infinite;
+    }
+    
+    /* Hide text on mobile, show only icon */
+    .header-priority-button .button-text {
+      display: none;
+    }
+  }
+
+  /* Modal Overlay */
+  .priority-clients-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .priority-clients-modal.is-open {
+    display: flex !important;
+    opacity: 1 !important;
+  }
+
+  /* Modal Content */
+  .priority-clients-modal__content {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+  }
+
+  .priority-clients-modal.is-open .priority-clients-modal__content {
+    transform: scale(1);
+  }
+
+  /* Modal Header */
+  .priority-clients-modal__header {
+    padding: 30px 30px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    position: relative;
+  }
+
+  .priority-clients-modal__close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #999;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+  }
+
+  .priority-clients-modal__close:hover {
+    color: #333;
+  }
+
+  .priority-clients-modal__title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+  }
+
+  .priority-clients-modal__subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+  }
+
+  /* Modal Body */
+  .priority-clients-modal__body {
+    padding: 30px;
+  }
+
+  .priority-clients-form__group {
+    margin-bottom: 20px;
+  }
+
+  .priority-clients-form__label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+  }
+
+  .priority-clients-form__label span {
+    color: #e74c3c;
+  }
+
+  .priority-clients-form__input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+  }
+
+  .priority-clients-form__input:focus {
+    outline: none;
+    border-color: {{ section.settings.button_color }};
+  }
+
+  .priority-clients-form__input.error {
+    border-color: #e74c3c;
+  }
+
+  .priority-clients-form__error {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+  }
+
+  .priority-clients-form__error.is-visible {
+    display: block;
+  }
+
+  .priority-clients-form__submit {
+    width: 100%;
+    background: {{ section.settings.button_color }};
+    color: #fff;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+  }
+
+  .priority-clients-form__submit:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .priority-clients-form__submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Success Message */
+  .priority-clients-success {
+    display: none;
+    text-align: center;
+    padding: 40px 30px;
+  }
+
+  .priority-clients-success.is-visible {
+    display: block;
+  }
+
+  .priority-clients-success__icon {
+    width: 64px;
+    height: 64px;
+    background: #27ae60;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  .priority-clients-success__icon svg {
+    width: 32px;
+    height: 32px;
+    stroke: #fff;
+    stroke-width: 3;
+  }
+
+  .priority-clients-success__title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 12px 0;
+  }
+
+  .priority-clients-success__message {
+    font-size: 15px;
+    color: #666;
+    margin: 0;
+  }
+{%- endstyle -%}
+
+<!-- Header Button (Add this to your header section where you want it to appear) -->
+<button type="button" class="header-priority-button" onclick="window.openPriorityModal()">
+  {% if section.settings.button_icon != blank %}
+    <img src="{{ section.settings.button_icon | img_url: '100x' }}" alt="Priority Client Icon" class="button-icon-img">
+  {% endif %}
+  <span class="button-text">{{ section.settings.button_text }}</span>
+</button>
+
+<!-- Modal -->
+<div class="priority-clients-modal" id="priorityClientsModal-{{ section.id }}">
+  <div class="priority-clients-modal__content">
+    <div class="priority-clients-modal__header">
+      <button type="button" class="priority-clients-modal__close" onclick="window.closePriorityModal()">&times;</button>
+      <h2 class="priority-clients-modal__title">{{ section.settings.modal_title }}</h2>
+      <p class="priority-clients-modal__subtitle">{{ section.settings.modal_subtitle }}</p>
+    </div>
+
+    <!-- Form -->
+    <div class="priority-clients-modal__body" id="formContainer-{{ section.id }}">
+      <form id="priorityClientsForm-{{ section.id }}" class="priority-clients-form" onsubmit="window.handlePriorityFormSubmit(event, '{{ section.id }}')">
+        <div class="priority-clients-form__group">
+          <label class="priority-clients-form__label" for="clientName-{{ section.id }}">
+            Name <span>*</span>
+          </label>
+          <input
+            type="text"
+            id="clientName-{{ section.id }}"
+            name="name"
+            class="priority-clients-form__input"
+            placeholder="Enter your full name"
+            required
+          >
+          <div class="priority-clients-form__error" id="nameError-{{ section.id }}">Please enter your name</div>
+        </div>
+
+        <div class="priority-clients-form__group">
+          <label class="priority-clients-form__label" for="clientPhone-{{ section.id }}">
+            Phone Number <span>*</span>
+          </label>
+          <input
+            type="tel"
+            id="clientPhone-{{ section.id }}"
+            name="phone"
+            class="priority-clients-form__input"
+            placeholder="Enter your phone number"
+            required
+          >
+          <div class="priority-clients-form__error" id="phoneError-{{ section.id }}">Please enter a valid phone number</div>
+        </div>
+
+        <div class="priority-clients-form__group">
+          <label class="priority-clients-form__label" for="clientEmail-{{ section.id }}">
+            Email <span>*</span>
+          </label>
+          <input
+            type="email"
+            id="clientEmail-{{ section.id }}"
+            name="email"
+            class="priority-clients-form__input"
+            placeholder="Enter your email address"
+            required
+          >
+          <div class="priority-clients-form__error" id="emailError-{{ section.id }}">Please enter a valid email</div>
+        </div>
+
+        <button type="submit" class="priority-clients-form__submit">
+          Submit Request
+        </button>
+      </form>
+    </div>
+
+    <!-- Success Message -->
+    <div class="priority-clients-success" id="successMessage-{{ section.id }}">
+      <div class="priority-clients-success__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <h3 class="priority-clients-success__title">Thank You!</h3>
+      <p class="priority-clients-success__message">We've received your request. Our team will contact you shortly.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  
+  const sectionId = '{{ section.id }}';
+  
+  // Global functions attached to window object
+  window.openPriorityModal = function() {
+    console.log('Opening modal...');
+    const modal = document.getElementById('priorityClientsModal-' + sectionId);
+    if (modal) {
+      modal.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+      console.log('Modal opened successfully');
+    } else {
+      console.error('Modal element not found');
+    }
+  };
+
+  window.closePriorityModal = function() {
+    console.log('Closing modal...');
+    const modal = document.getElementById('priorityClientsModal-' + sectionId);
+    const formContainer = document.getElementById('formContainer-' + sectionId);
+    const successMessage = document.getElementById('successMessage-' + sectionId);
+    const form = document.getElementById('priorityClientsForm-' + sectionId);
+    
+    if (modal) {
+      modal.classList.remove('is-open');
+      document.body.style.overflow = '';
+      
+      setTimeout(function() {
+        if (formContainer) formContainer.style.display = 'block';
+        if (successMessage) successMessage.classList.remove('is-visible');
+        if (form) form.reset();
+        clearErrors();
+      }, 300);
+    }
+  };
+
+  window.handlePriorityFormSubmit = async function(e, id) {
+    e.preventDefault();
+    console.log('Form submitted');
+
+    if (!validateForm(id)) {
+      return;
+    }
+
+    const form = document.getElementById('priorityClientsForm-' + id);
+    const submitBtn = form.querySelector('.priority-clients-form__submit');
+    const formContainer = document.getElementById('formContainer-' + id);
+    const successMessage = document.getElementById('successMessage-' + id);
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+
+    const formData = {
+      customer_name: document.getElementById('clientName-' + id).value,
+      customer_email: document.getElementById('clientEmail-' + id).value,
+      customer_phone: document.getElementById('clientPhone-' + id).value,
+      timestamp: new Date().toISOString(),
+      dateSubmitted: new Date().toLocaleDateString(),
+      timeSubmitted: new Date().toLocaleTimeString(),
+      source: 'Priority Clients Form',
+      pageUrl: window.location.href,
+      client_type: 'priority',
+      status: 'new',
+      priority: 'high'
+    };
+
+    try {
+      const makeWebhookUrl = 'https://hook.eu1.make.com/587xwvjndenjock1o32ux66aofry7dvd';
+      
+      const response = await fetch(makeWebhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Webhook failed');
+      }
+
+      console.log('Form submitted successfully:', formData);
+
+      formContainer.style.display = 'none';
+      successMessage.classList.add('is-visible');
+
+      setTimeout(function() {
+        window.closePriorityModal();
+      }, 3000);
+
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert('There was an error submitting your request. Please try again.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Request';
+    }
+  };
+
+  function validateForm(id) {
+    let isValid = true;
+    clearErrors();
+
+    const name = document.getElementById('clientName-' + id);
+    const phone = document.getElementById('clientPhone-' + id);
+    const email = document.getElementById('clientEmail-' + id);
+
+    if (!name.value.trim()) {
+      showError('nameError-' + id, name);
+      isValid = false;
+    }
+
+    if (!phone.value.trim()) {
+      showError('phoneError-' + id, phone);
+      isValid = false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.value.trim() || !emailRegex.test(email.value)) {
+      showError('emailError-' + id, email);
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  function showError(errorId, input) {
+    const errorEl = document.getElementById(errorId);
+    if (errorEl) errorEl.classList.add('is-visible');
+    if (input) input.classList.add('error');
+  }
+
+  function clearErrors() {
+    document.querySelectorAll('.priority-clients-form__error').forEach(function(el) {
+      el.classList.remove('is-visible');
+    });
+    document.querySelectorAll('.priority-clients-form__input').forEach(function(el) {
+      el.classList.remove('error');
+    });
+  }
+
+  // Initialize on load
+  function init() {
+    console.log('Priority Clients Modal initialized for section:', sectionId);
+    
+    const modal = document.getElementById('priorityClientsModal-' + sectionId);
+    
+    // Close on overlay click
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          window.closePriorityModal();
+        }
+      });
+    }
+
+    // Close on ESC key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && modal && modal.classList.contains('is-open')) {
+        window.closePriorityModal();
+      }
+    });
+  }
+
+  // Run init when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Priority Clients Button",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Button Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "button_icon",
+      "label": "Button Icon (Required)",
+      "info": "Upload your priority badge icon (PNG recommended)"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": " Client"
+    },
+    {
+      "type": "header",
+      "content": "Modal Content"
+    },
+    {
+      "type": "text",
+      "id": "modal_title",
+      "label": "Modal title",
+      "default": "Become a Priority Client"
+    },
+    {
+      "type": "text",
+      "id": "modal_subtitle",
+      "label": "Modal subtitle",
+      "default": "Get exclusive access to premium support and special offers"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Priority Clients Button"
+    }
+  ]
+}
+{% endschema %}
