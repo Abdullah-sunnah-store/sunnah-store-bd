@@ -170,112 +170,6 @@
   font-weight: 400;
 }
 
-/* FIXED: Priority Service Button - Prevent Flash on Load */
-.header-priority-button {
-  background: transparent;
-  color: #000;
-  border: none;
-  padding: 0;
-  margin: 0;
-  border-radius: 0;
-  font-size: 0;
-  cursor: pointer;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 15px;
-  width: 100px;
-  height: 35px;
-  min-width: 100px;
-  min-height: 35px;
-  max-width: 100px;
-  max-height: 35px;
-  flex-shrink: 0;
-}
-
-.header-priority-button:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-.header-priority-button .button-icon-img {
-  width: 100px !important;
-  height: 35px !important;
-  max-width: 100px !important;
-  max-height: 35px !important;
-  min-width: 100px !important;
-  min-height: 35px !important;
-  object-fit: contain;
-  display: block;
-  animation: blinkZoom 1.5s ease-in-out infinite;
-}
-
-.header-priority-button .button-text {
-  display: none;
-}
-
-/* Blinking animation for priority button */
-@keyframes blinkZoom {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.3;
-    transform: scale(1.15);
-  }
-}
-
-@media screen and (max-width: 749px) {
-  .country-dropdown {
-    margin-right: 0.5rem;
-  }
-  
-  .country-dropdown__trigger {
-    padding: 6px 8px;
-    font-size: 12px;
-  }
-  
-  .country-dropdown__flag {
-    width: 16px;
-    height: 12px;
-  }
-  
-  .country-dropdown__menu {
-    min-width: 180px;
-    right: 0;
-    left: auto;
-  }
-  
-  /* Hide country code text */
-  .country-dropdown__code, .country-dropdown__arrow {
-    display: none;
-  }
-  
-  /* Remove padding and borders from container */
-  .country-dropdown__trigger {
-    padding: 0;
-    border: none;
-  }
-  
-  /* Mobile priority button */
-  .header-priority-button {
-    margin-left: 10px;
-    width: 60px;
-    height: 35px;
-    min-width: 60px;
-    max-width: 60px;
-  }
-  
-  .header-priority-button .button-icon-img {
-    width: 60px !important;
-    height: 35px !important;
-    min-width: 60px !important;
-    max-width: 60px !important;
-  }
-}
-
 @media screen and (max-width: 991px){
   .header__heading-logo-wrapper{
     display: none;
@@ -307,6 +201,37 @@
         line-height: 2;
         text-transform: lowercase;
     }
+  
+  .country-dropdown {
+    margin-right: 0.5rem;
+  }
+  
+  .country-dropdown__trigger {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  
+  .country-dropdown__flag {
+    width: 16px;
+    height: 12px;
+  }
+  
+  .country-dropdown__menu {
+    min-width: 180px;
+    right: 0;
+    left: auto;
+  }
+  /* Hide country code text */
+  .country-dropdown__code, .country-dropdown__arrow {
+    display: none;
+  }
+ 
+  
+  /* Remove padding and borders from container */
+  .country-dropdown__trigger {
+    padding: 0;
+    border: none;
+  }
 }
 
  #shopify-section-{{section.id}} header.header.header--middle-left.header--mobile-center.page-width.header--has-menu.header--has-social.header--has-account{
@@ -568,21 +493,13 @@ text-underline-offset: 0.6rem
           </localization-form>
         {%- endif -%}
       </div>
-      
-      <!-- FIXED: Priority Service Button with proper sizing -->
-      <button type="button" class="header-priority-button" onclick="window.openPriorityModal()" aria-label="Priority Service">
-        <img 
-          src="https://cdn.shopify.com/s/files/1/0737/6525/7459/files/Priority_Service_Icon_2_babe2db9-7175-4501-bf1a-43d1983913c0.png?v=1769506538" 
-          alt="Priority Service" 
-          class="button-icon-img"
-          width="100"
-          height="35"
-          loading="eager"
-        >
+      <button type="button" class="header-priority-button" onclick="window.openPriorityModal()">
+        <img src="https://cdn.shopify.com/s/files/1/0737/6525/7459/files/Priority_Service_Icon_2_babe2db9-7175-4501-bf1a-43d1983913c0.png?v=1769506538" alt="Priority" class="button-icon-img">
+        <span class="button-text"> </span>
       </button>
 
       <!-- Country Dropdown -->
-      {% comment %} <div class="country-dropdown" id="country-dropdown">
+      <div class="country-dropdown" id="country-dropdown">
         <button class="country-dropdown__trigger" id="country-trigger" aria-expanded="false">
         <div class="country-dropdown__flag">
           <img src="{{ section.settings.default_flag | default: 'https://flagcdn.com/w40/bd.png' }}" alt="Country flag" id="selected-flag">
@@ -623,7 +540,7 @@ text-underline-offset: 0.6rem
           
           <!-- Add more countries as needed -->
         </div>
-      </div> {% endcomment %}
+      </div>
 
       {% render 'header-search', input_id: 'Search-In-Modal' %}
 
