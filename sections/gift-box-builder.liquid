@@ -92,9 +92,12 @@
       </div>
 
       <select class="cmb-sortOptions" id="sortOptions">
-        <option value="title-asc">Default sorting</option>
+        <option value="manual">Default (Manual Order)</option>
+        <option value="best-selling">Best Selling</option>
+        <option value="featured">Featured First</option>
         <option value="price-asc">Price low to high</option>
         <option value="price-desc">Price high to low</option>
+        <option value="title-asc">Alphabetically A-Z</option>
       </select>
     </div>
 
@@ -104,8 +107,16 @@
       <!-- Product Grid Step -->
       <div id="product-step" class="step-section">
         <h2>Choose Products</h2>
+        
+        <!-- Featured/Best Selling Section -->
+        <div id="showcase-section" class="showcase-section" style="display: none;">
+          <h3 class="showcase-title">Featured Products</h3>
+          <div id="showcaseGrid" class="product-grid showcase-grid"></div>
+        </div>
+        
         <div id="productGrid" class="product-grid">
           {% assign processed_products = '' %}
+          {% assign product_index = 0 %}
           {% comment %} Loop through selected collections only {% endcomment %}
           {% for block in section.blocks %}
             {% if block.type == 'collection' %}
@@ -115,6 +126,7 @@
                  {% if product.available %}
                    {% unless processed_products contains product.id %}
                      {% assign processed_products = processed_products | append: product.id | append: ',' %}
+                     {% assign product_index = product_index | plus: 1 %}
                      
                      {% assign first_available_variant = null %}
                      {% for v in product.variants %}
@@ -127,6 +139,27 @@
                      {% assign variant_price = first_available_variant.price | divided_by: 100.0 %}
                      {% assign variant_price_rounded = variant_price | round %}
 
+                     {% assign is_featured = false %}
+                     {% assign is_best_selling = false %}
+                     {% assign product_position = 9999 %}
+                     
+                     {% for tag in product.tags %}
+                       {% assign tag_lower = tag | downcase %}
+                       {% if tag_lower == 'featured' %}
+                         {% assign is_featured = true %}
+                       {% endif %}
+                       {% if tag_lower == 'best-selling' or tag_lower == 'best selling' %}
+                         {% assign is_best_selling = true %}
+                       {% endif %}
+                       {% comment %} Check for position tag (format: position-1, position-2, etc.) {% endcomment %}
+                       {% if tag_lower contains 'position-' %}
+                         {% assign position_parts = tag_lower | split: '-' %}
+                         {% if position_parts.size == 2 %}
+                           {% assign product_position = position_parts[1] | plus: 0 %}
+                         {% endif %}
+                       {% endif %}
+                     {% endfor %}
+                     
                      <div class="product-card"
                         data-id="{{ first_available_variant.id }}"
                         data-product-id="{{ product.id }}"
@@ -134,8 +167,21 @@
                         data-price="{{ variant_price_rounded }}"
                         data-collection="{{ selected_collection.handle }}"
                         data-options="{{ first_available_variant.options | join: ' / ' }}"
-                        data-available="{{ product.available }}">
+                        data-available="{{ product.available }}"
+                        data-featured="{{ is_featured }}"
+                        data-best-selling="{{ is_best_selling }}"
+                        data-position="{{ product_position }}"
+                        data-collection-index="{{ product_index }}">
                    
+                       <!-- Badge for Stock Status / Featured / Best Selling -->
+                       {% if product.available == false %}
+                         <div class="product-badge outofstock-badge">Out of Stock</div>
+                       {% elsif is_featured %}
+                         <div class="product-badge featured-badge">Featured</div>
+                       {% elsif is_best_selling %}
+                         <div class="product-badge bestseller-badge">Best Seller</div>
+                       {% endif %}
+                       
                        <!-- Updated image element with data attribute for variant image -->
                        <img class="product-main-image" 
                             src="{% if first_available_variant.image %}{{ first_available_variant.image | img_url: '300x' }}{% else %}{{ product.featured_image | img_url: '300x' }}{% endif %}" 
@@ -144,36 +190,31 @@
                        <p class="product-title">{{ product.title }}</p>
                        <p class="product-price">৳{{ variant_price_rounded }}</p>
                    
+                       {% comment %} Store all variants data for modal {% endcomment %}
                        {% if product.variants.size > 1 %}
-                         {% for option in product.options_with_values %}
-                           <div class="variant-values">
-                             {% assign option_values = '' %}
-                             {% for variant in product.variants %}
-                               {% if variant.available %}
-                                 {% assign value = variant.options[forloop.parentloop.index0] %}
-                                 {% unless option_values contains value %}
-                                   {% assign option_values = option_values | append: value | append: ',' %}
-                                   {% assign option_price = variant.price | divided_by: 100.0 | round %}
-                                   <button class="variant-option-btn {% if variant.id == first_available_variant.id %}active{% endif %}"
-                                     data-variant-id="{{ variant.id }}"
-                                     data-title="{{ product.title | escape }} - {{ variant.title }}"
-                                     data-price="{{ option_price }}"
-                                     data-variant-image="{% if variant.image %}{{ variant.image | img_url: '300x' }}{% else %}{{ product.featured_image | img_url: '300x' }}{% endif %}">
-                                     {{ value }}
-                                   </button>
-                                 {% endunless %}
-                               {% endif %}
-                             {% endfor %}
-                           </div>
-                         {% endfor %}
+                         <div class="product-variants-data" style="display: none;" data-variants='[
+                           {% for variant in product.variants %}
+                             {% assign variant_price_calc = variant.price | divided_by: 100.0 | round %}
+                             {
+                               "id": {{ variant.id }},
+                               "title": "{{ variant.title | escape }}",
+                               "price": {{ variant_price_calc }},
+                               "image": "{% if variant.image %}{{ variant.image | img_url: '300x' }}{% else %}{{ product.featured_image | img_url: '300x' }}{% endif %}",
+                               "options": {{ variant.options | json }},
+                               "available": {{ variant.available }}
+                             }{% unless forloop.last %},{% endunless %}
+                           {% endfor %}
+                         ]' data-options='{{ product.options_with_values | json }}'></div>
                        {% endif %}
                    
                        <button class="add-to-box-btn"
                          data-id="{{ first_available_variant.id }}"
                          data-title="{{ product.title | escape }} - {{ first_available_variant.title }}"
                          data-price="{{ variant_price_rounded }}"
-                         data-image="{% if first_available_variant.image %}{{ first_available_variant.image | img_url: '200x' }}{% else %}{{ product.featured_image | img_url: '200x' }}{% endif %}">
-                         Add +
+                         data-image="{% if first_available_variant.image %}{{ first_available_variant.image | img_url: '200x' }}{% else %}{{ product.featured_image | img_url: '200x' }}{% endif %}"
+                         data-has-variants="{{ product.variants.size | minus: 1 }}"
+                         {% unless product.available %}disabled{% endunless %}>
+                         {% if product.available %}Add +{% else %}Out of Stock{% endif %}
                        </button>
                    
                        <div class="cus-quantity-control" style="display: none;">
@@ -215,6 +256,8 @@
                      data-collection="gift-box"
                      data-options="{{ first_available_variant.options | join: ' / ' }}"
                      data-available="{{ product.available }}"
+                     data-featured="false"
+                     data-best-selling="false"
                      style="display: none;">
                 
                     <img class="product-main-image" 
@@ -314,6 +357,25 @@
     </div>
   </div>
 </div>
+</div>
+
+<!-- Variant Selection Modal -->
+<div id="variant-modal" class="variant-modal" style="display: none;">
+  <div class="variant-modal-overlay"></div>
+  <div class="variant-modal-content">
+    <button class="variant-modal-close">&times;</button>
+    <div class="variant-modal-body">
+      <div class="variant-modal-image">
+        <img id="modal-product-image" src="" alt="">
+      </div>
+      <div class="variant-modal-details">
+        <h3 id="modal-product-title"></h3>
+        <p class="modal-product-price" id="modal-product-price"></p>
+        <div id="modal-variant-options"></div>
+        <button id="modal-add-to-box" class="modal-add-btn">Add to Box</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -543,6 +605,21 @@ $(document).ready(function () {
     // ==================== ADD TO BOX ====================
     $(document).on('click', '.add-to-box-btn', function () {
         const $card = $(this).closest('.product-card');
+        const hasVariants = parseInt($(this).data('has-variants')) > 0;
+        const isAvailable = $card.data('available') === 'true' || $card.data('available') === true;
+        
+        // Don't allow adding out of stock products
+        if (!isAvailable) {
+            return;
+        }
+        
+        // ALWAYS show modal if product has variants (removed the cart check)
+        if (hasVariants) {
+            showVariantModal($card);
+            return;
+        }
+        
+        // Otherwise, add directly to cart
         const productId = $card.data('product-id');
         
         let product = {
@@ -551,7 +628,7 @@ $(document).ready(function () {
             image: $(this).data('image'),
             price: parsePrice($(this).data('price')),
             collection: $card.data('collection'),
-            productId: productId // Add product ID for tracking
+            productId: productId
         };
 
         selectedProducts.push(product);
@@ -559,6 +636,160 @@ $(document).ready(function () {
         
         // Update UI state for this variant
         updateVariantUIState($card, product.id);
+    });
+
+    // ==================== VARIANT MODAL ====================
+    function showVariantModal($card) {
+        const variantsData = $card.find('.product-variants-data');
+        if (!variantsData.length) return;
+        
+        const variants = JSON.parse(variantsData.attr('data-variants'));
+        const options = JSON.parse(variantsData.attr('data-options'));
+        const productTitle = $card.find('.product-title').text();
+        const productImage = $card.find('.product-main-image').attr('src');
+        const productCollection = $card.data('collection');
+        const productId = $card.data('product-id');
+        
+        // Set modal content
+        $('#modal-product-image').attr('src', productImage);
+        $('#modal-product-title').text(productTitle);
+        
+        // Build variant options
+        const $optionsContainer = $('#modal-variant-options');
+        $optionsContainer.empty();
+        
+        // Find first available variant as default
+        let selectedVariant = variants.find(v => v.available !== false) || variants[0];
+        $('#modal-product-price').text(formatPrice(selectedVariant.price));
+        $('#modal-product-image').attr('src', selectedVariant.image);
+        
+        // Create option selectors for each product option
+        options.forEach((option, optionIndex) => {
+            const optionName = option.name;
+            const optionValues = option.values;
+            
+            const $optionGroup = $('<div class="modal-variant-group"></div>');
+            $optionGroup.append(`<label class="modal-option-label">${optionName}:</label>`);
+            
+            const $buttonGroup = $('<div class="modal-variant-buttons"></div>');
+            
+            optionValues.forEach(value => {
+                // Check if this option value is available in any variant
+                const variantWithThisOption = variants.find(v => v.options[optionIndex] === value);
+                const isAvailable = variantWithThisOption && variantWithThisOption.available !== false;
+                
+                const $btn = $(`<button class="modal-variant-btn" data-option-index="${optionIndex}" data-value="${value}" ${!isAvailable ? 'disabled' : ''}>${value}${!isAvailable ? ' (Out of Stock)' : ''}</button>`);
+                
+                // Set first available option as active
+                if (isAvailable && optionIndex === 0 && value === selectedVariant.options[0]) {
+                    $btn.addClass('active');
+                }
+                
+                $buttonGroup.append($btn);
+            });
+            
+            $optionGroup.append($buttonGroup);
+            $optionsContainer.append($optionGroup);
+        });
+        
+        // Store variants data on modal
+        $('#variant-modal').data('variants', variants);
+        $('#variant-modal').data('product-collection', productCollection);
+        $('#variant-modal').data('product-id', productId);
+        $('#variant-modal').data('product-title', productTitle);
+        $('#variant-modal').data('selected-variant', selectedVariant);
+        
+        // Update add button state
+        updateModalAddButtonState(selectedVariant);
+        
+        // Show modal
+        $('#variant-modal').fadeIn(300);
+        $('body').css('overflow', 'hidden');
+    }
+    
+    // Update modal add to box button based on variant availability
+    function updateModalAddButtonState(variant) {
+        const $addBtn = $('#modal-add-to-box');
+        const isAvailable = variant && variant.available !== false;
+        
+        if (!isAvailable) {
+            $addBtn.prop('disabled', true).text('Out of Stock');
+        } else {
+            $addBtn.prop('disabled', false).text('Add to Box');
+        }
+    }
+    
+    // Close modal handlers
+    $('.variant-modal-close, .variant-modal-overlay').on('click', function() {
+        $('#variant-modal').fadeOut(300);
+        $('body').css('overflow', '');
+    });
+    
+    // Variant selection in modal
+    $(document).on('click', '.modal-variant-btn:not(:disabled)', function() {
+        const $btn = $(this);
+        const optionIndex = parseInt($btn.data('option-index'));
+        
+        // Toggle active state for this option group
+        $btn.siblings().removeClass('active');
+        $btn.addClass('active');
+        
+        // Get all selected options
+        const selectedOptions = [];
+        $('.modal-variant-btn.active').each(function() {
+            selectedOptions[$(this).data('option-index')] = $(this).data('value');
+        });
+        
+        // Find matching variant
+        const variants = $('#variant-modal').data('variants');
+        const matchingVariant = variants.find(v => {
+            return v.options.every((opt, idx) => opt === selectedOptions[idx]);
+        });
+        
+        if (matchingVariant) {
+            $('#modal-product-price').text(formatPrice(matchingVariant.price));
+            $('#modal-product-image').attr('src', matchingVariant.image);
+            $('#variant-modal').data('selected-variant', matchingVariant);
+            updateModalAddButtonState(matchingVariant);
+        }
+    });
+    
+    // Add to box from modal
+    $('#modal-add-to-box').on('click', function() {
+        const selectedVariant = $('#variant-modal').data('selected-variant') || $('#variant-modal').data('variants')[0];
+        const productCollection = $('#variant-modal').data('product-collection');
+        const productId = $('#variant-modal').data('product-id');
+        const productTitle = $('#variant-modal').data('product-title');
+        
+        // Check if variant is available
+        if (!selectedVariant.available) {
+            return;
+        }
+        
+        let product = {
+            id: String(selectedVariant.id),
+            title: productTitle + ' - ' + selectedVariant.title,
+            image: selectedVariant.image.replace('300x', '200x'),
+            price: parsePrice(selectedVariant.price),
+            collection: productCollection,
+            productId: productId
+        };
+
+        selectedProducts.push(product);
+        updateLocalStorageAndUI();
+        
+        // Update UI for all cards with this product
+        $(`.product-card[data-product-id="${productId}"]`).each(function() {
+            const $card = $(this);
+            const cardVariantId = $card.data('id');
+            if (String(cardVariantId) === String(selectedVariant.id)) {
+                updateVariantUIState($card, selectedVariant.id);
+            }
+        });
+        
+        // Close modal
+        $('#variant-modal').fadeOut(300);
+        $('body').css('overflow', '');
     });
 
     // ==================== QUANTITY CONTROLS ====================
@@ -617,58 +848,6 @@ $(document).ready(function () {
 
         updateLocalStorageAndUI();
         updateQuantityDisplay(id);
-    });
-
-    // ==================== VARIANT SELECTION - FIXED LOGIC ====================
-    $(document).on('click', '.variant-option-btn', function () {
-        const $btn = $(this);
-        const $container = $btn.closest('.variant-values');
-        const $card = $btn.closest('.product-card');
-        
-        // Remove active class from all buttons in this variant group
-        $container.find('.variant-option-btn').removeClass('active');
-        $btn.addClass('active');
-        
-        // Get the selected variant data
-        const newVariantId = $btn.data('variant-id');
-        const newTitle = $btn.data('title');
-        const newPrice = parsePrice($btn.data('price'));
-        const newVariantImage = $btn.data('variant-image');
-        
-        // Update the product image
-        const $productImage = $card.find('.product-main-image');
-        if (newVariantImage) {
-            $productImage.attr('src', newVariantImage);
-        } else {
-            // Fallback to default product image
-            const defaultImage = $productImage.data('default-image');
-            if (defaultImage) {
-                $productImage.attr('src', defaultImage);
-            }
-        }
-        
-        // Update the card's data attributes
-        $card.attr('data-id', newVariantId);
-        $card.attr('data-title', newTitle);
-        $card.attr('data-price', newPrice);
-        
-        // Update the add-to-box button data (including image for cart)
-        const cartImageSize = newVariantImage ? newVariantImage.replace('300x', '200x') : $productImage.data('default-image').replace('300x', '200x');
-        $card.find('.add-to-box-btn').attr({
-            'data-id': newVariantId,
-            'data-title': newTitle,
-            'data-price': newPrice,
-            'data-image': cartImageSize
-        });
-        
-        // Update quantity control buttons
-        $card.find('.cus-qty-btn').attr('data-id', newVariantId);
-        
-        // Update the displayed price
-        $card.find('.product-price').text(formatPrice(newPrice));
-        
-        // Update UI state for the selected variant
-        updateVariantUIState($card, newVariantId);
     });
 
     // ==================== REMOVE ITEM FROM BOX ====================
@@ -951,7 +1130,7 @@ $(document).ready(function () {
         if (clickedStep < currentStep) showStep(clickedStep);
     });
 
-    // ==================== SEARCH & SORT ====================
+    // ==================== SEARCH & SORT WITH SHOWCASE ====================
     $('#productSearch').on('input', applySearchAndSort);
     $('#sortOptions').on('change', applySearchAndSort);
 
@@ -959,24 +1138,98 @@ $(document).ready(function () {
         let searchQuery = $('#productSearch').val().toLowerCase();
         let sortOption = $('#sortOptions').val();
 
-        let $products = $('.product-card:visible').sort(function (a, b) {
+        // Handle showcase section
+        if (sortOption === 'best-selling' || sortOption === 'featured') {
+            handleShowcaseDisplay(sortOption);
+        } else {
+            $('#showcase-section').hide();
+            $('#showcaseGrid').empty();
+        }
+
+        // Only sort products in the main grid, not in showcase
+        let $products = $('#productGrid .product-card:visible').sort(function (a, b) {
             let priceA = parsePrice($(a).data('price'));
             let priceB = parsePrice($(b).data('price'));
             let titleA = $(a).data('title').toLowerCase();
             let titleB = $(b).data('title').toLowerCase();
+            let featuredA = $(a).data('featured') === 'true' || $(a).data('featured') === true;
+            let featuredB = $(b).data('featured') === 'true' || $(b).data('featured') === true;
+            let bestSellingA = $(a).data('best-selling') === 'true' || $(a).data('best-selling') === true;
+            let bestSellingB = $(b).data('best-selling') === 'true' || $(b).data('best-selling') === true;
+            let positionA = parseInt($(a).data('position')) || 9999;
+            let positionB = parseInt($(b).data('position')) || 9999;
+            let collectionIndexA = parseInt($(a).data('collection-index')) || 9999;
+            let collectionIndexB = parseInt($(b).data('collection-index')) || 9999;
 
+            if (sortOption === 'manual') {
+                // Sort by manual position first, then use collection's natural order
+                if (positionA !== positionB) return positionA - positionB;
+                // Use collection's default sorting (respects your collection settings)
+                return collectionIndexA - collectionIndexB;
+            }
             if (sortOption === 'price-asc') return priceA - priceB;
             if (sortOption === 'price-desc') return priceB - priceA;
             if (sortOption === 'title-asc') return titleA.localeCompare(titleB);
-            return 0;
+            if (sortOption === 'featured') {
+                if (featuredA && !featuredB) return -1;
+                if (!featuredA && featuredB) return 1;
+                return collectionIndexA - collectionIndexB;
+            }
+            if (sortOption === 'best-selling') {
+                if (bestSellingA && !bestSellingB) return -1;
+                if (!bestSellingA && bestSellingB) return 1;
+                return collectionIndexA - collectionIndexB;
+            }
+            return collectionIndexA - collectionIndexB;
         });
 
+        // Apply search filter and append back to main grid
         $products.each(function () {
             let title = $(this).data('title').toLowerCase();
             $(this).toggle(title.includes(searchQuery));
         });
 
         $('#productGrid').append($products);
+    }
+
+    // ==================== SHOWCASE DISPLAY HANDLER ====================
+    function handleShowcaseDisplay(type) {
+        const $showcaseGrid = $('#showcaseGrid');
+        const $showcaseSection = $('#showcase-section');
+        
+        $showcaseGrid.empty();
+        
+        let showcaseProducts = [];
+        let showcaseTitle = type === 'best-selling' ? 'Best Selling Products' : 'Featured Products';
+        
+        // Only get products from main grid, not from showcase
+        $('#productGrid .product-card').each(function() {
+            const $card = $(this);
+            const collection = $card.data('collection');
+            
+            // Skip gift-box products
+            if (collection === 'gift-box') return;
+            
+            // Check if product should be showcased
+            const isBestSelling = $card.data('best-selling') === 'true' || $card.data('best-selling') === true;
+            const isFeatured = $card.data('featured') === 'true' || $card.data('featured') === true;
+            
+            if ((type === 'best-selling' && isBestSelling) || (type === 'featured' && isFeatured)) {
+                // Clone the product card for showcase
+                const $clone = $card.clone(true);
+                showcaseProducts.push($clone);
+            }
+        });
+        
+        if (showcaseProducts.length > 0) {
+            $('.showcase-title').text(showcaseTitle);
+            showcaseProducts.forEach($product => {
+                $showcaseGrid.append($product);
+            });
+            $showcaseSection.show();
+        } else {
+            $showcaseSection.hide();
+        }
     }
 
     // ==================== SEARCH SUGGESTIONS ====================
@@ -1043,7 +1296,7 @@ $(document).ready(function () {
     initializeFilters();
     
     setTimeout(() => {
-        $('#sortOptions').val('title-asc');
+        $('#sortOptions').val('manual');
         applyAllFilters();
         initializeQuantityControls();
     }, 100);
@@ -1315,6 +1568,55 @@ $(document).ready(function () {
   width: 32%;
 }
 
+/* Showcase Section */
+.showcase-section {
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.showcase-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #000;
+  font-family: 'Garet', sans-serif;
+}
+
+.showcase-grid {
+  margin-bottom: 0 !important;
+}
+
+/* Product Badges */
+.product-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 4px;
+  z-index: 2;
+  letter-spacing: 0.5px;
+}
+
+.featured-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.bestseller-badge {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+/* Out of Stock Badge */
+.outofstock-badge {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+}
+
 /* Step Indicator */
 .step-indicator {
   display: flex;
@@ -1424,6 +1726,7 @@ $(document).ready(function () {
   flex-direction: column;
   justify-content: space-between;
   transition: box-shadow 0.2s ease;
+  position: relative;
 }
 
 .product-card:hover {
@@ -1487,6 +1790,195 @@ $(document).ready(function () {
   background: #000;
   color: white;
   border: 1px solid #ccc;
+}
+
+/* Variant Modal */
+.variant-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.variant-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.variant-modal-content {
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 2;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.variant-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #f5f5f5;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+  z-index: 3;
+  color: #333;
+  line-height: 1;
+}
+
+.variant-modal-close:hover {
+  background: #e0e0e0;
+}
+
+.variant-modal-body {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.variant-modal-image {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.variant-modal-image img {
+  width: 100%;
+  height: auto;
+  max-height: 350px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.variant-modal-details h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: #000;
+}
+
+.modal-product-price {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 20px;
+}
+
+.modal-variant-group {
+  margin-bottom: 20px;
+}
+
+.modal-option-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.modal-variant-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.modal-variant-btn {
+  padding: 10px 20px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.modal-variant-btn:hover {
+  border-color: #000;
+}
+
+.modal-variant-btn.active {
+  background: #000;
+  color: white;
+  border-color: #000;
+}
+
+/* Disabled variant buttons */
+.modal-variant-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f5f5f5;
+  color: #999;
+  border-color: #ddd;
+}
+
+.modal-variant-btn:disabled:hover {
+  border-color: #ddd;
+  background: #f5f5f5;
+}
+
+.modal-add-btn {
+  width: 100%;
+  background: #000;
+  color: white;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+}
+
+.modal-add-btn:hover {
+  background: #333;
+}
+
+/* Disabled add to box button in modal */
+#modal-add-to-box:disabled {
+  opacity: 0.5;
+  background-color: #ccc !important;
+  color: #888 !important;
+  cursor: not-allowed !important;
+}
+
+@media (min-width: 768px) {
+  .variant-modal-body {
+    flex-direction: row;
+    padding: 30px;
+    gap: 30px;
+  }
+  
+  .variant-modal-image {
+    width: 45%;
+    margin-bottom: 0;
+  }
+  
+  .variant-modal-details {
+    flex: 1;
+  }
 }
 
 /* Quantity Controls */
@@ -1577,6 +2069,24 @@ span.qty {
 .add-to-box-btn > * {
   position: relative;
   z-index: 2;
+}
+
+/* Disabled add button on product card */
+.add-to-box-btn:disabled {
+  opacity: 0.5;
+  background-color: #ccc !important;
+  color: #888 !important;
+  cursor: not-allowed !important;
+  border-color: #aaa !important;
+}
+
+.add-to-box-btn:disabled:hover {
+  background-color: #ccc !important;
+  color: #888 !important;
+}
+
+.add-to-box-btn:disabled::before {
+  display: none;
 }
 
 @keyframes smooth-shine {
@@ -1756,6 +2266,7 @@ div#box-items {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
 .cmb-Price, .cmb-Availability, .cmb-sortOptions{
     display: block;
   }
