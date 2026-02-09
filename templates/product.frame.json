@@ -132,6 +132,7 @@
         },
         "quantity_selector_hzhn9U": {
           "type": "quantity_selector",
+          "disabled": true,
           "settings": {}
         },
         "custom_property_input_faC6Bj": {
@@ -150,6 +151,7 @@
         },
         "text_xTfQnP": {
           "type": "text",
+          "disabled": true,
           "settings": {
             "text": "ফ্রেম অর্ডার করতে হলে <strong>৫০% অগ্রিম পেমেন্ট বাধ্যতামূলক</strong>",
             "text_style": "body"
