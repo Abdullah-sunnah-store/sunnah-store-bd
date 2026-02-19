@@ -155,8 +155,13 @@
             "show_gift_card_recipient": true
           }
         },
+        "whatsapp_button_snippet_TKF7ec": {
+          "type": "whatsapp-button-snippet",
+          "settings": {}
+        },
         "favorite_button_4RtPCm": {
           "type": "favorite-button",
+          "disabled": true,
           "settings": {}
         },
         "product_tabs_TPtxnJ": {
@@ -290,6 +295,7 @@
         "quantity_selector_hzhn9U",
         "custom_property_input_faC6Bj",
         "buy_buttons_UMeeWm",
+        "whatsapp_button_snippet_TKF7ec",
         "favorite_button_4RtPCm",
         "product_tabs_TPtxnJ",
         "description_XHwNxM",
