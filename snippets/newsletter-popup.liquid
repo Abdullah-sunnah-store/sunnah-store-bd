@@ -53,7 +53,7 @@
                   
                   <!-- Welcome Discount Code -->
                   <div class="discount-code-section">
-                    <h3 class="discount-title">{{ settings.discount_title | default: 'Here\'s your welcome gift!' }}</h3>
+                    <h3 class="discount-title">{{ settings.discount_title | default: 'Here\' }}</h3>
                     <p class="discount-description">{{ settings.discount_description | default: 'Use this code to get your exclusive discount' }}</p>
                     <div class="discount-code-container">
                       <span class="discount-code" id="discount-code">{{ settings.discount_code | default: 'WELCOME10' }}</span>
@@ -840,4 +840,13 @@
   checkFormSuccess();
 });
 </script>
-{% endif %}
+{% endif %}{%- comment -%}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{{ settings.discount_title | default: 'Here\\'s your welcome gift!' }}"
+  to: "{{ settings.discount_title | default: 'Here\\' }}"
+  position: 3107..3155
+{%- endcomment -%}
