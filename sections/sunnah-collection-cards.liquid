@@ -1,5 +1,7 @@
 {%- assign sid = section.id -%}
 
+{% render 'tss-base' %}
+
 <section
   class="scc-section"
   id="scc-{{ sid }}"
@@ -77,21 +79,30 @@
   #scc-{{ sid }} .scc-eyebrow {
     margin: 0 0 8px;
     font-size: {{ section.settings.eyebrow_size }}px;
-    letter-spacing: 0.04em;
-    font-weight: 600;
+    letter-spacing: 0.22em;
+    font-weight: 500;
+    text-transform: uppercase;
     color: {{ section.settings.eyebrow_color }};
-    font-family: var(--font-body--family);
+    font-family: var(--tss-sans);
   }
 
   #scc-{{ sid }} .scc-title {
     margin: 0 0 10px;
-    font-size: var(--font-h2--size);
-    font-family: var(--font-heading--family);
-    font-weight: var(--font-h2--weight);
-    letter-spacing: var(--font-h2--letter-spacing);
+    font-size: {{ section.settings.heading_size_mobile }}px;
+    font-family: var(--tss-serif);
+    font-weight: 400;
+    letter-spacing: normal;
     color: {{ section.settings.heading_color }};
-    line-height: var(--font-h2--line-height);
+    line-height: 1.1;
+    text-wrap: balance;
     text-align: center;
+  }
+
+  /* Matches the .tss-head-title step-up used by the TSS sections */
+  @media screen and (min-width: 64rem) {
+    #scc-{{ sid }} .scc-title {
+      font-size: {{ section.settings.heading_size }}px;
+    }
   }
 
   #scc-{{ sid }} .scc-subtext {
@@ -218,7 +229,7 @@
     #scc-{{ sid }} {
       padding: {{ section.settings.mobile_padding_top }}px {{ section.settings.mobile_padding_right }}px {{ section.settings.mobile_padding_bottom }}px {{ section.settings.mobile_padding_left }}px !important;
     }
-    /* .scc-title size handled by theme heading scale */
+    /* .scc-title uses "Font size mobile" as its base size */
     #scc-{{ sid }} .scc-grid { grid-template-columns: repeat(2, 1fr); }
     #scc-{{ sid }} .scc-card { aspect-ratio: 4 / 6; min-height: unset; }
   }
@@ -240,13 +251,13 @@
 
     { "type": "header", "content": "Eyebrow" },
     { "type": "text",  "id": "eyebrow",       "label": "Eyebrow text",   "default": "A SUNNAH OF GIVING" },
-    { "type": "range", "id": "eyebrow_size",  "label": "Font size (px)", "min": 9, "max": 18, "step": 1, "default": 11 },
+    { "type": "range", "id": "eyebrow_size",  "label": "Font size (px)", "min": 9, "max": 18, "step": 1, "default": 10 },
     { "type": "color", "id": "eyebrow_color", "label": "Color",          "default": "#1C4A3A" },
 
     { "type": "header", "content": "Heading" },
     { "type": "text",   "id": "heading",             "label": "Heading",                "default": "Gifts that never age." },
-    { "type": "range",  "id": "heading_size",        "label": "Font size desktop (px)", "min": 20, "max": 80, "step": 2, "default": 44 },
-    { "type": "range",  "id": "heading_size_mobile", "label": "Font size mobile (px)",  "min": 18, "max": 48, "step": 2, "default": 28 },
+    { "type": "range",  "id": "heading_size",        "label": "Font size desktop (px)", "min": 20, "max": 80, "step": 2, "default": 46 },
+    { "type": "range",  "id": "heading_size_mobile", "label": "Font size mobile (px)",  "min": 18, "max": 48, "step": 2, "default": 34 },
     { "type": "color",  "id": "heading_color",       "label": "Color",                  "default": "#1C1C1A" },
     { "type": "header", "content": "Subtext" },
     { "type": "text",  "id": "subtext",       "label": "Subtext",        "default": "Four gifts the world has always loved — carried here as the Sunnah intended." },

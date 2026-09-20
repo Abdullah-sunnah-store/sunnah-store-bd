@@ -114,7 +114,6 @@
         "m1": {
           "type": "maker",
           "settings": {
-            "image": "shopify://shop_images/Fight_the_evil_-_Cover.png",
             "image_asset": "tss-maker-rihla.jpg",
             "name": "The Reading Cafe",
             "description": "An independent bookstore nurturing Bangladesh's reading culture with thoughtfully curated books and a welcoming space for readers of all ages.",
@@ -234,6 +233,108 @@
         "padding_bottom": 80
       }
     },
+    "sunnah_collection_cards_kcP4wQ": {
+      "type": "sunnah-collection-cards",
+      "blocks": {
+        "card_rfWfzm": {
+          "type": "card",
+          "settings": {
+            "collection": "academic",
+            "fallback_title": "",
+            "icon": "shopify://shop_images/books_c127b4ef-9fa4-4f1b-935f-bbf053ce51e4.png",
+            "category_label": "Knowledge",
+            "category_color": "#ffffff",
+            "quote": "Islamic Books\"Convey from me, even if it is one verse.\"",
+            "card_color_top": "#1c4a3a",
+            "card_color_bottom": "#051e16"
+          }
+        },
+        "card_i9frey": {
+          "type": "card",
+          "settings": {
+            "collection": "fragrances",
+            "fallback_title": "Atter",
+            "icon": "shopify://shop_images/Perfume_d0898be3-e858-4e92-82d1-b30146c8a0df.png",
+            "category_label": "Fragrance",
+            "category_color": "#ffffff",
+            "quote": "Attar & Perfume\"The Prophet ﷺ never refused a gift of fragrance.\"",
+            "card_color_top": "#1c4a3a",
+            "card_color_bottom": "#051e16"
+          }
+        },
+        "card_pJfzUD": {
+          "type": "card",
+          "settings": {
+            "collection": "",
+            "fallback_title": "Flower",
+            "icon": "shopify://shop_images/Flowers_bbd554d0-4ae9-4927-9f25-e3bac3c64803.png",
+            "category_label": "Beauty",
+            "category_color": "#ffffff",
+            "quote": "Fresh Flowers\"Allah is beautiful and He loves beauty.\"",
+            "card_color_top": "#1c4a3a",
+            "card_color_bottom": "#051e16"
+          }
+        },
+        "card_QXmQjz": {
+          "type": "card",
+          "settings": {
+            "collection": "",
+            "fallback_title": "Chocolate",
+            "icon": "shopify://shop_images/chocolate_93bc8288-e575-4c30-8a21-2e84d5d64512.png",
+            "category_label": "Sweetness",
+            "category_color": "#ffffff",
+            "quote": "Halal Chocolates\"The Prophet ﷺ loved sweet things and honey.\"",
+            "card_color_top": "#1c4a3a",
+            "card_color_bottom": "#051e16"
+          }
+        }
+      },
+      "block_order": [
+        "card_rfWfzm",
+        "card_i9frey",
+        "card_pJfzUD",
+        "card_QXmQjz"
+      ],
+      "name": "Sunnah Collection Cards",
+      "settings": {
+        "section_bg": "#f5f0e8",
+        "max_width": 1400,
+        "eyebrow": "A SUNNAH OF GIVING",
+        "eyebrow_size": 10,
+        "eyebrow_color": "#1c4a3a",
+        "heading": "Gifts That Never Age.",
+        "heading_size": 46,
+        "heading_size_mobile": 34,
+        "heading_color": "#1c1c1a",
+        "subtext": "",
+        "subtext_size": 15,
+        "subtext_color": "#555555",
+        "head_bottom_gap": 32,
+        "view_all_text": "",
+        "view_all_url": "",
+        "btn_font_size": 13,
+        "view_all_top_gap": 32,
+        "columns": 4,
+        "columns_tablet": 2,
+        "columns_mobile": 1,
+        "card_gap": 12,
+        "card_radius": 8,
+        "card_height": 380,
+        "card_padding": 24,
+        "card_title_color": "#ffffff",
+        "card_title_size": 24,
+        "quote_color": "#f5f0e8",
+        "quote_size": 15,
+        "padding_top": 60,
+        "padding_bottom": 60,
+        "padding_left": 40,
+        "padding_right": 40,
+        "mobile_padding_top": 40,
+        "mobile_padding_bottom": 40,
+        "mobile_padding_left": 20,
+        "mobile_padding_right": 20
+      }
+    },
     "tss_05_build_box": {
       "type": "tss-build-box",
       "name": "TSS 05 · Build your box",
@@ -244,28 +345,6 @@
         "button_label": "Begin Your Box",
         "button_link": "shopify://pages/custom-gift-box",
         "note": "The box and the wrapping are ours. You pay only for what's inside.",
-        "padding_top": 112,
-        "padding_bottom": 112
-      }
-    },
-    "tss_06_founder": {
-      "type": "tss-founder",
-      "name": "TSS 06 · Founder",
-      "settings": {
-        "image_asset": "tss-founder.jpg",
-        "issue": "No. 04 · Muharram",
-        "quote": "I gave this to my mother on an ordinary Tuesday — no occasion, no reason. She still sends me a photo of it every morning with her tea. That was the day I understood what we actually make here: not a mug, but a way to say 'I was thinking of you' — without needing the words.",
-        "quote_size": 26,
-        "name": "Rashid Shahriar",
-        "role": "Founder & CEO, The Sunnah Store",
-        "pick_product": "the-barakah-family-set-gift-box",
-        "pick_image_asset": "tss-founder-attar.jpg",
-        "pick_vendor": "",
-        "pick_title": "",
-        "pick_description": "The one I reach for when the gift has to say something I cannot.",
-        "pick_link": "",
-        "journal_label": "Read my latest letter in The Journal →",
-        "journal_link": "shopify://blogs/news",
         "padding_top": 112,
         "padding_bottom": 112
       }
@@ -409,8 +488,8 @@
     "tss_02_hadith",
     "tss_03_makers",
     "tss_04_most_gifted",
+    "sunnah_collection_cards_kcP4wQ",
     "tss_05_build_box",
-    "tss_06_founder",
     "tss_07_journal",
     "tss_08_shop_all",
     "tss_09_promises",
