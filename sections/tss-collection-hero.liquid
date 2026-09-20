@@ -1,0 +1,262 @@
+{% comment %}
+  TSS — Collection hero
+  The flat emerald band that opens a gifting landing page: a gold breadcrumb,
+  a serif title and an italic lede, matching the reference build at
+  thesunnahstoremarketplace.vercel.app/gifts/by-occasion
+
+  Text falls back to the page it sits on, so the same section can head any
+  "By …" landing page without being re-typed.
+{% endcomment %}
+
+{% render 'tss-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+
+  assign heading = s.title
+  if heading == blank
+    assign heading = page.title
+  endif
+  if heading == blank
+    assign heading = collection.title
+  endif
+
+  assign crumb = s.crumb_current
+  if crumb == blank
+    assign crumb = heading
+  endif
+
+  assign lede = s.lede
+  if lede == blank and collection != blank
+    assign lede = collection.description | strip_html | strip
+  endif
+
+  comment
+    On a collection template the band can be limited to collections that head
+    a menu item with children, where it replaces the usual header.
+  endcomment
+  assign show_here = true
+  if s.show_on == 'menu_parents'
+    assign show_here = false
+    if collection != blank and s.menu != blank
+      for l in linklists[s.menu].links
+        assign lp = l.url | split: '?' | first
+        if l.links.size > 0
+          if lp == request.path or l.object.handle == collection.handle
+            assign show_here = true
+            break
+          endif
+        endif
+      endfor
+    endif
+  endif
+-%}
+
+{%- if show_here -%}
+
+<style>
+  /* A third of the viewport, text settled at the bottom, as on the reference. */
+  #tss-chero-{{ uid }} {
+    position: relative;
+    display: flex;
+    min-height: 34svh;
+    flex-direction: column;
+    justify-content: flex-end;
+    background: var(--tss-green);
+    overflow: hidden;
+  }
+
+  #tss-chero-{{ uid }} .tss-chero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #tss-chero-{{ uid }} .tss-chero__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      rgba(5, 30, 22, {{ s.scrim | default: 80 | divided_by: 100.0 }}) 0%,
+      rgba(5, 30, 22, {{ s.scrim | default: 80 | times: 0.7 | divided_by: 100.0 }}) 55%,
+      rgba(5, 30, 22, {{ s.scrim | default: 80 | times: 0.45 | divided_by: 100.0 }}) 100%
+    );
+  }
+
+  #tss-chero-{{ uid }} .tss-chero__inner {
+    position: relative;
+    padding: {{ s.padding_top | default: 84 }}px var(--tss-gutter) {{ s.padding_bottom | default: 72 }}px;
+  }
+
+  #tss-chero-{{ uid }} .tss-chero__crumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgb(184 134 11 / 0.7);
+  }
+
+  #tss-chero-{{ uid }} .tss-chero__crumb a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.4s ease;
+  }
+
+  #tss-chero-{{ uid }} .tss-chero__crumb a:hover {
+    color: var(--tss-ivory);
+  }
+
+  #tss-chero-{{ uid }} .tss-chero__crumb span[aria-hidden] {
+    opacity: 0.6;
+  }
+
+  #tss-chero-{{ uid }} .tss-chero__title {
+    margin-top: 16px;
+    max-width: 18ch;
+    font-family: var(--tss-serif);
+    font-size: {{ s.title_size | default: 42 }}px;
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: 0;
+    text-wrap: balance;
+    color: var(--tss-ivory);
+  }
+
+  #tss-chero-{{ uid }} .tss-chero__lede {
+    margin-top: 16px;
+    max-width: 23em;
+    font-family: var(--tss-serif);
+    font-size: 17px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.375;
+    color: rgb(245 240 232 / 0.85);
+  }
+</style>
+
+<section id="tss-chero-{{ uid }}" class="tss-section" {{ section.shopify_attributes }}>
+  {%- if s.image != blank or s.image_asset != blank -%}
+    {% render 'tss-image',
+      image: s.image,
+      asset: s.image_asset,
+      class: 'tss-chero__img',
+      width: 1600,
+      widths: '480,720,960,1280,1600',
+      sizes: '100vw',
+      priority: true,
+      alt: heading
+    %}
+    <div class="tss-chero__scrim" aria-hidden="true"></div>
+  {%- endif -%}
+
+  <div class="tss-chero__inner">
+    {%- if s.crumb_parent != blank or crumb != blank -%}
+      <nav class="tss-chero__crumb" aria-label="Breadcrumb">
+        {%- if s.crumb_parent != blank -%}
+          {%- if s.crumb_parent_url != blank -%}
+            <a href="{{ s.crumb_parent_url }}">{{ s.crumb_parent | escape }}</a>
+          {%- else -%}
+            <span>{{ s.crumb_parent | escape }}</span>
+          {%- endif -%}
+          <span aria-hidden="true">/</span>
+        {%- endif -%}
+        <span aria-current="page">{{ crumb | escape }}</span>
+      </nav>
+    {%- endif -%}
+
+    {%- if heading != blank -%}
+      <h1 class="tss-chero__title">{{ heading | escape }}</h1>
+    {%- endif -%}
+
+    {%- if lede != blank -%}
+      <p class="tss-chero__lede">{{ lede | escape }}</p>
+    {%- endif -%}
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "TSS · Collection hero",
+  "tag": "section",
+  "settings": [
+    { "type": "header", "content": "Breadcrumb" },
+    { "type": "text", "id": "crumb_parent", "label": "Parent label", "default": "Gifts" },
+    { "type": "url", "id": "crumb_parent_url", "label": "Parent link" },
+    {
+      "type": "text",
+      "id": "crumb_current",
+      "label": "Current label",
+      "info": "Falls back to the title below, then to the page title."
+    },
+    { "type": "header", "content": "Text" },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "info": "Leave empty to use the page title."
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Title size",
+      "min": 28,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 42
+    },
+    {
+      "type": "textarea",
+      "id": "lede",
+      "label": "Lede",
+      "default": "Every occasion asks for something different. Here is where we would begin."
+    },
+    { "type": "header", "content": "Background" },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Optional. The band is flat emerald when nothing is set."
+    },
+    { "type": "text", "id": "image_asset", "label": "Theme asset", "info": "Filename in assets/, used when no image is picked." },
+    {
+      "type": "range",
+      "id": "scrim",
+      "label": "Image darkening",
+      "min": 40,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "default": 80
+    },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 32, "max": 200, "step": 4, "unit": "px", "default": 84 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 32, "max": 200, "step": 4, "unit": "px", "default": 72 },
+    { "type": "header", "content": "Visibility" },
+    {
+      "type": "select",
+      "id": "show_on",
+      "label": "Show on",
+      "options": [
+        { "value": "always", "label": "Always" },
+        { "value": "menu_parents", "label": "Collections with a submenu" }
+      ],
+      "default": "always"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "info": "Used with \"Collections with a submenu\"."
+    }
+  ],
+  "presets": [{ "name": "TSS · Collection hero" }]
+}
+{% endschema %}

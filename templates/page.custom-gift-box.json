@@ -57,6 +57,156 @@
         "padding-block-end": 80
       }
     },
+    "tss_box_builder": {
+      "type": "tss-box-builder",
+      "blocks": {
+        "tier_barakah": {
+          "type": "tier",
+          "settings": {
+            "name": "Barakah",
+            "pieces": 3,
+            "product": "",
+            "price_text": "300$"
+          }
+        },
+        "tier_noor": {
+          "type": "tier",
+          "settings": {
+            "name": "Noor",
+            "pieces": 6,
+            "product": "",
+            "price_text": "600$"
+          }
+        },
+        "tier_ihsan": {
+          "type": "tier",
+          "settings": {
+            "name": "Ihsan",
+            "pieces": 9,
+            "product": "",
+            "price_text": "900$"
+          }
+        },
+        "tier_jannah": {
+          "type": "tier",
+          "settings": {
+            "name": "Jannah",
+            "pieces": 12,
+            "product": "",
+            "price_text": "1200$"
+          }
+        },
+        "cat_stationeries": {
+          "type": "collection",
+          "settings": {
+            "collection": "stationeries",
+            "custom_name": ""
+          }
+        },
+        "cat_candles": {
+          "type": "collection",
+          "settings": {
+            "collection": "candles",
+            "custom_name": ""
+          }
+        },
+        "cat_cards": {
+          "type": "collection",
+          "settings": {
+            "collection": "cards",
+            "custom_name": ""
+          }
+        },
+        "cat_mugs": {
+          "type": "collection",
+          "settings": {
+            "collection": "mugs",
+            "custom_name": ""
+          }
+        },
+        "cat_essentials": {
+          "type": "collection",
+          "settings": {
+            "collection": "essentials",
+            "custom_name": ""
+          }
+        },
+        "cat_prayer_mat": {
+          "type": "collection",
+          "settings": {
+            "collection": "prayer-mat",
+            "custom_name": ""
+          }
+        },
+        "cat_lifestyle": {
+          "type": "collection",
+          "settings": {
+            "collection": "lifestyle",
+            "custom_name": "Lifestyle"
+          }
+        },
+        "cat_books": {
+          "type": "collection",
+          "settings": {
+            "collection": "books",
+            "custom_name": ""
+          }
+        }
+      },
+      "block_order": [
+        "tier_barakah",
+        "tier_noor",
+        "tier_ihsan",
+        "tier_jannah",
+        "cat_stationeries",
+        "cat_candles",
+        "cat_cards",
+        "cat_mugs",
+        "cat_essentials",
+        "cat_prayer_mat",
+        "cat_lifestyle",
+        "cat_books"
+      ],
+      "name": "TSS · Build your own box",
+      "settings": {
+        "eyebrow": "Our Signature",
+        "title": "Build your own box",
+        "lede": "Choose each piece yourself. We'll size the box, wrap it by hand, and send it as one considered whole.",
+        "sub_lede": "The box and the wrapping are ours. You pay only for what's inside.",
+        "title_size": 34,
+        "ready_made_label": "Prefer a ready-made box? →",
+        "ready_made_link": "shopify://collections/all-gifts",
+        "all_label": "All",
+        "add_label": "Add",
+        "places_word": "places",
+        "pieces_word": "pieces",
+        "continue_label": "Continue",
+        "back_label": "Back",
+        "empty_label": "Nothing in this category yet.",
+        "personalise_title": "Personalise it.",
+        "personalise_lede": "The card is written by hand, and your message goes on exactly as you type it — so take your time with the words.",
+        "wrapping_label": "Wrapping",
+        "wrapping_options": "Ivory & Twine, Deep Green, No wrapping",
+        "occasion_label": "Occasion card",
+        "occasions": "Eid, Ramadan, Wedding, Nikkah, New home, Thank you, No card",
+        "recipient_label": "For",
+        "recipient_placeholder": "Their name",
+        "message_label": "Message",
+        "message_placeholder": "A few words to go on the card — we'll write them by hand.",
+        "message_max": 200,
+        "hide_price_label": "Hide the price on the delivery note",
+        "review_title": "Your box",
+        "review_lede": "",
+        "total_label": "Total",
+        "submit_label": "Add to Cart",
+        "empty_error": "Choose at least one piece for your box.",
+        "addon_product_1": "wrapping-paper",
+        "addon_product_2": "wishcard",
+        "addons_label": "A finishing touch",
+        "addon_add_label": "Add",
+        "addon_added_label": "Added"
+      }
+    },
     "gift_box_builder_AXL9qJ": {
       "type": "gift-box-builder",
       "blocks": {
@@ -127,6 +277,7 @@
         "collection_MDkAHg",
         "collection_dEFdPJ"
       ],
+      "disabled": true,
       "name": "Custom Gift Box  v2",
       "settings": {
         "main_title": "Build Your Custom Gift Box",
@@ -140,6 +291,7 @@
   },
   "order": [
     "main",
+    "tss_box_builder",
     "gift_box_builder_AXL9qJ"
   ]
 }

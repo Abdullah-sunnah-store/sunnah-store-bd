@@ -1,0 +1,125 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "tss-collection-hero",
+      "settings": {
+        "crumb_parent": "Gifts",
+        "crumb_parent_url": "",
+        "crumb_current": "",
+        "title": "By Occasion",
+        "title_size": 36,
+        "lede": "Every occasion asks for something different. Here is where we would begin.",
+        "scrim": 80,
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
+    "rows": {
+      "type": "tss-collection-rows",
+      "blocks": {
+        "row_eid_fitr": {
+          "type": "row",
+          "settings": {
+            "label": "Eid ul-Fitr",
+            "link": "shopify://collections/ramadan-eid",
+            "image_asset": "occasion-eid-ul-fitr.jpg"
+          }
+        },
+        "row_eid_adha": {
+          "type": "row",
+          "settings": {
+            "label": "Eid ul-Adha",
+            "link": "shopify://collections/ramadan-eid",
+            "image_asset": "occasion-eid-ul-adha.jpg"
+          }
+        },
+        "row_ramadan": {
+          "type": "row",
+          "settings": {
+            "label": "Ramadan",
+            "link": "shopify://collections/ramadan-eid",
+            "image_asset": "occasion-ramadan.jpg"
+          }
+        },
+        "row_nikah": {
+          "type": "row",
+          "settings": {
+            "label": "Nikah",
+            "link": "shopify://collections/nikah-gifts",
+            "image_asset": "occasion-nikah.jpg"
+          }
+        },
+        "row_aqiqah": {
+          "type": "row",
+          "settings": {
+            "label": "Aqiqah",
+            "link": "shopify://collections/all-gifts",
+            "image_asset": "occasion-aqiqah.jpg"
+          }
+        },
+        "row_hajj": {
+          "type": "row",
+          "settings": {
+            "label": "Hajj & Umrah",
+            "link": "shopify://collections/all-gifts",
+            "image_asset": "occasion-hajj-umrah.jpg"
+          }
+        },
+        "row_housewarming": {
+          "type": "row",
+          "settings": {
+            "label": "Housewarming",
+            "link": "shopify://collections/all-gifts",
+            "image_asset": "occasion-housewarming.jpg"
+          }
+        },
+        "row_graduation": {
+          "type": "row",
+          "settings": {
+            "label": "Graduation",
+            "link": "shopify://collections/all-gifts",
+            "image_asset": "occasion-graduation.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "row_eid_fitr",
+        "row_eid_adha",
+        "row_ramadan",
+        "row_nikah",
+        "row_aqiqah",
+        "row_hajj",
+        "row_housewarming",
+        "row_graduation"
+      ],
+      "settings": {
+        "aria_label": "Gifts by occasion",
+        "row_height": 200,
+        "gap": 8,
+        "label_size": 24,
+        "scrim": 55,
+        "show_count": false,
+        "count_label": "gifts",
+        "foot_text": "Not sure yet? See everything we've chosen →",
+        "foot_url": "shopify://collections/all-gifts",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "empty_text": "Add a row to start this list."
+      }
+    },
+    "newsletter": {
+      "type": "tss-newsletter",
+      "settings": {}
+    }
+  },
+  "order": ["hero", "rows", "newsletter"]
+}
