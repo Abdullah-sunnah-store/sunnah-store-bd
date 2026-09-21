@@ -243,6 +243,37 @@
     /* .scc-title uses "Font size mobile" as its base size */
   }
 
+  /* Below 40rem the grid is a rail, so the section stops padding its sides and
+     the gutter moves onto the head, the first card and the rule — the opening
+     inset the Journal and Makers rails use, with the next card free to bleed
+     off the right. Scoped under 40rem because from there up this is a grid
+     again and still needs the section's own side padding. */
+  @media screen and (max-width: 39.999rem) {
+    #scc-{{ sid }} {
+      padding-inline: 0 !important;
+    }
+
+    #scc-{{ sid }} .scc-head {
+      padding-inline: {{ section.settings.mobile_padding_left }}px {{ section.settings.mobile_padding_right }}px;
+    }
+
+    #scc-{{ sid }} .scc-grid {
+      scroll-padding-inline-start: {{ section.settings.mobile_padding_left }}px;
+    }
+
+    #scc-{{ sid }} .scc-grid > :first-child {
+      margin-inline-start: {{ section.settings.mobile_padding_left }}px;
+    }
+
+    #scc-{{ sid }} .scc-progress {
+      margin-inline: {{ section.settings.mobile_padding_left }}px {{ section.settings.mobile_padding_right }}px;
+    }
+
+    #scc-{{ sid }} .scc-view-all-wrap {
+      padding-inline: {{ section.settings.mobile_padding_left }}px {{ section.settings.mobile_padding_right }}px;
+    }
+  }
+
   /* From the theme's 40rem breakpoint up the rail becomes a grid again, so the
      column settings still drive tablet and desktop. */
   @media screen and (min-width: 40rem) {

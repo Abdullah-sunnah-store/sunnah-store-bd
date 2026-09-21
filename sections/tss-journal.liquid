@@ -46,21 +46,24 @@
     margin-top: 48px;
   }
 
-  /* Below the desktop breakpoint the gutter moves off the rail and onto its
-     wrapper: padding on a flex scroll container does not hold, which left the
-     cards flush against the screen edge. Desktop is untouched — there .tss-rail
-     still centres itself at --tss-max with its own 40px gutters. */
+  /* Below the desktop breakpoint the rail runs full width and the opening
+     gutter comes from a margin on the first card. Padding on a flex scroll
+     container is not honoured, which is what left the cards flush against the
+     screen edge; a flex item's own margin always is. Only the start edge is
+     inset, so the next card still bleeds off the right as it should.
+     Desktop is untouched — there .tss-rail centres itself at --tss-max. */
   @media screen and (max-width: 63.999rem) {
-    #tss-journal-{{ uid }} .tss-journal__rail-wrap {
-      padding-inline: var(--tss-gutter);
-    }
-
     #tss-journal-{{ uid }} .tss-rail {
       padding-inline: 0;
+      scroll-padding-inline-start: var(--tss-gutter);
+    }
+
+    #tss-journal-{{ uid }} .tss-rail > :first-child {
+      margin-inline-start: var(--tss-gutter);
     }
 
     #tss-journal-{{ uid }} .tss-progress {
-      margin-inline: 0;
+      margin-inline: var(--tss-gutter);
     }
   }
 
