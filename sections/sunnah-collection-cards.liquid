@@ -173,12 +173,11 @@
 
   /* ── Grid ── */
   /* Mobile inherits .tss-rail — the same horizontal snap rail the Journal
-     uses. The negative margin cancels the section's mobile padding so the rail
-     runs edge to edge, while the matching padding keeps the first card lined
-     up with the heading above it. */
+     uses. The section's own mobile padding provides the inset, so the rail
+     zeroes the gutter .tss-rail would otherwise add. Padding on a flex scroll
+     container is unreliable, so the inset lives on the section instead. */
   #scc-{{ sid }} .scc-grid {
-    margin-inline: calc(-1 * {{ section.settings.mobile_padding_left }}px) calc(-1 * {{ section.settings.mobile_padding_right }}px);
-    padding-inline: {{ section.settings.mobile_padding_left }}px {{ section.settings.mobile_padding_right }}px;
+    padding-inline: 0;
   }
 
   /* ── Card — image above, text below (mirrors the Journal card) ── */
