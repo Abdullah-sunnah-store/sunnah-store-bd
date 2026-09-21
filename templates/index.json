@@ -244,10 +244,8 @@
             "fallback_title": "",
             "icon": "shopify://shop_images/books_c127b4ef-9fa4-4f1b-935f-bbf053ce51e4.png",
             "category_label": "Knowledge",
-            "category_color": "#ffffff",
-            "quote": "Islamic Books\"Convey from me, even if it is one verse.\"",
-            "card_color_top": "#1c4a3a",
-            "card_color_bottom": "#051e16"
+            "category_color": "#B8860B",
+            "quote": "Islamic Books\"Convey from me, even if it is one verse.\""
           }
         },
         "card_i9frey": {
@@ -257,10 +255,8 @@
             "fallback_title": "Atter",
             "icon": "shopify://shop_images/Perfume_d0898be3-e858-4e92-82d1-b30146c8a0df.png",
             "category_label": "Fragrance",
-            "category_color": "#ffffff",
-            "quote": "Attar & Perfume\"The Prophet ﷺ never refused a gift of fragrance.\"",
-            "card_color_top": "#1c4a3a",
-            "card_color_bottom": "#051e16"
+            "category_color": "#B8860B",
+            "quote": "Attar & Perfume\"The Prophet ﷺ never refused a gift of fragrance.\""
           }
         },
         "card_pJfzUD": {
@@ -270,10 +266,8 @@
             "fallback_title": "Flower",
             "icon": "shopify://shop_images/Flowers_bbd554d0-4ae9-4927-9f25-e3bac3c64803.png",
             "category_label": "Beauty",
-            "category_color": "#ffffff",
-            "quote": "Fresh Flowers\"Allah is beautiful and He loves beauty.\"",
-            "card_color_top": "#1c4a3a",
-            "card_color_bottom": "#051e16"
+            "category_color": "#B8860B",
+            "quote": "Fresh Flowers\"Allah is beautiful and He loves beauty.\""
           }
         },
         "card_QXmQjz": {
@@ -283,10 +277,8 @@
             "fallback_title": "Chocolate",
             "icon": "shopify://shop_images/chocolate_93bc8288-e575-4c30-8a21-2e84d5d64512.png",
             "category_label": "Sweetness",
-            "category_color": "#ffffff",
-            "quote": "Halal Chocolates\"The Prophet ﷺ loved sweet things and honey.\"",
-            "card_color_top": "#1c4a3a",
-            "card_color_bottom": "#051e16"
+            "category_color": "#B8860B",
+            "quote": "Halal Chocolates\"The Prophet ﷺ loved sweet things and honey.\""
           }
         }
       },
@@ -302,7 +294,7 @@
         "max_width": 1400,
         "eyebrow": "A SUNNAH OF GIVING",
         "eyebrow_size": 10,
-        "eyebrow_color": "#1c4a3a",
+        "eyebrow_color": "#B8860B",
         "heading": "Gifts That Never Age.",
         "heading_size": 46,
         "heading_size_mobile": 34,
@@ -318,14 +310,12 @@
         "columns": 4,
         "columns_tablet": 2,
         "columns_mobile": 1,
-        "card_gap": 12,
-        "card_radius": 8,
-        "card_height": 380,
-        "card_padding": 24,
-        "card_title_color": "#ffffff",
-        "card_title_size": 24,
-        "quote_color": "#f5f0e8",
-        "quote_size": 15,
+        "card_gap": 24,
+        "card_radius": 0,
+        "card_title_color": "#1C1C1A",
+        "card_title_size": 22,
+        "quote_color": "#5A5A54",
+        "quote_size": 14,
         "padding_top": 60,
         "padding_bottom": 60,
         "padding_left": 40,
@@ -333,7 +323,8 @@
         "mobile_padding_top": 40,
         "mobile_padding_bottom": 40,
         "mobile_padding_left": 20,
-        "mobile_padding_right": 20
+        "mobile_padding_right": 20,
+        "card_link_label": "Shop →"
       }
     },
     "tss_05_build_box": {
