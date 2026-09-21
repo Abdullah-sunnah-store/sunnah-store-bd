@@ -34,6 +34,14 @@
     scroll-margin-top: 96px;
   }
 
+  /* Mobile block padding, on the same 768px breakpoint the Sunnah Collection
+     Cards section uses, so the three sections share one rhythm on phones. */
+  @media screen and (max-width: 768px) {
+    #tss-journal-{{ uid }} {
+      padding-block: {{ s.mobile_padding_top | default: 40 }}px {{ s.mobile_padding_bottom | default: 40 }}px;
+    }
+  }
+
   #tss-journal-{{ uid }} .tss-journal__rail-wrap {
     margin-top: 48px;
   }
@@ -242,6 +250,26 @@
       "step": 4,
       "unit": "px",
       "default": 80
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_top",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_bottom",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
     }
   ],
   "blocks": [
