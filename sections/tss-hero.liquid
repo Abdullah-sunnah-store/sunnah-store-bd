@@ -20,6 +20,13 @@
     background: var(--tss-green-dark);
   }
 
+  /* <picture> is inline by default; the img below sizes against it. */
+  #tss-hero-{{ uid }} .tss-hero__picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
   /* Settles from 1.06 on load. Driven by an animation, not a reveal class, so
      the hero — the LCP element — is never held at opacity 0. */
   #tss-hero-{{ uid }} .tss-hero__img {
@@ -193,19 +200,28 @@
   <a id="top" class="tss-sr-only" aria-hidden="true" tabindex="-1"></a>
 
   <div class="tss-hero__media">
-    {% render 'tss-image',
-      image: s.image,
-      asset: s.image_asset,
-      class: 'tss-hero__img',
-      asset_width: 1024,
-      asset_height: 1024,
-      width: 1600,
-      widths: '480,720,960,1280,1600',
-      sizes: '100vw',
-      priority: true,
-      alt: s.title,
-      placeholder: 'lifestyle-1'
-    %}
+    <picture class="tss-hero__picture">
+      {%- if s.image_mobile != blank -%}
+        <source
+          media="(max-width: 39.999rem)"
+          srcset="{{ s.image_mobile | image_url: width: 480 }} 480w, {{ s.image_mobile | image_url: width: 750 }} 750w, {{ s.image_mobile | image_url: width: 1100 }} 1100w"
+          sizes="100vw"
+        >
+      {%- endif -%}
+      {% render 'tss-image',
+        image: s.image,
+        asset: s.image_asset,
+        class: 'tss-hero__img',
+        asset_width: 1024,
+        asset_height: 1024,
+        width: 1600,
+        widths: '480,720,960,1280,1600',
+        sizes: '100vw',
+        priority: true,
+        alt: s.title,
+        placeholder: 'lifestyle-1'
+      %}
+    </picture>
 
     <div class="tss-hero__scrim" aria-hidden="true"></div>
 
@@ -257,6 +273,12 @@
   "settings": [
     { "type": "header", "content": "Media" },
     { "type": "image_picker", "id": "image", "label": "Hero image (portrait)" },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Mobile image (portrait)",
+      "info": "Shown on screens under 640px. Falls back to the hero image above when empty."
+    },
     {
       "type": "text",
       "id": "image_asset",

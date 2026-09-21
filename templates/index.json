@@ -41,8 +41,9 @@
       ],
       "name": "TSS 01 · Hero",
       "settings": {
+        "image": "shopify://shop_images/Frame_Banner_Image_for_Website.png",
         "image_asset": "tss-hero.jpg",
-        "height": 92,
+        "height": 75,
         "show_scroll_line": true,
         "eyebrow": "Curated Islamic Gifting",
         "title": "The few we chose this month.",
@@ -174,7 +175,7 @@
         "g1": {
           "type": "item",
           "settings": {
-            "product": "acid-wash-oversized-drop-shoulder-t-shirt-denim-blue",
+            "product": "asma-ul-husna-regular-glass-frame",
             "image_asset": "tss-gift-03.jpg",
             "vendor": "",
             "title": "",
@@ -185,7 +186,7 @@
         "g2": {
           "type": "item",
           "settings": {
-            "product": "arabian-platinum-thobe-copper-brown",
+            "product": "atomic-habits-by-james-clear",
             "image_asset": "tss-gift-02.jpg",
             "vendor": "",
             "title": "",
@@ -196,7 +197,7 @@
         "g3": {
           "type": "item",
           "settings": {
-            "product": "jar-of-duas",
+            "product": "father-mug",
             "image_asset": "tss-gift-01.jpg",
             "vendor": "",
             "title": "",
@@ -207,7 +208,7 @@
         "g4": {
           "type": "item",
           "settings": {
-            "product": "fight-against-the-devil",
+            "product": "scented-candle-ebony-rose",
             "image_asset": "tss-gift-04.jpg",
             "vendor": "",
             "title": "",
