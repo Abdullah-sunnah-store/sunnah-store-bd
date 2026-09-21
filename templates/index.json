@@ -309,7 +309,6 @@
         "view_all_top_gap": 32,
         "columns": 4,
         "columns_tablet": 2,
-        "columns_mobile": 1,
         "card_gap": 24,
         "card_radius": 0,
         "card_title_color": "#1C1C1A",

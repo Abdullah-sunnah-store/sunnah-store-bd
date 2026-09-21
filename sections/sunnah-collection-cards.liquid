@@ -21,7 +21,13 @@
     </div>
 
     <!-- Collection cards -->
-    <div class="scc-grid">
+    <div
+      class="scc-grid tss-rail"
+      role="region"
+      tabindex="0"
+      aria-label="{{ section.settings.heading | default: 'Collections' | escape }}"
+      data-progress="scc-progress-{{ sid }}"
+    >
       {%- for block in section.blocks -%}
         {%- liquid
           assign b = block.settings
@@ -60,6 +66,10 @@
           </div>
         </a>
       {%- endfor -%}
+    </div>
+
+    <div class="tss-progress scc-progress" id="scc-progress-{{ sid }}" aria-hidden="true">
+      <span></span>
     </div>
 
     <!-- View All — bottom center primary button -->
@@ -162,10 +172,13 @@
   }
 
   /* ── Grid ── */
+  /* Mobile inherits .tss-rail — the same horizontal snap rail the Journal
+     uses. The negative margin cancels the section's mobile padding so the rail
+     runs edge to edge, while the matching padding keeps the first card lined
+     up with the heading above it. */
   #scc-{{ sid }} .scc-grid {
-    display: grid;
-    grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
-    gap: {{ section.settings.card_gap }}px;
+    margin-inline: calc(-1 * {{ section.settings.mobile_padding_left }}px) calc(-1 * {{ section.settings.mobile_padding_right }}px);
+    padding-inline: {{ section.settings.mobile_padding_left }}px {{ section.settings.mobile_padding_right }}px;
   }
 
   /* ── Card — image above, text below (mirrors the Journal card) ── */
@@ -217,6 +230,12 @@
     margin-top: 12px;
   }
 
+  /* .tss-progress carries its own gutter margin; the section is already padded,
+     so zero it to keep the bar flush with the cards. */
+  #scc-{{ sid }} .scc-progress {
+    margin-inline: 0;
+  }
+
   /* ── Responsive ── */
   @media screen and (max-width: 768px) {
     #scc-{{ sid }} {
@@ -225,17 +244,34 @@
     /* .scc-title uses "Font size mobile" as its base size */
   }
 
-  /* Below the theme's 64rem / 40rem breakpoints, honouring the column settings
-     rather than the 2 that used to be hard-coded here. */
-  @media screen and (max-width: 63.999rem) {
+  /* From the theme's 40rem breakpoint up the rail becomes a grid again, so the
+     column settings still drive tablet and desktop. */
+  @media screen and (min-width: 40rem) {
     #scc-{{ sid }} .scc-grid {
+      display: grid;
       grid-template-columns: repeat({{ section.settings.columns_tablet }}, 1fr);
+      gap: {{ section.settings.card_gap }}px;
+      overflow: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+      /* .tss-rail caps itself at --tss-max above 64rem; the wrapper's
+         "Content max-width" setting governs here instead. */
+      max-width: none;
+    }
+
+    /* Undoes the 46vw/24vw widths .tss-rail gives its children. */
+    #scc-{{ sid }} .scc-grid > * {
+      width: auto;
+    }
+
+    #scc-{{ sid }} .scc-progress {
+      display: none;
     }
   }
 
-  @media screen and (max-width: 39.999rem) {
+  @media screen and (min-width: 64rem) {
     #scc-{{ sid }} .scc-grid {
-      grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);
+      grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
     }
   }
 </style>
@@ -274,7 +310,6 @@
     { "type": "header", "content": "Card Grid" },
     { "type": "range", "id": "columns",        "label": "Columns (desktop)", "min": 1, "max": 6, "step": 1, "default": 4 },
     { "type": "range", "id": "columns_tablet", "label": "Columns (tablet)",  "min": 1, "max": 4, "step": 1, "default": 2 },
-    { "type": "range", "id": "columns_mobile", "label": "Columns (mobile)",  "min": 1, "max": 3, "step": 1, "default": 1 },
     { "type": "range", "id": "card_gap",     "label": "Gap between cards (px)",  "min": 0, "max": 40,  "step": 2,  "default": 24 },
     { "type": "range", "id": "card_radius", "label": "Card radius (px)",        "min": 0, "max": 24,  "step": 2,  "default": 0 },
 
