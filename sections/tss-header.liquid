@@ -209,6 +209,34 @@
     color: var(--tss-gold);
   }
 
+  /* Submenus are collapsed until their parent is tapped. <details> carries the
+     open/closed state and the expanded semantics on its own. */
+  #tss-drawer-{{ uid }} .tss-drawer__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  #tss-drawer-{{ uid }} .tss-drawer__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  #tss-drawer-{{ uid }} .tss-drawer__summary svg {
+    flex: 0 0 auto;
+    transition: transform 0.3s var(--tss-ease);
+  }
+
+  #tss-drawer-{{ uid }} .tss-drawer__group[open] .tss-drawer__summary svg {
+    transform: rotate(180deg);
+  }
+
+  #tss-drawer-{{ uid }} .tss-drawer__subs {
+    padding: 4px 0 12px;
+  }
+
   #tss-drawer-{{ uid }} .tss-drawer__sub {
     display: block;
     padding: 8px 0 8px 16px;
@@ -336,10 +364,21 @@
     <button type="button" class="tss-drawer__close" data-tss-close>Close</button>
     <nav>
       {%- for link in menu.links -%}
-        <a href="{{ link.url }}" class="tss-drawer__link">{{ link.title | escape }}</a>
-        {%- for child in link.links -%}
-          <a href="{{ child.url }}" class="tss-drawer__sub">{{ child.title | escape }}</a>
-        {%- endfor -%}
+        {%- if link.links.size > 0 -%}
+          <details class="tss-drawer__group">
+            <summary class="tss-drawer__link tss-drawer__summary">
+              <span>{{ link.title | escape }}</span>
+              {% render 'tss-icon', icon: 'chevron-down', size: 18, stroke: 1.5 %}
+            </summary>
+            <div class="tss-drawer__subs">
+              {%- for child in link.links -%}
+                <a href="{{ child.url }}" class="tss-drawer__sub">{{ child.title | escape }}</a>
+              {%- endfor -%}
+            </div>
+          </details>
+        {%- else -%}
+          <a href="{{ link.url }}" class="tss-drawer__link">{{ link.title | escape }}</a>
+        {%- endif -%}
       {%- endfor -%}
     </nav>
   </div>
