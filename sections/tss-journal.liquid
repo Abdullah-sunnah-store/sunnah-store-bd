@@ -38,6 +38,24 @@
     margin-top: 48px;
   }
 
+  /* Below the desktop breakpoint the gutter moves off the rail and onto its
+     wrapper: padding on a flex scroll container does not hold, which left the
+     cards flush against the screen edge. Desktop is untouched — there .tss-rail
+     still centres itself at --tss-max with its own 40px gutters. */
+  @media screen and (max-width: 63.999rem) {
+    #tss-journal-{{ uid }} .tss-journal__rail-wrap {
+      padding-inline: var(--tss-gutter);
+    }
+
+    #tss-journal-{{ uid }} .tss-rail {
+      padding-inline: 0;
+    }
+
+    #tss-journal-{{ uid }} .tss-progress {
+      margin-inline: 0;
+    }
+  }
+
   #tss-journal-{{ uid }} .tss-journal__title {
     margin-top: 20px;
     max-width: 20ch;
