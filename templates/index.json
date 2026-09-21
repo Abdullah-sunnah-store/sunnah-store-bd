@@ -291,7 +291,7 @@
       "name": "Sunnah Collection Cards",
       "settings": {
         "section_bg": "#f5f0e8",
-        "max_width": 1400,
+        "max_width": 1200,
         "eyebrow": "A SUNNAH OF GIVING",
         "eyebrow_size": 10,
         "eyebrow_color": "#B8860B",
@@ -302,7 +302,7 @@
         "subtext": "",
         "subtext_size": 15,
         "subtext_color": "#555555",
-        "head_bottom_gap": 32,
+        "head_bottom_gap": 48,
         "view_all_text": "",
         "view_all_url": "",
         "btn_font_size": 13,
@@ -315,15 +315,17 @@
         "card_title_size": 22,
         "quote_color": "#5A5A54",
         "quote_size": 14,
-        "padding_top": 60,
-        "padding_bottom": 60,
+        "padding_top": 80,
+        "padding_bottom": 80,
         "padding_left": 40,
         "padding_right": 40,
         "mobile_padding_top": 40,
         "mobile_padding_bottom": 40,
         "mobile_padding_left": 20,
         "mobile_padding_right": 20,
-        "card_link_label": "Shop →"
+        "card_link_label": "Shop →",
+        "show_category": false,
+        "show_quote": false
       }
     },
     "tss_05_build_box": {
