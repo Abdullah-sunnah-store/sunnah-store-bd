@@ -874,6 +874,260 @@
     display: none;
   }
 
+  /* ---------- 1 · a closer look ---------- */
+  /* The media is a button now, so strip what the UA puts on one. */
+  #tss-bb-{{ uid }} button.tss-bb__card-media {
+    border: 0;
+    padding: 0;
+    text-align: start;
+    color: inherit;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-mark {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    border-radius: 2px;
+    background: rgb(245 240 232 / 0.92);
+    padding: 4px 8px;
+    font-family: var(--tss-sans);
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    line-height: 1;
+    color: var(--tss-green-mid);
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__card-media:hover .tss-bb__peek-mark,
+  #tss-bb-{{ uid }} .tss-bb__card-media:focus-visible .tss-bb__peek-mark {
+    background: var(--tss-green-mid);
+    color: var(--tss-ivory);
+  }
+
+  /* ---------- 1 · the drawer ---------- */
+  #tss-bb-{{ uid }} .tss-bb__peek[hidden] {
+    display: none;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek {
+    position: fixed;
+    inset: 0;
+    /* Over the site's WhatsApp launcher (z-index 100) and this section's tray. */
+    z-index: 120;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgb(5 30 22 / 0.45);
+    opacity: 0;
+    transition: opacity 0.4s var(--tss-ease);
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek[data-open='true'] .tss-bb__peek-scrim {
+    opacity: 1;
+  }
+
+  /* Slides in from the edge, the way the mini cart does. */
+  #tss-bb-{{ uid }} .tss-bb__peek-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    width: min(420px, 100%);
+    flex-direction: column;
+    border-left: 1px solid rgb(26 74 58 / 0.12);
+    background: var(--tss-ivory);
+    transform: translateX(100%);
+    transition: transform 0.5s var(--tss-ease);
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek[data-open='true'] .tss-bb__peek-panel {
+    transform: none;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-panel:focus {
+    outline: none;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-head {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid rgb(26 74 58 / 0.12);
+    padding: 16px var(--tss-gutter);
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-eyebrow {
+    font-family: var(--tss-sans);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgb(184 134 11 / 0.8);
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-close {
+    border: 0;
+    background: transparent;
+    padding: 4px;
+    font-family: var(--tss-sans);
+    font-size: 20px;
+    line-height: 1;
+    color: var(--tss-ink);
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-close:hover {
+    opacity: 0.6;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px var(--tss-gutter) 28px;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-media {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    width: 100%;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-vendor {
+    margin-top: 16px;
+    font-family: var(--tss-sans);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-vendor[hidden] {
+    display: none;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-title {
+    margin-top: 6px;
+    font-family: var(--tss-serif);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.15;
+    text-wrap: pretty;
+    color: var(--tss-ink);
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-price {
+    margin-top: 6px;
+    font-family: var(--tss-sans);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--tss-gold);
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-variants[hidden] {
+    display: none;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-desc {
+    margin-top: 16px;
+    border-top: 1px solid rgb(26 74 58 / 0.12);
+    padding-top: 16px;
+    font-family: var(--tss-sans);
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgb(28 28 26 / 0.7);
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-desc[hidden] {
+    display: none;
+  }
+
+  /* The description is merchant HTML, so give it back the basics. */
+  #tss-bb-{{ uid }} .tss-bb__peek-desc > * + * {
+    margin-top: 12px;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-desc ul,
+  #tss-bb-{{ uid }} .tss-bb__peek-desc ol {
+    margin-left: 18px;
+    list-style: revert;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-desc li + li {
+    margin-top: 6px;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-desc strong,
+  #tss-bb-{{ uid }} .tss-bb__peek-desc b {
+    font-weight: 600;
+    color: var(--tss-ink);
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-desc a {
+    color: var(--tss-green-mid);
+    text-decoration: underline;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-desc img,
+  #tss-bb-{{ uid }} .tss-bb__peek-desc iframe,
+  #tss-bb-{{ uid }} .tss-bb__peek-desc table {
+    max-width: 100%;
+    height: auto;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-foot {
+    flex-shrink: 0;
+    border-top: 1px solid rgb(26 74 58 / 0.12);
+    padding: 12px var(--tss-gutter) calc(12px + env(safe-area-inset-bottom));
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-foot .tss-bb__action {
+    margin-top: 0;
+  }
+
+  /* The drawer's own Add/stepper reads the same state the card does. */
+  #tss-bb-{{ uid }} .tss-bb__peek-panel[data-qty]:not([data-qty='0']) .tss-bb__add {
+    display: none;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-panel[data-qty]:not([data-qty='0']) .tss-bb__stepper {
+    display: flex;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__peek-panel[data-mute='true'] .tss-bb__add {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  body[data-tss-bb-peek='true'] {
+    overflow: hidden;
+  }
+
+  body[data-tss-bb-peek='true'] .whatsapp-float,
+  body[data-tss-bb-peek='true'] .whatsapp-popup {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   /* ---------- larger screens ---------- */
   @media (min-width: 40rem) {
     #tss-bb-{{ uid }} .tss-bb__grid {
@@ -1005,8 +1259,14 @@
                     data-price="{{ fv.price }}"
                     data-price-text="{{ fv.price | money | escape }}"
                     data-image="{% if card_image %}{{ card_image | image_url: width: 200 }}{% endif %}"
+                    data-image-lg="{% if card_image %}{{ card_image | image_url: width: 900 }}{% endif %}"
                   >
-                    <span class="tss-bb__card-media">
+                    <button
+                      type="button"
+                      class="tss-bb__card-media"
+                      data-bb-peek-open
+                      aria-label="{{ product.title | escape }} — {{ s.peek_open_label | default: 'a closer look' | escape }}"
+                    >
                       {% render 'tss-image',
                         image: card_image,
                         width: 600,
@@ -1014,7 +1274,13 @@
                         sizes: '(min-width: 64rem) 300px, 46vw',
                         alt: product.title
                       %}
-                    </span>
+                      {%- if s.peek_mark != blank -%}
+                        <span class="tss-bb__peek-mark" aria-hidden="true">{{ s.peek_mark | escape }}</span>
+                      {%- endif -%}
+                    </button>
+
+                    {% comment %} Kept out of first paint; the drawer clones it on open. {% endcomment %}
+                    <template data-bb-desc>{{ product.description }}</template>
 
                     {%- if product.vendor != blank -%}
                       <p class="tss-bb__card-vendor">{{ product.vendor | escape }}</p>
@@ -1037,6 +1303,7 @@
                             data-price="{{ v.price }}"
                             data-price-text="{{ v.price | money | escape }}"
                             data-image="{% if v.image %}{{ v.image | image_url: width: 200 }}{% else %}{{ product.featured_image | image_url: width: 200 }}{% endif %}"
+                            data-image-lg="{% if v.image %}{{ v.image | image_url: width: 900 }}{% else %}{{ product.featured_image | image_url: width: 900 }}{% endif %}"
                             {% unless v.available %}disabled{% endunless %}
                             {% if v.id == fv.id %}selected{% endif %}
                           >
@@ -1297,6 +1564,74 @@
       </div>
     </div>
   </div>
+  {% comment %}
+    A closer look at one piece. Opens like the mini cart — scrim, panel off the
+    edge — and carries the same Add/stepper the card does, so a piece can go in
+    without closing the drawer first.
+  {% endcomment %}
+  <div class="tss-bb__peek" data-bb-peek data-open="false" hidden>
+    <div class="tss-bb__peek-scrim" data-bb-peek-close></div>
+
+    <div
+      class="tss-bb__peek-panel"
+      data-bb-peek-panel
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tss-bb-peek-title-{{ uid }}"
+      tabindex="-1"
+      data-qty="0"
+    >
+      <div class="tss-bb__peek-head">
+        <p class="tss-bb__peek-eyebrow">
+          {{- s.peek_title | default: 'A closer look' | escape -}}
+        </p>
+        <button
+          type="button"
+          class="tss-bb__peek-close"
+          data-bb-peek-close
+          aria-label="{{ s.peek_close_label | default: 'Close' | escape }}"
+        >&times;</button>
+      </div>
+
+      <div class="tss-bb__peek-body" data-bb-peek-scroll>
+        <span class="tss-bb__peek-media">
+          {% comment %} src and alt are set as the drawer opens. {% endcomment %}
+          <img data-bb-peek-image alt="" width="900" height="1200" loading="lazy" decoding="async">
+        </span>
+
+        <p class="tss-bb__peek-vendor" data-bb-peek-vendor hidden></p>
+        <h3 class="tss-bb__peek-title" id="tss-bb-peek-title-{{ uid }}" data-bb-peek-title></h3>
+        <p class="tss-bb__peek-price" data-bb-peek-price></p>
+
+        <div class="tss-bb__peek-variants" data-bb-peek-variants hidden></div>
+
+        <div class="tss-bb__peek-desc" data-bb-peek-desc></div>
+      </div>
+
+      <div class="tss-bb__peek-foot">
+        <div class="tss-bb__action">
+          <button type="button" class="tss-bb__add" data-bb-add>
+            {{- s.add_label | default: 'Add' | escape -}}
+          </button>
+          <div class="tss-bb__stepper">
+            <button
+              type="button"
+              class="tss-bb__step-btn"
+              data-bb-minus
+              aria-label="{{ 'Remove one' | escape }}"
+            >&minus;</button>
+            <span class="tss-bb__qty" data-bb-qty aria-live="polite">0</span>
+            <button
+              type="button"
+              class="tss-bb__step-btn"
+              data-bb-plus
+              aria-label="{{ 'Add one more' | escape }}"
+            >+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <script>
@@ -1467,6 +1802,7 @@
 
     // ---------- steps ----------
     function goto(step, scroll) {
+      closePeek();
       state.step = step;
       for (var i = 0; i < els.steps.length; i++) {
         var panel = els.steps[i];
@@ -1521,6 +1857,7 @@
       card.setAttribute('data-price', option.getAttribute('data-price') || '0');
       card.setAttribute('data-price-text', option.getAttribute('data-price-text') || '');
       card.setAttribute('data-image', option.getAttribute('data-image') || '');
+      card.setAttribute('data-image-lg', option.getAttribute('data-image-lg') || '');
 
       var priceEl = card.querySelector('[data-bb-card-price]');
       if (priceEl) priceEl.textContent = option.getAttribute('data-price-text') || '';
@@ -1569,7 +1906,9 @@
       var button = e.target.closest('[data-bb-add], [data-bb-plus], [data-bb-minus]');
       if (!button || !root.contains(button)) return;
 
-      var card = button.closest('[data-bb-card]');
+      // The drawer's buttons live outside the grid, so they act on the piece
+      // the drawer is showing.
+      var card = button.closest('[data-bb-card]') || peek.card;
       if (!card) return;
 
       var down = button.hasAttribute('data-bb-minus');
@@ -1591,6 +1930,152 @@
         }
       }
       sync();
+    });
+
+
+    // ---------- 1 · a closer look ----------
+    var peek = {
+      root: root.querySelector('[data-bb-peek]'),
+      panel: root.querySelector('[data-bb-peek-panel]'),
+      body: root.querySelector('[data-bb-peek-scroll]'),
+      image: root.querySelector('[data-bb-peek-image]'),
+      vendor: root.querySelector('[data-bb-peek-vendor]'),
+      title: root.querySelector('[data-bb-peek-title]'),
+      price: root.querySelector('[data-bb-peek-price]'),
+      variants: root.querySelector('[data-bb-peek-variants]'),
+      desc: root.querySelector('[data-bb-peek-desc]'),
+      card: null,
+      opener: null,
+      timer: null
+    };
+
+    // Image and price follow the chosen variant; everything else is the piece.
+    function refreshPeek() {
+      var card = peek.card;
+      if (!card) return;
+
+      if (peek.image) {
+        peek.image.src = card.getAttribute('data-image-lg') || card.getAttribute('data-image') || '';
+        peek.image.alt = card.getAttribute('data-title') || '';
+      }
+      if (peek.price) peek.price.textContent = card.getAttribute('data-price-text') || '';
+
+      syncPeek();
+    }
+
+    function syncPeek() {
+      if (!peek.panel || !peek.card) return;
+
+      var at = indexOfPick(peek.card.getAttribute('data-variant'));
+      var qty = at > -1 ? state.picks[at].qty : 0;
+      var atMax = placesUsed() >= maxPlaces();
+
+      peek.panel.setAttribute('data-qty', String(qty));
+      peek.panel.setAttribute('data-mute', String(atMax && qty === 0));
+
+      var qtyEl = peek.panel.querySelector('[data-bb-qty]');
+      if (qtyEl) qtyEl.textContent = String(qty);
+      var plus = peek.panel.querySelector('[data-bb-plus]');
+      if (plus) plus.disabled = atMax;
+      var add = peek.panel.querySelector('[data-bb-add]');
+      if (add) add.disabled = atMax;
+    }
+
+    function fillPeek(card) {
+      peek.card = card;
+
+      var vendor = card.getAttribute('data-vendor') || '';
+      if (peek.vendor) {
+        peek.vendor.textContent = vendor;
+        peek.vendor.hidden = !vendor;
+      }
+      if (peek.title) peek.title.textContent = card.getAttribute('data-title') || '';
+
+      if (peek.desc) {
+        var source = card.querySelector('[data-bb-desc]');
+        peek.desc.innerHTML = '';
+        if (source && source.content) peek.desc.appendChild(source.content.cloneNode(true));
+        // A description of nothing but whitespace leaves a rule and a gap.
+        peek.desc.hidden = !peek.desc.textContent.trim() && !peek.desc.querySelector('img, iframe, table');
+      }
+
+      // The card keeps the real select; the drawer's is a stand-in that hands
+      // the choice back so both stay on the same variant.
+      if (peek.variants) {
+        peek.variants.innerHTML = '';
+        var select = card.querySelector('[data-bb-variants]');
+        if (select) {
+          var clone = select.cloneNode(true);
+          clone.removeAttribute('id');
+          clone.removeAttribute('data-bb-variants');
+          clone.value = select.value;
+          clone.addEventListener('change', function () {
+            select.value = this.value;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            refreshPeek();
+          });
+          peek.variants.appendChild(clone);
+        }
+        peek.variants.hidden = !select;
+      }
+
+      refreshPeek();
+    }
+
+    function openPeek(card) {
+      if (!peek.root || !card) return;
+
+      clearTimeout(peek.timer);
+      fillPeek(card);
+      if (peek.body) peek.body.scrollTop = 0;
+
+      peek.root.hidden = false;
+      document.body.setAttribute('data-tss-bb-peek', 'true');
+
+      // One frame off-screen so the panel has somewhere to slide in from.
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          peek.root.setAttribute('data-open', 'true');
+          if (peek.panel) peek.panel.focus({ preventScroll: true });
+        });
+      });
+    }
+
+    function closePeek() {
+      if (!peek.root || peek.root.hidden) return;
+
+      peek.root.setAttribute('data-open', 'false');
+      document.body.removeAttribute('data-tss-bb-peek');
+
+      clearTimeout(peek.timer);
+      peek.timer = setTimeout(function () {
+        peek.root.hidden = true;
+        peek.card = null;
+      }, 500);
+
+      if (peek.opener && document.contains(peek.opener)) {
+        peek.opener.focus({ preventScroll: true });
+      }
+      peek.opener = null;
+    }
+
+    root.addEventListener('click', function (e) {
+      var opener = e.target.closest('[data-bb-peek-open]');
+      if (opener && root.contains(opener)) {
+        var card = opener.closest('[data-bb-card]');
+        if (card) {
+          peek.opener = opener;
+          openPeek(card);
+        }
+        return;
+      }
+
+      var close = e.target.closest('[data-bb-peek-close]');
+      if (close && root.contains(close)) closePeek();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' || e.key === 'Esc') closePeek();
     });
 
     // ---------- tray + card state ----------
@@ -1645,6 +2130,8 @@
       }
 
       if (els.tray) els.tray.setAttribute('data-filled', used > 0 ? 'true' : 'false');
+
+      syncPeek();
     }
 
     if (els.cont) {
@@ -1954,6 +2441,10 @@
     { "type": "text", "id": "continue_label", "label": "Continue label", "default": "Continue" },
     { "type": "text", "id": "back_label", "label": "Back label", "default": "Back" },
     { "type": "text", "id": "empty_label", "label": "Empty category text", "default": "Nothing in this category yet." },
+    { "type": "text", "id": "peek_mark", "label": "Image badge", "default": "View", "info": "Sits on each photo. Leave blank to hide it — the photo still opens the drawer." },
+    { "type": "text", "id": "peek_title", "label": "Drawer eyebrow", "default": "A closer look" },
+    { "type": "text", "id": "peek_open_label", "label": "Image button label", "default": "a closer look", "info": "Read out by screen readers after the piece's name." },
+    { "type": "text", "id": "peek_close_label", "label": "Drawer close label", "default": "Close" },
 
     { "type": "header", "content": "Step 2 · Personalise" },
     { "type": "text", "id": "personalise_title", "label": "Heading", "default": "Personalise it." },
