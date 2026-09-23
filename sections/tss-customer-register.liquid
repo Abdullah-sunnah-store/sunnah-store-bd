@@ -1,0 +1,125 @@
+{% comment %}
+  TSS — Create account (legacy customer accounts)
+  The sign-in card's twin: same measure, fields and colours.
+{% endcomment %}
+
+{% render 'tss-base' %}
+{{ 'tss-account.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+-%}
+
+<section
+  id="tss-register-{{ uid }}"
+  class="tss-section tss-acct"
+  style="--acct-page: {{ s.page_bg }}; --acct-card: {{ s.card_bg }}; --acct-btn: {{ s.button_bg }}; --acct-btn-text: {{ s.button_text }};"
+>
+  <div class="tss-acct__card">
+    <h1 class="tss-acct__title">{{ s.title | escape }}</h1>
+    {%- if s.lede != blank -%}
+      <p class="tss-acct__lede">{{ s.lede | escape }}</p>
+    {%- endif -%}
+
+    {%- form 'create_customer', novalidate: 'novalidate', class: 'tss-acct__form' -%}
+      {%- if form.errors -%}
+        <div class="tss-acct__errors" role="alert">{{ form.errors | default_errors }}</div>
+      {%- endif -%}
+
+      <div class="tss-acct__row">
+        <label class="tss-sr-only" for="tss-reg-first-{{ uid }}">First name</label>
+        <input
+          type="text"
+          id="tss-reg-first-{{ uid }}"
+          class="tss-acct__input"
+          name="customer[first_name]"
+          value="{{ form.first_name }}"
+          placeholder="First name"
+          autocomplete="given-name"
+        >
+        <label class="tss-sr-only" for="tss-reg-last-{{ uid }}">Last name</label>
+        <input
+          type="text"
+          id="tss-reg-last-{{ uid }}"
+          class="tss-acct__input"
+          name="customer[last_name]"
+          value="{{ form.last_name }}"
+          placeholder="Last name"
+          autocomplete="family-name"
+        >
+      </div>
+
+      <label class="tss-sr-only" for="tss-reg-email-{{ uid }}">Email</label>
+      <input
+        type="email"
+        id="tss-reg-email-{{ uid }}"
+        class="tss-acct__input"
+        name="customer[email]"
+        value="{{ form.email }}"
+        placeholder="Email"
+        autocomplete="email"
+        autocapitalize="off"
+        spellcheck="false"
+        required
+      >
+
+      <label class="tss-sr-only" for="tss-reg-password-{{ uid }}">Password</label>
+      <input
+        type="password"
+        id="tss-reg-password-{{ uid }}"
+        class="tss-acct__input"
+        name="customer[password]"
+        placeholder="Password"
+        autocomplete="new-password"
+        required
+      >
+
+      <label class="tss-acct__check">
+        <input type="checkbox" name="customer[accepts_marketing]" value="true" checked>
+        {{ s.marketing_label | escape }}
+      </label>
+
+      <button type="submit" class="tss-acct__btn">{{ s.button_label | escape }}</button>
+    {%- endform -%}
+
+    <p class="tss-acct__alt">
+      Already have an account?
+      <a href="{{ routes.account_login_url }}" class="tss-acct__link">Sign in</a>
+    </p>
+
+    {%- if s.terms != blank -%}
+      <div class="tss-acct__terms">{{ s.terms }}</div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TSS · Create account",
+  "tag": "div",
+  "settings": [
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Create account" },
+    {
+      "type": "text",
+      "id": "lede",
+      "label": "Subheading",
+      "default": "Save your details, track orders and keep a wishlist."
+    },
+    { "type": "text", "id": "marketing_label", "label": "Newsletter checkbox", "default": "Email me with new arrivals and offers" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Create account" },
+    {
+      "type": "richtext",
+      "id": "terms",
+      "label": "Terms line",
+      "default": "<p>By creating an account, you agree to our <a href=\"/policies/terms-of-service\" title=\"Terms of Service\">Terms of Service</a> and <a href=\"/policies/privacy-policy\" title=\"Privacy Policy\">Privacy Policy</a>.</p>"
+    },
+    { "type": "header", "content": "Colours" },
+    { "type": "color", "id": "page_bg", "label": "Page background", "default": "#F5F5F7" },
+    { "type": "color", "id": "card_bg", "label": "Card background", "default": "#FFFFFF" },
+    { "type": "color", "id": "button_bg", "label": "Button", "default": "#1F6FC5" },
+    { "type": "color", "id": "button_text", "label": "Button text", "default": "#FFFFFF" }
+  ]
+}
+{% endschema %}

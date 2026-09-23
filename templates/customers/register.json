@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "tss-customer-register",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

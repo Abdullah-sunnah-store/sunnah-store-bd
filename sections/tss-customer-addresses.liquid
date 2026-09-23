@@ -1,0 +1,123 @@
+{% comment %}
+  TSS — Addresses (legacy customer accounts)
+  Saved addresses as cards, each with an inline edit form; a new-address form
+  opens from the head.
+{% endcomment %}
+
+{% render 'tss-base' %}
+{{ 'tss-account.css' | asset_url | stylesheet_tag }}
+
+{%- assign s = section.settings -%}
+
+<section id="tss-addresses-{{ section.id }}" class="tss-section tss-acct" style="--acct-page: {{ s.page_bg }};">
+  <div class="tss-acct__wrap">
+    <header class="tss-acct__head">
+      <div>
+        <p class="tss-acct__eyebrow">My account</p>
+        <h1 class="tss-acct__h1">Addresses</h1>
+      </div>
+      <nav class="tss-acct__nav" aria-label="Account">
+        <a href="{{ routes.account_url }}">← Back to account</a>
+      </nav>
+    </header>
+
+    {%- paginate customer.addresses by 12 -%}
+      <div class="tss-acct__addresses">
+        <details class="tss-acct__box tss-acct__box--wide tss-acct__edit"{% if customer.addresses.size == 0 %} open{% endif %}>
+          <summary class="tss-acct__h2">+ Add a new address</summary>
+          {%- form 'customer_address', customer.new_address, class: 'tss-acct__form' -%}
+            {%- if form.errors -%}
+              <div class="tss-acct__errors" role="alert">{{ form.errors | default_errors }}</div>
+            {%- endif -%}
+            {% render 'tss-address-fields', form: form %}
+            <div class="tss-acct__actions">
+              <button type="submit" class="tss-acct__btn">Save address</button>
+            </div>
+          {%- endform -%}
+        </details>
+
+        {%- for address in customer.addresses -%}
+          <div class="tss-acct__box">
+            {%- if address == customer.default_address -%}
+              <p class="tss-acct__eyebrow">Default</p>
+            {%- endif -%}
+            <address class="tss-acct__address" style="margin-top: 8px;">{{ address | format_address }}</address>
+
+            <details class="tss-acct__edit">
+              <summary class="tss-acct__actions">
+                <span class="tss-acct__btn tss-acct__btn--ghost">Edit</span>
+              </summary>
+              {%- form 'customer_address', address, class: 'tss-acct__form' -%}
+                {%- if form.errors -%}
+                  <div class="tss-acct__errors" role="alert">{{ form.errors | default_errors }}</div>
+                {%- endif -%}
+                {% render 'tss-address-fields', form: form %}
+                <div class="tss-acct__actions">
+                  <button type="submit" class="tss-acct__btn">Update address</button>
+                </div>
+              {%- endform -%}
+            </details>
+
+            <form method="post" action="{{ address.url }}" class="tss-acct__actions" data-tss-delete>
+              <input type="hidden" name="_method" value="delete">
+              <button type="submit" class="tss-acct__btn tss-acct__btn--ghost">Delete</button>
+            </form>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if paginate.pages > 1 -%}
+        <nav class="tss-acct__pager" aria-label="Address pages">
+          {%- if paginate.previous -%}<a href="{{ paginate.previous.url }}">← Previous</a>{%- endif -%}
+          <span>Page {{ paginate.current_page }} of {{ paginate.pages }}</span>
+          {%- if paginate.next -%}<a href="{{ paginate.next.url }}">Next →</a>{%- endif -%}
+        </nav>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+
+<script>
+  (() => {
+    const root = document.getElementById('tss-addresses-{{ section.id }}');
+    if (!root) return;
+
+    // Each country <option> from all_country_option_tags carries its regions
+    // as data-provinces: [["Dhaka","Dhaka"], ...]. Empty means no region field.
+    root.querySelectorAll('[data-tss-country]').forEach((country) => {
+      const province = country.form.querySelector('[data-tss-province]');
+      country.value = country.dataset.default;
+
+      const fill = () => {
+        const option = country.options[country.selectedIndex];
+        const list = option ? JSON.parse(option.dataset.provinces || '[]') : [];
+        province.innerHTML = '';
+        list.forEach(([value, label]) => province.add(new Option(label, value)));
+        province.hidden = list.length === 0;
+        if (list.length) province.value = province.dataset.default || list[0][0];
+      };
+
+      fill();
+      country.addEventListener('change', () => {
+        province.dataset.default = '';
+        fill();
+      });
+    });
+
+    root.querySelectorAll('[data-tss-delete]').forEach((form) => {
+      form.addEventListener('submit', (e) => {
+        if (!window.confirm('Delete this address?')) e.preventDefault();
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "TSS · Addresses",
+  "tag": "div",
+  "settings": [
+    { "type": "color", "id": "page_bg", "label": "Page background", "default": "#F5F0E8" }
+  ]
+}
+{% endschema %}

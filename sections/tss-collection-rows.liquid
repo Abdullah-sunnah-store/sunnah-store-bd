@@ -33,6 +33,10 @@
         endif
       endfor
     endif
+    # A menu sharing the collection's handle also makes it a parent, e.g. By Occasion.
+    if menu_parent == nil and collection != blank and linklists[collection.handle].links.size > 0
+      assign menu_parent = linklists[collection.handle]
+    endif
   endif
 
   if from_menu

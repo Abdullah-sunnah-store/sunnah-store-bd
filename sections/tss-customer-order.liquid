@@ -1,0 +1,133 @@
+{% comment %}
+  TSS — Order detail (legacy customer accounts)
+{% endcomment %}
+
+{% render 'tss-base' %}
+{{ 'tss-account.css' | asset_url | stylesheet_tag }}
+
+{%- assign s = section.settings -%}
+
+<section class="tss-section tss-acct" style="--acct-page: {{ s.page_bg }};">
+  <div class="tss-acct__wrap">
+    <header class="tss-acct__head">
+      <div>
+        <p class="tss-acct__eyebrow">Placed {{ order.created_at | time_tag: format: 'date' }}</p>
+        <h1 class="tss-acct__h1">Order {{ order.name }}</h1>
+      </div>
+      <nav class="tss-acct__nav" aria-label="Account">
+        <a href="{{ routes.account_url }}">← Back to account</a>
+      </nav>
+    </header>
+
+    {%- if order.cancelled -%}
+      <p class="tss-acct__errors" style="margin-top: 24px;">
+        Cancelled {{ order.cancelled_at | time_tag: format: 'date' }} — {{ order.cancel_reason_label }}
+      </p>
+    {%- endif -%}
+
+    <div class="tss-acct__grid">
+      <div class="tss-acct__table-wrap">
+        <table class="tss-acct__table">
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col" class="is-num">Price</th>
+              <th scope="col" class="is-num">Qty</th>
+              <th scope="col" class="is-num">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {%- for line_item in order.line_items -%}
+              <tr>
+                <td>
+                  <div class="tss-acct__item">
+                    {%- if line_item.image -%}
+                      {{ line_item.image | image_url: width: 120 | image_tag: loading: 'lazy', alt: line_item.title }}
+                    {%- endif -%}
+                    <div>
+                      {%- if line_item.url != blank -%}
+                        <a href="{{ line_item.url }}" class="tss-acct__link">{{ line_item.product.title | default: line_item.title | escape }}</a>
+                      {%- else -%}
+                        {{ line_item.title | escape }}
+                      {%- endif -%}
+                      {%- unless line_item.product.has_only_default_variant or line_item.variant_title == blank -%}
+                        <div class="tss-acct__muted">{{ line_item.variant_title | escape }}</div>
+                      {%- endunless -%}
+                      {%- if line_item.fulfillment -%}
+                        <div class="tss-acct__muted">
+                          Shipped {{ line_item.fulfillment.created_at | time_tag: format: 'date' }}
+                          {%- if line_item.fulfillment.tracking_url -%}
+                            · <a href="{{ line_item.fulfillment.tracking_url }}" class="tss-acct__link">Track</a>
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </td>
+                <td class="is-num">{{ line_item.final_price | money }}</td>
+                <td class="is-num">{{ line_item.quantity }}</td>
+                <td class="is-num">{{ line_item.final_line_price | money }}</td>
+              </tr>
+            {%- endfor -%}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3">Subtotal</td>
+              <td class="is-num">{{ order.line_items_subtotal_price | money }}</td>
+            </tr>
+            {%- for discount_application in order.cart_level_discount_applications -%}
+              <tr>
+                <td colspan="3">Discount ({{ discount_application.title | escape }})</td>
+                <td class="is-num">-{{ discount_application.total_allocated_amount | money }}</td>
+              </tr>
+            {%- endfor -%}
+            {%- for shipping_method in order.shipping_methods -%}
+              <tr>
+                <td colspan="3">Shipping ({{ shipping_method.title | escape }})</td>
+                <td class="is-num">{{ shipping_method.price | money }}</td>
+              </tr>
+            {%- endfor -%}
+            {%- for tax_line in order.tax_lines -%}
+              <tr>
+                <td colspan="3">Tax ({{ tax_line.title | escape }} {{ tax_line.rate | times: 100 }}%)</td>
+                <td class="is-num">{{ tax_line.price | money }}</td>
+              </tr>
+            {%- endfor -%}
+            <tr>
+              <td colspan="3">Total</td>
+              <td class="is-num">{{ order.total_net_amount | money_with_currency }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <aside class="tss-acct__panel">
+        <h2 class="tss-acct__h2">Status</h2>
+        <p class="tss-acct__muted">
+          Payment: {{ order.financial_status_label }}<br>
+          Fulfilment: {{ order.fulfillment_status_label }}
+        </p>
+
+        {%- if order.shipping_address -%}
+          <h2 class="tss-acct__h2">Shipping address</h2>
+          <address class="tss-acct__address">{{ order.shipping_address | format_address }}</address>
+        {%- endif -%}
+
+        {%- if order.billing_address -%}
+          <h2 class="tss-acct__h2">Billing address</h2>
+          <address class="tss-acct__address">{{ order.billing_address | format_address }}</address>
+        {%- endif -%}
+      </aside>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TSS · Order",
+  "tag": "div",
+  "settings": [
+    { "type": "color", "id": "page_bg", "label": "Page background", "default": "#F5F0E8" }
+  ]
+}
+{% endschema %}

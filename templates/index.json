@@ -16,21 +16,21 @@
           "type": "link",
           "settings": {
             "label": "By Occasion",
-            "link": "shopify://pages/by-occasion"
+            "link": "shopify://collections/shop-by-occasion"
           }
         },
         "recipient": {
           "type": "link",
           "settings": {
             "label": "By Recipient",
-            "link": "shopify://collections/attar"
+            "link": ""
           }
         },
         "budget": {
           "type": "link",
           "settings": {
             "label": "By Budget",
-            "link": "shopify://collections/best-seller"
+            "link": "shopify://collections/shop-by-budget"
           }
         }
       },
@@ -166,7 +166,9 @@
         "lede": "Every maker in our house is met, visited and chosen by hand — a small few each month, for the care they refuse to hurry. We photograph and fulfil each one ourselves.",
         "rail_label": "Makers we discovered this month",
         "padding_top": 80,
-        "padding_bottom": 80
+        "padding_bottom": 80,
+        "mobile_padding_top": 40,
+        "mobile_padding_bottom": 40
       }
     },
     "tss_04_most_gifted": {
@@ -244,7 +246,7 @@
             "fallback_title": "",
             "icon": "shopify://shop_images/books_c127b4ef-9fa4-4f1b-935f-bbf053ce51e4.png",
             "category_label": "Knowledge",
-            "category_color": "#B8860B",
+            "category_color": "#b8860b",
             "quote": "Islamic Books\"Convey from me, even if it is one verse.\""
           }
         },
@@ -255,7 +257,7 @@
             "fallback_title": "Atter",
             "icon": "shopify://shop_images/Perfume_d0898be3-e858-4e92-82d1-b30146c8a0df.png",
             "category_label": "Fragrance",
-            "category_color": "#B8860B",
+            "category_color": "#b8860b",
             "quote": "Attar & Perfume\"The Prophet ﷺ never refused a gift of fragrance.\""
           }
         },
@@ -266,7 +268,7 @@
             "fallback_title": "Flower",
             "icon": "shopify://shop_images/Flowers_bbd554d0-4ae9-4927-9f25-e3bac3c64803.png",
             "category_label": "Beauty",
-            "category_color": "#B8860B",
+            "category_color": "#b8860b",
             "quote": "Fresh Flowers\"Allah is beautiful and He loves beauty.\""
           }
         },
@@ -277,7 +279,7 @@
             "fallback_title": "Chocolate",
             "icon": "shopify://shop_images/chocolate_93bc8288-e575-4c30-8a21-2e84d5d64512.png",
             "category_label": "Sweetness",
-            "category_color": "#B8860B",
+            "category_color": "#b8860b",
             "quote": "Halal Chocolates\"The Prophet ﷺ loved sweet things and honey.\""
           }
         }
@@ -294,7 +296,7 @@
         "max_width": 1200,
         "eyebrow": "A SUNNAH OF GIVING",
         "eyebrow_size": 10,
-        "eyebrow_color": "#B8860B",
+        "eyebrow_color": "#b8860b",
         "heading": "Gifts That Never Age.",
         "heading_size": 46,
         "heading_size_mobile": 34,
@@ -311,10 +313,13 @@
         "columns_tablet": 2,
         "card_gap": 24,
         "card_radius": 0,
-        "card_title_color": "#1C1C1A",
+        "show_category": false,
+        "show_quote": false,
+        "card_title_color": "#1c1c1a",
         "card_title_size": 22,
-        "quote_color": "#5A5A54",
+        "quote_color": "#5a5a54",
         "quote_size": 14,
+        "card_link_label": "Shop →",
         "padding_top": 80,
         "padding_bottom": 80,
         "padding_left": 40,
@@ -322,10 +327,7 @@
         "mobile_padding_top": 40,
         "mobile_padding_bottom": 40,
         "mobile_padding_left": 20,
-        "mobile_padding_right": 20,
-        "card_link_label": "Shop →",
-        "show_category": false,
-        "show_quote": false
+        "mobile_padding_right": 20
       }
     },
     "tss_05_build_box": {
@@ -400,7 +402,9 @@
         "button_link": "shopify://blogs/news",
         "rail_label": "Stories from the Journal",
         "padding_top": 80,
-        "padding_bottom": 80
+        "padding_bottom": 80,
+        "mobile_padding_top": 40,
+        "mobile_padding_bottom": 40
       }
     },
     "tss_08_shop_all": {

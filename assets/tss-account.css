@@ -1,0 +1,461 @@
+/*
+  TSS Account — legacy customer account pages (sign in, register, password,
+  account, order, addresses). The auth pages are a single centred card; the
+  account pages widen to a measure for tables and address lists.
+
+  Colours come from custom properties each section sets on its root, so the
+  editor can restyle the card without touching this file.
+*/
+
+.tss-acct {
+  --acct-page: var(--tss-ivory);
+  --acct-card: #fff;
+  --acct-btn: var(--tss-green);
+  --acct-btn-text: #fff;
+  --acct-line: rgb(28 28 26 / 0.18);
+
+  background: var(--acct-page);
+  padding: 48px var(--tss-gutter) 64px;
+}
+
+@media (min-width: 40rem) {
+  .tss-acct {
+    padding-block: 80px 96px;
+  }
+}
+
+/* ---------- auth card ---------- */
+
+.tss-acct__card {
+  width: 100%;
+  max-width: 540px;
+  margin-inline: auto;
+  padding: 32px 24px;
+  background: var(--acct-card);
+  border: 1px solid rgb(28 28 26 / 0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgb(28 28 26 / 0.08);
+}
+
+@media (min-width: 40rem) {
+  .tss-acct__card {
+    padding: 44px 40px 36px;
+  }
+}
+
+.tss-acct__title {
+  font-family: var(--tss-sans);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--tss-ink);
+}
+
+.tss-acct__lede {
+  margin-top: 10px;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--tss-ink);
+}
+
+.tss-acct__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.tss-acct__row {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 40rem) {
+  .tss-acct__row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.tss-acct .tss-acct__input,
+.tss-acct .tss-acct__select {
+  width: 100%;
+  height: 58px;
+  padding: 0 18px;
+  font-family: var(--tss-sans);
+  font-size: 17px;
+  color: var(--tss-ink);
+  background: #fff;
+  border: 1px solid var(--acct-line);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tss-acct .tss-acct__input::placeholder {
+  color: rgb(28 28 26 / 0.5);
+}
+
+.tss-acct .tss-acct__input:focus,
+.tss-acct .tss-acct__select:focus {
+  border-color: var(--acct-btn);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acct-btn) 22%, transparent);
+}
+
+.tss-acct__check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: var(--tss-ink);
+}
+
+.tss-acct__check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--acct-btn);
+}
+
+.tss-acct .tss-acct__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 58px;
+  padding: 0 20px;
+  font-family: var(--tss-sans);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--acct-btn-text);
+  background: var(--acct-btn);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter 0.2s ease;
+}
+
+.tss-acct .tss-acct__btn:hover {
+  filter: brightness(1.08);
+}
+
+.tss-acct .tss-acct__btn--ghost {
+  color: var(--tss-ink);
+  background: #fff;
+  border: 1px solid var(--acct-line);
+}
+
+.tss-acct .tss-acct__btn--ghost:hover {
+  filter: none;
+  background: rgb(28 28 26 / 0.03);
+}
+
+.tss-acct__or {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-block: 28px 24px;
+  font-size: 18px;
+  color: var(--tss-ink);
+}
+
+.tss-acct__or::before,
+.tss-acct__or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--acct-line);
+}
+
+/* App blocks (social sign-in) stack like the Continue button above them. */
+.tss-acct__social {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tss-acct__alt {
+  margin-top: 20px;
+  font-size: 15px;
+  text-align: center;
+  color: var(--tss-ink);
+}
+
+.tss-acct .tss-acct__link {
+  color: var(--tss-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tss-acct .tss-acct__link:hover {
+  color: var(--acct-btn);
+}
+
+.tss-acct__forgot {
+  margin-top: -4px;
+  font-size: 14px;
+  text-align: right;
+}
+
+.tss-acct__terms {
+  margin-top: 28px;
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--tss-ink);
+}
+
+.tss-acct__terms a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tss-acct__errors,
+.tss-acct__notice {
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  border-radius: 8px;
+}
+
+.tss-acct__errors {
+  color: #9b1c1c;
+  background: #fdf0f0;
+}
+
+.tss-acct__errors ul {
+  padding-left: 18px;
+  list-style: disc;
+}
+
+.tss-acct__notice {
+  color: var(--tss-green);
+  background: rgb(26 74 58 / 0.08);
+}
+
+/* Sign in and password recovery share one card; the recover panel opens on
+   #recover (the "Forgot password?" link) or after it has been submitted. */
+.tss-acct__recover {
+  display: none;
+}
+
+.tss-acct__recover:target,
+.tss-acct__recover.is-open {
+  display: block;
+}
+
+.tss-acct__card:has(.tss-acct__recover:target) .tss-acct__login,
+.tss-acct__card:has(.tss-acct__recover.is-open) .tss-acct__login {
+  display: none;
+}
+
+/* ---------- account pages ---------- */
+
+.tss-acct__wrap {
+  max-width: 1040px;
+  margin-inline: auto;
+}
+
+.tss-acct__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--acct-line);
+}
+
+.tss-acct__eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--tss-gold);
+}
+
+.tss-acct__h1 {
+  margin-top: 8px;
+  font-family: var(--tss-serif);
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1.05;
+  color: var(--tss-green);
+}
+
+.tss-acct__h2 {
+  font-family: var(--tss-serif);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--tss-green);
+}
+
+.tss-acct__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.tss-acct .tss-acct__nav a {
+  color: var(--tss-green);
+  text-decoration: none;
+}
+
+.tss-acct .tss-acct__nav a:hover {
+  color: var(--tss-gold);
+}
+
+.tss-acct__grid {
+  display: grid;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+@media (min-width: 64rem) {
+  .tss-acct__grid {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 56px;
+  }
+}
+
+.tss-acct__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tss-acct__muted {
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgb(28 28 26 / 0.7);
+}
+
+.tss-acct__address {
+  font-size: 15px;
+  font-style: normal;
+  line-height: 1.6;
+  color: var(--tss-ink);
+}
+
+.tss-acct__table-wrap {
+  overflow-x: auto;
+}
+
+.tss-acct__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  color: var(--tss-ink);
+}
+
+.tss-acct__table th,
+.tss-acct__table td {
+  padding: 14px 12px 14px 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--acct-line);
+}
+
+.tss-acct__table th {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgb(28 28 26 / 0.6);
+}
+
+.tss-acct__table .is-num {
+  text-align: right;
+  padding-right: 0;
+}
+
+.tss-acct__table tfoot td {
+  border-bottom: 0;
+  padding-block: 8px;
+}
+
+.tss-acct__table tfoot tr:last-child td {
+  padding-top: 14px;
+  font-weight: 600;
+  border-top: 1px solid var(--acct-line);
+}
+
+.tss-acct__item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tss-acct__item img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--tss-ivory-2);
+}
+
+.tss-acct__addresses {
+  display: grid;
+  gap: 20px;
+  margin-top: 32px;
+}
+
+@media (min-width: 40rem) {
+  .tss-acct__addresses {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.tss-acct__box {
+  padding: 24px;
+  background: var(--acct-card);
+  border: 1px solid rgb(28 28 26 / 0.08);
+  border-radius: 12px;
+}
+
+.tss-acct__box--wide {
+  grid-column: 1 / -1;
+}
+
+.tss-acct__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.tss-acct .tss-acct__actions .tss-acct__btn {
+  width: auto;
+  height: 44px;
+  font-size: 15px;
+}
+
+.tss-acct__actions form {
+  margin: 0;
+}
+
+.tss-acct__edit > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.tss-acct__edit > summary::-webkit-details-marker {
+  display: none;
+}
+
+.tss-acct__pager {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+  font-size: 15px;
+}
+
+.tss-acct__pager a {
+  color: var(--tss-green);
+}

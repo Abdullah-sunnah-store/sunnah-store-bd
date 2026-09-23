@@ -51,6 +51,10 @@
       endif
     endfor
   endif
+  # A menu sharing the collection's handle also makes it a parent, e.g. By Occasion.
+  if s.hide_on_menu_parents and collection != blank and linklists[collection.handle].links.size > 0
+    assign hide_here = true
+  endif
 -%}
 
 {%- unless hide_here -%}
@@ -492,7 +496,8 @@
     #tss-cgrid-{{ uid }} .tss-cgrid__grid,
     #tss-cgrid-{{ uid }} .tss-cgrid__break-text,
     #tss-cgrid-{{ uid }} .tss-cgrid__pager {
-      max-width: var(--tss-max);
+      /* These carry their own gutter as padding, so widen by it to line up with the header and hero */
+      max-width: calc(var(--tss-max) + 2 * var(--tss-gutter));
       margin-inline: auto;
       width: 100%;
     }

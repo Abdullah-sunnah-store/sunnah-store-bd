@@ -1,0 +1,100 @@
+{% comment %}
+  TSS — Account overview (legacy customer accounts)
+  Order history on the left, default address on the right.
+{% endcomment %}
+
+{% render 'tss-base' %}
+{{ 'tss-account.css' | asset_url | stylesheet_tag }}
+
+{%- assign s = section.settings -%}
+
+<section class="tss-section tss-acct" style="--acct-page: {{ s.page_bg }};">
+  <div class="tss-acct__wrap">
+    <header class="tss-acct__head">
+      <div>
+        <p class="tss-acct__eyebrow">{{ s.eyebrow | escape }}</p>
+        <h1 class="tss-acct__h1">
+          {%- if customer.first_name != blank -%}
+            Assalamu alaikum, {{ customer.first_name | escape }}
+          {%- else -%}
+            Your account
+          {%- endif -%}
+        </h1>
+      </div>
+      <nav class="tss-acct__nav" aria-label="Account">
+        <a href="{{ routes.account_addresses_url }}">Addresses ({{ customer.addresses_count }})</a>
+        <a href="{{ routes.account_logout_url }}">Sign out</a>
+      </nav>
+    </header>
+
+    <div class="tss-acct__grid">
+      <div class="tss-acct__panel">
+        <h2 class="tss-acct__h2">Order history</h2>
+
+        {%- paginate customer.orders by 20 -%}
+          {%- if customer.orders.size > 0 -%}
+            <div class="tss-acct__table-wrap">
+              <table class="tss-acct__table">
+                <thead>
+                  <tr>
+                    <th scope="col">Order</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Payment</th>
+                    <th scope="col">Fulfilment</th>
+                    <th scope="col" class="is-num">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {%- for order in customer.orders -%}
+                    <tr>
+                      <td><a href="{{ order.customer_url }}" class="tss-acct__link">{{ order.name }}</a></td>
+                      <td>{{ order.created_at | time_tag: format: 'date' }}</td>
+                      <td>{{ order.financial_status_label }}</td>
+                      <td>{{ order.fulfillment_status_label }}</td>
+                      <td class="is-num">{{ order.total_net_amount | money_with_currency }}</td>
+                    </tr>
+                  {%- endfor -%}
+                </tbody>
+              </table>
+            </div>
+
+            {%- if paginate.pages > 1 -%}
+              <nav class="tss-acct__pager" aria-label="Order pages">
+                {%- if paginate.previous -%}<a href="{{ paginate.previous.url }}">← Newer</a>{%- endif -%}
+                <span>Page {{ paginate.current_page }} of {{ paginate.pages }}</span>
+                {%- if paginate.next -%}<a href="{{ paginate.next.url }}">Older →</a>{%- endif -%}
+              </nav>
+            {%- endif -%}
+          {%- else -%}
+            <p class="tss-acct__muted">You haven't placed any orders yet.</p>
+            <div class="tss-acct__actions">
+              <a href="{{ routes.all_products_collection_url }}" class="tss-acct__btn">Start shopping</a>
+            </div>
+          {%- endif -%}
+        {%- endpaginate -%}
+      </div>
+
+      <aside class="tss-acct__panel">
+        <h2 class="tss-acct__h2">Account details</h2>
+        <p class="tss-acct__muted">{{ customer.email | escape }}</p>
+        {%- if customer.default_address -%}
+          <address class="tss-acct__address">{{ customer.default_address | format_address }}</address>
+        {%- else -%}
+          <p class="tss-acct__muted">No address saved yet.</p>
+        {%- endif -%}
+        <p><a href="{{ routes.account_addresses_url }}" class="tss-acct__link">Manage addresses</a></p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TSS · Account",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "My account" },
+    { "type": "color", "id": "page_bg", "label": "Page background", "default": "#F5F0E8" }
+  ]
+}
+{% endschema %}

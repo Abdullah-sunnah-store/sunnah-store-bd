@@ -75,6 +75,10 @@
       endif
     endfor
   endif
+  # A menu sharing the collection's handle also makes it a parent, e.g. By Occasion.
+  if s.hide_on_menu_parents and collection != blank and linklists[collection.handle].links.size > 0
+    assign hide_here = true
+  endif
 -%}
 
 {%- unless hide_here -%}

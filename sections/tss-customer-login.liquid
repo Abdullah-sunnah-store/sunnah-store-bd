@@ -1,0 +1,152 @@
+{% comment %}
+  TSS — Sign in (legacy customer accounts)
+  One card holding the sign-in form and, behind the "Forgot password?" link,
+  the password-recovery form. Social sign-in apps drop their buttons in as app
+  blocks under the "Or" rule.
+{% endcomment %}
+
+{% render 'tss-base' %}
+{{ 'tss-account.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+-%}
+
+<section
+  id="tss-login-{{ uid }}"
+  class="tss-section tss-acct"
+  style="--acct-page: {{ s.page_bg }}; --acct-card: {{ s.card_bg }}; --acct-btn: {{ s.button_bg }}; --acct-btn-text: {{ s.button_text }};"
+>
+  <div class="tss-acct__card">
+    <div class="tss-acct__login">
+      <h1 class="tss-acct__title">{{ s.title | escape }}</h1>
+      {%- if s.lede != blank -%}
+        <p class="tss-acct__lede">{{ s.lede | escape }}</p>
+      {%- endif -%}
+
+      {%- form 'customer_login', novalidate: 'novalidate', class: 'tss-acct__form' -%}
+        {%- if form.errors -%}
+          <div class="tss-acct__errors" role="alert">{{ form.errors | default_errors }}</div>
+        {%- endif -%}
+
+        <label class="tss-sr-only" for="tss-login-email-{{ uid }}">Email</label>
+        <input
+          type="email"
+          id="tss-login-email-{{ uid }}"
+          class="tss-acct__input"
+          name="customer[email]"
+          placeholder="{{ s.email_placeholder | escape }}"
+          autocomplete="email"
+          autocapitalize="off"
+          spellcheck="false"
+          required
+        >
+
+        {%- if form.password_needed -%}
+          <label class="tss-sr-only" for="tss-login-password-{{ uid }}">Password</label>
+          <input
+            type="password"
+            id="tss-login-password-{{ uid }}"
+            class="tss-acct__input"
+            name="customer[password]"
+            placeholder="Password"
+            autocomplete="current-password"
+            required
+          >
+          <p class="tss-acct__forgot">
+            <a href="#recover" class="tss-acct__link">Forgot password?</a>
+          </p>
+        {%- endif -%}
+
+        <button type="submit" class="tss-acct__btn">{{ s.button_label | escape }}</button>
+      {%- endform -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <div class="tss-acct__or"><span>Or</span></div>
+        <div class="tss-acct__social">
+          {%- for block in section.blocks -%}
+            {% render block %}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      <p class="tss-acct__alt">
+        {{ s.register_prompt | escape }}
+        <a href="{{ routes.account_register_url }}" class="tss-acct__link">{{ s.register_label | escape }}</a>
+      </p>
+
+      {%- if s.terms != blank -%}
+        <div class="tss-acct__terms">{{ s.terms }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- capture recover -%}
+      {%- form 'recover_customer_password', class: 'tss-acct__form' -%}
+        {%- if form.posted_successfully? -%}
+          {%- assign recover_open = true -%}
+          <p class="tss-acct__notice" role="status">We've emailed you a link to reset your password.</p>
+        {%- endif -%}
+        {%- if form.errors -%}
+          {%- assign recover_open = true -%}
+          <div class="tss-acct__errors" role="alert">{{ form.errors | default_errors }}</div>
+        {%- endif -%}
+
+        <label class="tss-sr-only" for="tss-recover-email-{{ uid }}">Email</label>
+        <input
+          type="email"
+          id="tss-recover-email-{{ uid }}"
+          class="tss-acct__input"
+          name="email"
+          placeholder="Enter your email"
+          autocomplete="email"
+          autocapitalize="off"
+          required
+        >
+        <button type="submit" class="tss-acct__btn">Send reset link</button>
+      {%- endform -%}
+    {%- endcapture -%}
+
+    <div id="recover" class="tss-acct__recover{% if recover_open %} is-open{% endif %}">
+      <h2 class="tss-acct__title">Reset password</h2>
+      <p class="tss-acct__lede">We'll email you a link to set a new one.</p>
+      {{ recover }}
+      <p class="tss-acct__alt">
+        <a href="{{ routes.account_login_url }}" class="tss-acct__link">Back to sign in</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TSS · Sign in",
+  "tag": "div",
+  "settings": [
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Sign in" },
+    {
+      "type": "text",
+      "id": "lede",
+      "label": "Subheading",
+      "default": "Access your order history, wishlist, and recommendations now."
+    },
+    { "type": "text", "id": "email_placeholder", "label": "Email placeholder", "default": "Enter your email" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Continue" },
+    { "type": "text", "id": "register_prompt", "label": "Register prompt", "default": "New here?" },
+    { "type": "text", "id": "register_label", "label": "Register link", "default": "Create an account" },
+    {
+      "type": "richtext",
+      "id": "terms",
+      "label": "Terms line",
+      "default": "<p>By signing in, you agree to our <a href=\"/policies/terms-of-service\" title=\"Terms of Service\">Terms of Service</a> and <a href=\"/policies/privacy-policy\" title=\"Privacy Policy\">Privacy Policy</a>.</p>"
+    },
+    { "type": "header", "content": "Colours" },
+    { "type": "color", "id": "page_bg", "label": "Page background", "default": "#F5F5F7" },
+    { "type": "color", "id": "card_bg", "label": "Card background", "default": "#FFFFFF" },
+    { "type": "color", "id": "button_bg", "label": "Button", "default": "#1F6FC5" },
+    { "type": "color", "id": "button_text", "label": "Button text", "default": "#FFFFFF" }
+  ],
+  "blocks": [{ "type": "@app" }]
+}
+{% endschema %}

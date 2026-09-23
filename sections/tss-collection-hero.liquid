@@ -50,6 +50,10 @@
         endif
       endfor
     endif
+    # A menu sharing the collection's handle also makes it a parent, e.g. By Occasion.
+    if collection != blank and linklists[collection.handle].links.size > 0
+      assign show_here = true
+    endif
   endif
 -%}
 

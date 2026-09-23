@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "tss-customer-addresses",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

@@ -1,0 +1,31 @@
+{% comment %}
+  Address inputs shared by the add and edit forms on customers/addresses.
+  Render inside a {% form 'customer_address' %} block and pass its form:
+    {% render 'tss-address-fields', form: form, id: 'new' %}
+
+  The province select is filled from the chosen country's data-provinces by
+  the script in tss-customer-addresses.
+{% endcomment %}
+
+<div class="tss-acct__row">
+  <input type="text" class="tss-acct__input" name="address[first_name]" value="{{ form.first_name }}" placeholder="First name" autocomplete="given-name" aria-label="First name">
+  <input type="text" class="tss-acct__input" name="address[last_name]" value="{{ form.last_name }}" placeholder="Last name" autocomplete="family-name" aria-label="Last name">
+</div>
+<input type="text" class="tss-acct__input" name="address[company]" value="{{ form.company }}" placeholder="Company (optional)" autocomplete="organization" aria-label="Company">
+<input type="text" class="tss-acct__input" name="address[address1]" value="{{ form.address1 }}" placeholder="Address" autocomplete="address-line1" aria-label="Address">
+<input type="text" class="tss-acct__input" name="address[address2]" value="{{ form.address2 }}" placeholder="Apartment, suite, etc. (optional)" autocomplete="address-line2" aria-label="Apartment, suite, etc.">
+<div class="tss-acct__row">
+  <input type="text" class="tss-acct__input" name="address[city]" value="{{ form.city }}" placeholder="City" autocomplete="address-level2" aria-label="City">
+  <input type="text" class="tss-acct__input" name="address[zip]" value="{{ form.zip }}" placeholder="Postal code" autocomplete="postal-code" aria-label="Postal code">
+</div>
+<div class="tss-acct__row">
+  <select class="tss-acct__select" name="address[country]" data-tss-country data-default="{{ form.country | default: 'Bangladesh' }}" autocomplete="country" aria-label="Country">
+    {{ all_country_option_tags }}
+  </select>
+  <select class="tss-acct__select" name="address[province]" data-tss-province data-default="{{ form.province }}" autocomplete="address-level1" aria-label="Region" hidden></select>
+</div>
+<input type="tel" class="tss-acct__input" name="address[phone]" value="{{ form.phone }}" placeholder="Phone" autocomplete="tel" aria-label="Phone">
+<label class="tss-acct__check">
+  {{ form.set_as_default_checkbox }}
+  Set as default address
+</label>
