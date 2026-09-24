@@ -1,0 +1,322 @@
+{% comment %}
+  TSS — Maker pieces
+  "In our house · Pieces by <maker>" with a short note, then the maker's
+  products. Mirrors the grid on
+  thesunnahstoremarketplace.vercel.app/makers/ratan-karmakar
+
+  Built for collection.maker: the products are the collection's, the name is
+  its title and the note is its description (or the section's text).
+{% endcomment %}
+
+{% render 'tss-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+
+  assign name = s.name | default: collection.title
+  assign heading = s.heading | replace: '[name]', name
+  assign note = s.note
+  if note == blank
+    assign note = collection.description | strip_html | truncatewords: 40
+  endif
+-%}
+
+<style>
+  #tss-mpieces-{{ uid }} {
+    background: var(--tss-ivory);
+    padding: {{ s.padding_top | default: 40 }}px var(--tss-gutter) {{ s.padding_bottom | default: 64 }}px;
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__head,
+  #tss-mpieces-{{ uid }} .tss-mpieces__grid {
+    max-width: var(--tss-max);
+    margin-inline: auto;
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--tss-gold);
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__title {
+    margin-top: 12px;
+    font-family: var(--tss-serif);
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--tss-ink);
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__note {
+    margin-top: 12px;
+    max-width: 44ch;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: rgb(28 28 26 / 0.75);
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__grid {
+    display: grid;
+    grid-template-columns: repeat({{ s.mobile_columns | default: 1 }}, minmax(0, 1fr));
+    gap: 32px 12px;
+    margin-top: 32px;
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__media {
+    position: relative;
+    aspect-ratio: {{ s.aspect | default: '3 / 4' }};
+    overflow: hidden;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--tss-ease);
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__link:hover .tss-mpieces__img {
+    transform: scale(1.03);
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__flag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 8px;
+    background: rgb(5 30 22 / 0.82);
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--tss-ivory);
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__meta {
+    margin-top: 14px;
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__type {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__name {
+    margin-top: 4px;
+    font-family: var(--tss-serif);
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--tss-ink);
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__price {
+    margin-top: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--tss-gold);
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__was {
+    margin-left: 8px;
+    font-weight: 400;
+    color: rgb(28 28 26 / 0.4);
+    text-decoration: line-through;
+  }
+
+  #tss-mpieces-{{ uid }} .tss-mpieces__empty {
+    margin-top: 32px;
+    font-size: 14px;
+    color: rgb(28 28 26 / 0.6);
+  }
+
+  @media (min-width: 40rem) {
+    #tss-mpieces-{{ uid }} .tss-mpieces__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    #tss-mpieces-{{ uid }} {
+      padding-block: {{ s.padding_top | default: 40 | plus: 24 }}px {{ s.padding_bottom | default: 64 | plus: 32 }}px;
+    }
+
+    #tss-mpieces-{{ uid }} .tss-mpieces__title {
+      font-size: 32px;
+    }
+
+    #tss-mpieces-{{ uid }} .tss-mpieces__grid {
+      grid-template-columns: repeat({{ s.desktop_columns | default: 2 }}, minmax(0, 1fr));
+      gap: 48px 16px;
+      margin-top: 40px;
+    }
+  }
+</style>
+
+<section id="tss-mpieces-{{ uid }}" class="tss-section" aria-labelledby="tss-mpieces-title-{{ uid }}">
+  <div class="tss-mpieces__head">
+    {%- if s.eyebrow != blank -%}
+      <p class="tss-mpieces__eyebrow">{{ s.eyebrow | escape }}</p>
+    {%- endif -%}
+    <h2 id="tss-mpieces-title-{{ uid }}" class="tss-mpieces__title">{{ heading | escape }}</h2>
+    {%- if note != blank -%}
+      <p class="tss-mpieces__note">{{ note | escape }}</p>
+    {%- endif -%}
+  </div>
+
+  {%- paginate collection.products by s.per_page -%}
+    {%- if collection.products.size > 0 -%}
+      <ul class="tss-mpieces__grid" role="list">
+        {%- for product in collection.products -%}
+          {%- liquid
+            assign on_sale = false
+            if product.compare_at_price > product.price
+              assign on_sale = true
+            endif
+          -%}
+          <li>
+            <a class="tss-mpieces__link" href="{{ product.url }}">
+              <div class="tss-mpieces__media">
+                {%- if product.featured_media -%}
+                  {{
+                    product.featured_media
+                    | image_url: width: 1400
+                    | image_tag:
+                      class: 'tss-mpieces__img',
+                      widths: '360,540,720,960,1200,1400',
+                      sizes: '(min-width: 64rem) 50vw, (min-width: 40rem) 50vw, 100vw',
+                      loading: 'lazy',
+                      alt: product.featured_media.alt | default: product.title
+                  }}
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag: 'tss-mpieces__img' }}
+                {%- endif -%}
+
+                {%- if product.available == false -%}
+                  <span class="tss-mpieces__flag">Sold out</span>
+                {%- elsif on_sale -%}
+                  <span class="tss-mpieces__flag">Reduced</span>
+                {%- endif -%}
+              </div>
+
+              <div class="tss-mpieces__meta">
+                {%- if product.type != blank -%}
+                  <p class="tss-mpieces__type">{{ product.type | escape }}</p>
+                {%- endif -%}
+                <h3 class="tss-mpieces__name">{{ product.title | escape }}</h3>
+                <p class="tss-mpieces__price">
+                  {{- product.price | money -}}
+                  {%- if on_sale -%}
+                    <s class="tss-mpieces__was">{{ product.compare_at_price | money }}</s>
+                  {%- endif -%}
+                </p>
+              </div>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p class="tss-mpieces__empty">{{ s.empty_text | escape }}</p>
+    {%- endif -%}
+  {%- endpaginate -%}
+</section>
+
+{% schema %}
+{
+  "name": "TSS · Maker pieces",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shows the collection's products. The note under the heading is the collection description unless you type one below."
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "In Our House" },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "[name] becomes the maker's name.",
+      "default": "Pieces by [name]"
+    },
+    { "type": "text", "id": "name", "label": "Name override", "info": "Leave empty to use the collection title." },
+    { "type": "textarea", "id": "note", "label": "Note override" },
+    {
+      "type": "select",
+      "id": "aspect",
+      "label": "Image shape",
+      "options": [
+        { "value": "3 / 4", "label": "Portrait (3:4)" },
+        { "value": "4 / 5", "label": "Portrait (4:5)" },
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 3", "label": "Landscape (4:3)" }
+      ],
+      "default": "3 / 4"
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "label": "Columns (desktop)",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Columns (mobile)",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "per_page",
+      "label": "Products shown",
+      "min": 4,
+      "max": 48,
+      "step": 4,
+      "default": 24
+    },
+    { "type": "text", "id": "empty_text", "label": "Empty message", "default": "New pieces from this maker are on their way." },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "presets": [{ "name": "TSS · Maker pieces" }]
+}
+{% endschema %}

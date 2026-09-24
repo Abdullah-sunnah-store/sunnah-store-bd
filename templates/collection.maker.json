@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "hero": {
+      "type": "tss-maker-hero",
+      "settings": {}
+    },
+    "pieces": {
+      "type": "tss-maker-pieces",
+      "settings": {}
+    }
+  },
+  "order": ["hero", "pieces"]
+}

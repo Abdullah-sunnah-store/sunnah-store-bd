@@ -23,7 +23,7 @@
           "type": "link",
           "settings": {
             "label": "By Recipient",
-            "link": ""
+            "link": "shopify://collections/shop-by-recipient"
           }
         },
         "budget": {

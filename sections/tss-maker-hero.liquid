@@ -1,0 +1,232 @@
+{% comment %}
+  TSS — Maker hero
+  Full-bleed portrait of the maker with eyebrow, name and place set at the
+  bottom-left over an emerald scrim. Mirrors the head of
+  thesunnahstoremarketplace.vercel.app/makers/ratan-karmakar
+
+  Built for collection.maker: a maker is a collection, so the photo, name and
+  place come from the collection being viewed —
+    photo  collection image (or the section's image override)
+    name   collection title
+    place  collection metafield custom.maker_location (or the section's text)
+{% endcomment %}
+
+{% render 'tss-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+
+  assign image = s.image | default: collection.image
+  assign name = s.name | default: collection.title
+  assign place = collection.metafields.custom.maker_location.value | default: s.place
+-%}
+
+<style>
+  #tss-mhero-{{ uid }} {
+    position: relative;
+    height: {{ s.mobile_height | default: 72 }}svh;
+    min-height: 420px;
+    overflow: hidden;
+    background: var(--tss-green-dark);
+  }
+
+  #tss-mhero-{{ uid }} .tss-mhero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center {{ s.focus | default: 30 }}%;
+    animation: tss-mhero-settle-{{ uid }} 2.4s var(--tss-ease) both;
+  }
+
+  @keyframes tss-mhero-settle-{{ uid }} {
+    from {
+      transform: scale(1.06);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  #tss-mhero-{{ uid }} .tss-mhero__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(5, 30, 22, {{ s.scrim | default: 70 | divided_by: 100.0 }}) 0%,
+      rgba(5, 30, 22, 0.25) 35%,
+      rgba(5, 30, 22, 0) 60%
+    );
+  }
+
+  #tss-mhero-{{ uid }} .tss-mhero__content {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    padding: 0 var(--tss-gutter) 40px;
+    animation: tss-mhero-in-{{ uid }} 0.9s var(--tss-ease) 0.15s both;
+  }
+
+  @keyframes tss-mhero-in-{{ uid }} {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  #tss-mhero-{{ uid }} .tss-mhero__eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--tss-gold-bright);
+  }
+
+  #tss-mhero-{{ uid }} .tss-mhero__name {
+    margin-top: 10px;
+    font-family: var(--tss-serif);
+    font-size: {{ s.name_size | default: 36 }}px;
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--tss-ivory);
+  }
+
+  #tss-mhero-{{ uid }} .tss-mhero__place {
+    margin-top: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: rgb(245 240 232 / 0.8);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #tss-mhero-{{ uid }} .tss-mhero__img,
+    #tss-mhero-{{ uid }} .tss-mhero__content {
+      animation: none;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    #tss-mhero-{{ uid }} {
+      height: {{ s.height | default: 64 }}svh;
+    }
+
+    /* Widened by the gutter it pads itself with, so the name lines up with the
+       "Pieces by" heading below, which sits inside the section's gutter. */
+    #tss-mhero-{{ uid }} .tss-mhero__content {
+      max-width: calc(var(--tss-max) + 2 * var(--tss-gutter));
+      margin-inline: auto;
+      padding-bottom: 48px;
+    }
+
+    #tss-mhero-{{ uid }} .tss-mhero__name {
+      font-size: {{ s.name_size | default: 36 | plus: 8 }}px;
+    }
+  }
+</style>
+
+<section id="tss-mhero-{{ uid }}" class="tss-section" aria-label="{{ name | escape }}">
+  {%- if image != blank -%}
+    {{
+      image
+      | image_url: width: 2400
+      | image_tag:
+        class: 'tss-mhero__img',
+        widths: '600,900,1200,1600,2000,2400',
+        sizes: '100vw',
+        fetchpriority: 'high',
+        loading: 'eager',
+        alt: name
+    }}
+  {%- else -%}
+    {{ 'lifestyle-2' | placeholder_svg_tag: 'tss-mhero__img' }}
+  {%- endif -%}
+
+  <div class="tss-mhero__scrim" aria-hidden="true"></div>
+
+  <div class="tss-mhero__content">
+    {%- if s.eyebrow != blank -%}
+      <p class="tss-mhero__eyebrow">{{ s.eyebrow | escape }}</p>
+    {%- endif -%}
+    <h1 class="tss-mhero__name">{{ name | escape }}</h1>
+    {%- if place != blank -%}
+      <p class="tss-mhero__place">{{ place | escape }}</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TSS · Maker hero",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Photo, name and place come from the collection. Set the place in the collection's \"Maker location\" metafield (custom.maker_location), or type it below."
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Discovered This Month" },
+    { "type": "image_picker", "id": "image", "label": "Photo override", "info": "Leave empty to use the collection image." },
+    { "type": "text", "id": "name", "label": "Name override", "info": "Leave empty to use the collection title." },
+    { "type": "text", "id": "place", "label": "Place fallback", "info": "Used when the collection has no Maker location metafield." },
+    {
+      "type": "range",
+      "id": "name_size",
+      "label": "Name size (mobile)",
+      "min": 24,
+      "max": 56,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "label": "Height (desktop)",
+      "min": 40,
+      "max": 90,
+      "step": 1,
+      "unit": "svh",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "Height (mobile)",
+      "min": 50,
+      "max": 100,
+      "step": 1,
+      "unit": "svh",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "focus",
+      "label": "Photo focus (top to bottom)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "scrim",
+      "label": "Shade behind text",
+      "min": 0,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "default": 70
+    }
+  ],
+  "presets": [{ "name": "TSS · Maker hero" }]
+}
+{% endschema %}
