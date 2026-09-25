@@ -303,6 +303,23 @@
   }
 
   @media screen and (min-width: 64rem) {
+    /* Desktop: sit on the header bar's measure — content spans --tss-max with
+       the gutter only as a floor — so the cards line up with the wordmark and
+       the cart. Overrides the inline side padding and the max-width setting. */
+    #scc-{{ sid }} {
+      padding-inline: max(var(--tss-gutter), calc((100% - var(--tss-max)) / 2)) !important;
+    }
+
+    #scc-{{ sid }} .scc-wrap {
+      max-width: none;
+    }
+
+    /* .tss-progress caps itself 80px short of --tss-max from 64rem up; let the
+       rule run the full width of the cards above it. */
+    #scc-{{ sid }} .scc-progress {
+      max-width: none;
+    }
+
     #scc-{{ sid }} .scc-grid {
       grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
     }

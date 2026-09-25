@@ -50,6 +50,23 @@
     }
   }
 
+  /* Desktop: span the header bar's measure — content runs the full --tss-max
+     with the gutter only as a floor. The base rail pads its gutter inside
+     --tss-max, which left the cards 40px in from the wordmark and the cart. */
+  @media screen and (min-width: 64rem) {
+    #tss-makers-{{ uid }} .tss-rail {
+      max-width: calc(var(--tss-max) + (2 * var(--tss-gutter)));
+    }
+
+    #tss-makers-{{ uid }} .tss-rail > * {
+      width: calc((var(--tss-max) - (3 * 24px)) / 4);
+    }
+
+    #tss-makers-{{ uid }} .tss-progress {
+      max-width: var(--tss-max);
+    }
+  }
+
   #tss-makers-{{ uid }} .tss-makers__name {
     margin-top: 20px;
     font-family: var(--tss-serif);

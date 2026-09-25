@@ -115,41 +115,45 @@
         "m1": {
           "type": "maker",
           "settings": {
+            "image": "shopify://shop_images/60ac1063-DSC09153v2.webp",
             "image_asset": "tss-maker-rihla.jpg",
-            "name": "The Reading Cafe",
-            "description": "An independent bookstore nurturing Bangladesh's reading culture with thoughtfully curated books and a welcoming space for readers of all ages.",
+            "name": "Sunnah Publishing",
+            "description": "Hajj Dua Card",
             "link_label": "Discover →",
-            "link": "shopify://collections/all-gifts"
+            "link": "shopify://collections/sunnah-publishing"
           }
         },
         "m2": {
           "type": "maker",
           "settings": {
+            "image": "shopify://shop_images/25eb9547-Nikah-Nama-05-jpg.webp",
             "image_asset": "tss-maker-amina.jpg",
-            "name": "Elinor",
-            "description": "A homegrown studio of hand-poured scented candles and wax décor — warmth and artistry for everyday spaces.",
+            "name": "Islamic Life Redesign",
+            "description": "Nikah Nama",
             "link_label": "Discover →",
-            "link": "shopify://collections/candles"
+            "link": "shopify://collections/islamic-life-redesign"
           }
         },
         "m3": {
           "type": "maker",
           "settings": {
+            "image": "shopify://shop_images/Love_Mercy_Mug-1.jpg",
             "image_asset": "tss-maker-noor.jpg",
-            "name": "Raw Let",
-            "description": "Premium leather accessories and lifestyle essentials — refined aesthetics, quality materials, lasting functionality.",
+            "name": "Ceramix",
+            "description": "Love & Duas Mug",
             "link_label": "Discover →",
-            "link": "shopify://collections/all-gifts"
+            "link": "shopify://collections/ceramix"
           }
         },
         "m4": {
           "type": "maker",
           "settings": {
+            "image": "shopify://shop_images/Cherry_Hijab_Blue_CBE_4.jpg",
             "image_asset": "tss-maker-qalam.jpg",
-            "name": "Cave Made",
-            "description": "A woodworking studio of desk accessories and home essentials — natural materials, modern lines, everyday use.",
+            "name": "Qudsiyah",
+            "description": "Hijab Box",
             "link_label": "Discover →",
-            "link": "shopify://collections/showpieces"
+            "link": "shopify://collections/qudsiyah"
           }
         }
       },
@@ -177,7 +181,7 @@
         "g1": {
           "type": "item",
           "settings": {
-            "product": "asma-ul-husna-regular-glass-frame",
+            "product": "leather-covered-holy-quran-color-coded-tajweed-rules",
             "image_asset": "tss-gift-03.jpg",
             "vendor": "",
             "title": "",
@@ -188,7 +192,7 @@
         "g2": {
           "type": "item",
           "settings": {
-            "product": "atomic-habits-by-james-clear",
+            "product": "four-quls-calligraphy-frame",
             "image_asset": "tss-gift-02.jpg",
             "vendor": "",
             "title": "",
@@ -199,7 +203,7 @@
         "g3": {
           "type": "item",
           "settings": {
-            "product": "father-mug",
+            "product": "hajj-daily-reminder-mug",
             "image_asset": "tss-gift-01.jpg",
             "vendor": "",
             "title": "",
@@ -210,7 +214,7 @@
         "g4": {
           "type": "item",
           "settings": {
-            "product": "scented-candle-ebony-rose",
+            "product": "wedding-package-turkish-sunnah-premium-gift-box",
             "image_asset": "tss-gift-04.jpg",
             "vendor": "",
             "title": "",
@@ -231,7 +235,7 @@
         "title": "Most gifted\nthis season",
         "lede": "An edit, not a shelf — the four our visitors reached for most this season, in the order they chose them.",
         "button_label": "See all bestsellers →",
-        "button_link": "shopify://collections/all-gifts",
+        "button_link": "shopify://collections/bestsellers",
         "padding_top": 80,
         "padding_bottom": 80
       }
@@ -264,7 +268,7 @@
         "card_pJfzUD": {
           "type": "card",
           "settings": {
-            "collection": "",
+            "collection": "flower",
             "fallback_title": "Flower",
             "icon": "shopify://shop_images/Flowers_bbd554d0-4ae9-4927-9f25-e3bac3c64803.png",
             "category_label": "Beauty",
@@ -275,7 +279,7 @@
         "card_QXmQjz": {
           "type": "card",
           "settings": {
-            "collection": "",
+            "collection": "chocolate",
             "fallback_title": "Chocolate",
             "icon": "shopify://shop_images/chocolate_93bc8288-e575-4c30-8a21-2e84d5d64512.png",
             "category_label": "Sweetness",
