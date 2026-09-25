@@ -786,7 +786,7 @@
             class="tss-pd__slide"
             data-slide
             data-index="{{ forloop.index0 }}"
-            data-full="{{ preview | image_url: width: 1800 }}"
+            data-full="{{ preview | image_url: width: 5760 }}"
             data-w="{{ preview.width }}"
             data-h="{{ preview.height }}"
             aria-label="Open image {{ forloop.index }} of {{ p.media.size }}"
@@ -794,9 +794,9 @@
             {%- if forloop.first -%}
               {{
                 preview
-                | image_url: width: 1400
+                | image_url: width: 5760
                 | image_tag:
-                  widths: '480,760,1000,1400',
+                  widths: '480,760,1000,1400,2000,2600,3200',
                   sizes: '100vw',
                   alt: media_alt,
                   fetchpriority: 'high'
@@ -804,9 +804,9 @@
             {%- else -%}
               {{
                 preview
-                | image_url: width: 1400
+                | image_url: width: 5760
                 | image_tag:
-                  widths: '480,760,1000,1400',
+                  widths: '480,760,1000,1400,2000,2600,3200',
                   sizes: '100vw',
                   alt: media_alt,
                   loading: 'lazy'
@@ -1276,7 +1276,7 @@
     </button>
     <img
       alt=""
-      src="{{ p.featured_image | image_url: width: 1800 }}"
+      src="{{ p.featured_image | image_url: width: 5760 }}"
       width="{{ p.featured_image.width | default: 1600 }}"
       height="{{ p.featured_image.height | default: 2000 }}"
       loading="lazy"

@@ -55,6 +55,9 @@
               <p class="scc-category" style="color:{{ b.category_color }};">{{ b.category_label }}</p>
             {%- endif -%}
             <p class="scc-col-name">{{ col_title }}</p>
+            {%- if b.description != blank -%}
+              <p class="scc-desc">{{ b.description }}</p>
+            {%- endif -%}
             {%- if section.settings.show_quote and b.quote != blank -%}
               <p class="scc-quote">&ldquo;{{ b.quote }}&rdquo;</p>
             {%- endif -%}
@@ -191,9 +194,36 @@
     border-radius: {{ section.settings.card_radius }}px;
   }
 
+  /* The picked crop replaces the 3:4 portrait .tss-img-34 gives every image. */
+  #scc-{{ sid }} .scc-card-media img,
+  #scc-{{ sid }} .scc-card-media svg {
+    aspect-ratio: {{ section.settings.image_ratio | default: '4 / 5' }};
+    object-fit: cover;
+  }
+
+  /* A slow settle on hover, the only motion once the clip reveal has run. */
+  #scc-{{ sid }} .scc-card-media img {
+    transition: transform 0.9s var(--tss-ease);
+  }
+
+  @media (hover: hover) {
+    #scc-{{ sid }} .scc-card:hover .scc-card-media img {
+      transform: scale(1.04);
+    }
+  }
+
   #scc-{{ sid }} .scc-card-text {
-    margin-top: 20px;
+    margin-top: 24px;
     text-align: left;
+  }
+
+  #scc-{{ sid }} .scc-desc {
+    margin: 10px 0 0;
+    font-family: var(--tss-sans);
+    font-size: {{ section.settings.desc_size }}px;
+    font-weight: 300;
+    line-height: 1.6;
+    color: {{ section.settings.desc_color }};
   }
 
   #scc-{{ sid }} .scc-category {
@@ -226,7 +256,7 @@
   }
 
   #scc-{{ sid }} .scc-link {
-    margin-top: 12px;
+    margin-top: 28px;
   }
 
   /* .tss-progress carries its own gutter margin; the section is already padded,
@@ -318,6 +348,9 @@
        rule run the full width of the cards above it. */
     #scc-{{ sid }} .scc-progress {
       max-width: none;
+      {%- unless section.settings.show_progress_desktop %}
+      display: none;
+      {%- endunless %}
     }
 
     #scc-{{ sid }} .scc-grid {
@@ -362,12 +395,23 @@
     { "type": "range", "id": "columns_tablet", "label": "Columns (tablet)",  "min": 1, "max": 4, "step": 1, "default": 2 },
     { "type": "range", "id": "card_gap",     "label": "Gap between cards (px)",  "min": 0, "max": 40,  "step": 2,  "default": 24 },
     { "type": "range", "id": "card_radius", "label": "Card radius (px)",        "min": 0, "max": 24,  "step": 2,  "default": 0 },
+    {
+      "type": "select", "id": "image_ratio", "label": "Image shape", "default": "4 / 5",
+      "options": [
+        { "value": "3 / 4", "label": "Portrait 3:4" },
+        { "value": "4 / 5", "label": "Portrait 4:5" },
+        { "value": "1 / 1", "label": "Square" }
+      ]
+    },
+    { "type": "checkbox", "id": "show_progress_desktop", "label": "Show gold line under cards on desktop", "default": false },
 
     { "type": "header", "content": "Card Text" },
     { "type": "checkbox", "id": "show_category", "label": "Show category label", "default": false },
     { "type": "checkbox", "id": "show_quote",    "label": "Show quote",          "default": false },
     { "type": "color",  "id": "card_title_color", "label": "Title color",     "default": "#1C1C1A" },
     { "type": "range",  "id": "card_title_size",  "label": "Title size (px)", "min": 14, "max": 32, "step": 1, "default": 22 },
+    { "type": "color", "id": "desc_color", "label": "Description color",     "default": "#6B6B64" },
+    { "type": "range", "id": "desc_size",  "label": "Description size (px)", "min": 11, "max": 18, "step": 1, "default": 14 },
     { "type": "color", "id": "quote_color", "label": "Quote color",    "default": "#5A5A54" },
     { "type": "range", "id": "quote_size",  "label": "Quote size (px)","min": 10, "max": 18, "step": 1, "default": 14 },
     { "type": "text",  "id": "card_link_label", "label": "Card link label", "info": "Gold link under each card, like \"Read →\" in the Journal. Leave empty to hide.", "default": "Shop →" },
@@ -394,6 +438,7 @@
         { "type": "image_picker", "id": "icon",            "label": "Icon image" },
         { "type": "text",         "id": "category_label",  "label": "Category label (e.g. KNOWLEDGE)" },
         { "type": "color",        "id": "category_color",  "label": "Category label color", "default": "#B8860B" },
+        { "type": "text",         "id": "description",     "label": "Description", "info": "One short line under the title." },
         { "type": "textarea",     "id": "quote",           "label": "Quote text" }
       ]
     }

@@ -50,7 +50,8 @@
         "logo": "shopify://shop_images/Tss_footer_Logo.png",
         "wordmark": "THE SUNNAH STORE",
         "menu": "main-menu-2",
-        "search_placeholder": "What are you looking for?",
+        "search_placeholder": "Search the house.",
+        "search_suggestions": "Eid Gifts\nQuran\nPrayer Mats\nAttar\nChildren's Books",
         "show_utility": true,
         "notice_seconds": 5
       }

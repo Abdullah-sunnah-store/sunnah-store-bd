@@ -7,9 +7,10 @@
     asset   - filename in assets/, e.g. 'tss-hero.jpg'
     class   - css class for the <img>
     alt     - alt text
-    width   - largest width to request from the CDN
+    width   - ignored; the src is always the master (original) upload
     asset_width / asset_height - intrinsic size of the theme asset (default 900)
-    widths  - srcset widths for picked images
+    widths  - srcset widths for picked images; 1200-3000 are added when missing
+              so high-density screens get a sharp copy
     sizes   - sizes attribute
     loading - 'lazy' (default) or 'eager'
     priority- true to set fetchpriority="high"
@@ -22,8 +23,16 @@
 
 {%- liquid
   assign img_class = class | default: 'tss-img-34'
-  assign img_width = width | default: 900
+  # 5760 is the CDN's ceiling and it never upscales, so this is the master file.
+  assign img_width = 5760
   assign img_widths = widths | default: '320,480,640,900'
+  assign img_width_list = img_widths | split: ','
+  assign hi_widths = '1200,1600,2000,2400,3000' | split: ','
+  for hi_width in hi_widths
+    unless img_width_list contains hi_width
+      assign img_widths = img_widths | append: ',' | append: hi_width
+    endunless
+  endfor
   assign img_sizes = sizes | default: '100vw'
   assign img_loading = loading | default: 'lazy'
   assign img_placeholder = placeholder | default: 'product-1'

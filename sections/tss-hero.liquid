@@ -204,7 +204,7 @@
       {%- if s.image_mobile != blank -%}
         <source
           media="(max-width: 39.999rem)"
-          srcset="{{ s.image_mobile | image_url: width: 480 }} 480w, {{ s.image_mobile | image_url: width: 750 }} 750w, {{ s.image_mobile | image_url: width: 1100 }} 1100w"
+          srcset="{{ s.image_mobile | image_url: width: 480 }} 480w, {{ s.image_mobile | image_url: width: 750 }} 750w, {{ s.image_mobile | image_url: width: 1100 }} 1100w, {{ s.image_mobile | image_url: width: 1600 }} 1600w, {{ s.image_mobile | image_url: width: 2200 }} 2200w"
           sizes="100vw"
         >
       {%- endif -%}

@@ -57,6 +57,21 @@
     top: var(--header-height, 0);
   }
 
+  /* Essential Upsell paints its heading and arrows in dark ink from inline
+     styles the theme can't reach, which vanished on the dark-green summary.
+     Seat the widget on an ivory panel so it reads, only where the summary is
+     dark (it inherits the light page scheme on mobile) and only once the app
+     has rendered something. */
+  @media screen and (min-width: 750px) {
+    .cart-summary .essential-upsell-cross-sell-block:not(:empty) {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 16px 16px 12px;
+      background: #f5f0e8;
+      color: #1c1c1a;
+    }
+  }
+
   .cart-summary {
     @media screen and (max-width: 749px) {
       border: none;

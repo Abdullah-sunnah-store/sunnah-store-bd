@@ -459,13 +459,17 @@
     color: var(--tss-gold);
   }
 
-  /* Search overlay */
+  /* Search overlay — full-screen ivory sheet over the header: close top right,
+     a single ruled input, then suggested searches and a popular-products rail
+     until the shopper types, when live product and collection results take
+     their place. */
   #tss-search-{{ uid }} {
     position: fixed;
     inset: 0;
     z-index: 60;
-    background: rgb(245 240 232 / 0.98);
-    padding: 96px var(--tss-gutter) 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--tss-ivory);
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.35s var(--tss-ease), visibility 0.35s;
@@ -476,40 +480,303 @@
     opacity: 1;
   }
 
+  #tss-search-{{ uid }} .tss-search__top,
+  #tss-search-{{ uid }} .tss-search__inner {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: calc(var(--tss-max) + (2 * var(--tss-gutter)));
+    margin-inline: auto;
+    padding-inline: var(--tss-gutter);
+  }
+
+  #tss-search-{{ uid }} .tss-search__top {
+    flex-shrink: 0;
+    padding-top: 12px;
+  }
+
+  #tss-search-{{ uid }} .tss-search__close-row {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  #tss-search-{{ uid }} .tss-search__close {
+    display: flex;
+    width: 48px;
+    height: 48px;
+    margin-right: -12px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: var(--tss-ink);
+    cursor: pointer;
+  }
+
   #tss-search-{{ uid }} form {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-inline: auto;
-    max-width: 40rem;
-    border-bottom: 1px solid rgb(8 41 30 / 0.3);
-    padding-bottom: 12px;
+    padding-bottom: 4px;
+  }
+
+  #tss-search-{{ uid }} .tss-search__glass {
+    position: absolute;
+    left: 0;
+    display: flex;
+    color: var(--tss-ink);
+    pointer-events: none;
   }
 
   #tss-search-{{ uid }} input {
-    flex: 1;
+    width: 100%;
+    height: 44px;
+    padding: 0 36px 0 28px;
     border: 0;
+    border-radius: 0;
     background: transparent;
-    font-family: var(--tss-serif);
-    font-size: 26px;
-    color: var(--tss-green);
+    font-family: var(--tss-sans);
+    font-size: 20px;
+    color: var(--tss-ink);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  #tss-search-{{ uid }} input::placeholder {
+    color: rgb(28 28 26 / 0.4);
+  }
+
+  #tss-search-{{ uid }} input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
   }
 
   #tss-search-{{ uid }} input:focus {
     outline: none;
   }
 
-  #tss-search-{{ uid }} .tss-search__close {
-    margin: 24px auto 0;
-    display: block;
+  #tss-search-{{ uid }} .tss-search__rule {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    background: rgb(26 74 58 / 0.25);
+    transition: background 0.3s;
+  }
+
+  #tss-search-{{ uid }} input:focus ~ .tss-search__rule {
+    background: var(--tss-gold);
+  }
+
+  #tss-search-{{ uid }} .tss-search__clear {
+    position: absolute;
+    right: -8px;
+    display: flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
     border: 0;
     background: transparent;
-    font-family: var(--tss-sans);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
     color: rgb(28 28 26 / 0.5);
     cursor: pointer;
+  }
+
+  #tss-search-{{ uid }} .tss-search__clear[hidden],
+  #tss-search-{{ uid }} [data-view][hidden] {
+    display: none;
+  }
+
+  #tss-search-{{ uid }} .tss-search__body {
+    flex: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: 64px;
+    overscroll-behavior: contain;
+  }
+
+  #tss-search-{{ uid }} .tss-search__label {
+    margin: 24px 0 4px;
+    font-family: var(--tss-sans);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--tss-gold);
+  }
+
+  #tss-search-{{ uid }} .tss-search__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  #tss-search-{{ uid }} .tss-search__suggest {
+    display: flex;
+    height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--tss-serif);
+    font-size: 17px;
+    color: var(--tss-ink);
+    text-decoration: none;
+  }
+
+  #tss-search-{{ uid }} .tss-search__suggest svg {
+    color: var(--tss-gold);
+    transition: transform 0.3s var(--tss-ease);
+  }
+
+  #tss-search-{{ uid }} .tss-search__suggest:hover svg {
+    transform: translateX(3px);
+  }
+
+  /* Popular rail: 40vw cards that bleed off the right on phones, four across
+     from 64rem up. */
+  #tss-search-{{ uid }} .tss-search__rail {
+    display: flex;
+    gap: 16px;
+    margin-inline: calc(var(--tss-gutter) * -1);
+    padding: 0 var(--tss-gutter) 8px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--tss-gutter);
+    scrollbar-width: none;
+  }
+
+  #tss-search-{{ uid }} .tss-search__rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  #tss-search-{{ uid }} .tss-search__card {
+    flex: 0 0 40vw;
+    scroll-snap-align: start;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  @media (min-width: 64rem) {
+    #tss-search-{{ uid }} .tss-search__card {
+      flex-basis: calc((100% - (2 * var(--tss-gutter)) - (3 * 16px)) / 4);
+    }
+  }
+
+  #tss-search-{{ uid }} .tss-search__card-media {
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-search-{{ uid }} .tss-search__card-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.9s var(--tss-ease);
+  }
+
+  @media (hover: hover) {
+    #tss-search-{{ uid }} .tss-search__card:hover img {
+      transform: scale(1.04);
+    }
+  }
+
+  #tss-search-{{ uid }} .tss-search__vendor {
+    margin: 12px 0 0;
+    font-family: var(--tss-sans);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-search-{{ uid }} .tss-search__title {
+    display: -webkit-box;
+    margin: 4px 0 0;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-family: var(--tss-serif);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--tss-ink);
+  }
+
+  #tss-search-{{ uid }} .tss-search__price {
+    margin: 4px 0 0;
+    font-family: var(--tss-sans);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--tss-gold);
+  }
+
+  /* Live results: 72px rows, thumbnail, vendor over title, price right. The
+     typed term stays full ink; the rest of the title dims around it. */
+  #tss-search-{{ uid }} .tss-search__row {
+    display: flex;
+    height: 72px;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgb(8 41 30 / 0.12);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  #tss-search-{{ uid }} .tss-search__thumb {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    overflow: hidden;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-search-{{ uid }} .tss-search__thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #tss-search-{{ uid }} .tss-search__row-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #tss-search-{{ uid }} .tss-search__row .tss-search__vendor {
+    margin: 0;
+  }
+
+  #tss-search-{{ uid }} .tss-search__row .tss-search__title {
+    display: block;
+    margin: 2px 0 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 400;
+    color: rgb(28 28 26 / 0.6);
+  }
+
+  #tss-search-{{ uid }} .tss-search__row .tss-search__title mark {
+    background: none;
+    color: var(--tss-ink);
+  }
+
+  #tss-search-{{ uid }} .tss-search__row .tss-search__price {
+    flex-shrink: 0;
+    margin: 0;
+    font-size: 13px;
+  }
+
+  #tss-search-{{ uid }} .tss-search__all {
+    display: inline-block;
+    margin-top: 24px;
+  }
+
+  #tss-search-{{ uid }} .tss-search__empty {
+    margin: 24px 0 0;
+    font-family: var(--tss-serif);
+    font-size: 17px;
+    color: rgb(28 28 26 / 0.6);
   }
 </style>
 
@@ -645,21 +912,106 @@
 </div>
 
 {%- comment -%} Search overlay {%- endcomment -%}
-<div id="tss-search-{{ uid }}" class="tss-section" data-open="false" role="dialog" aria-modal="true" aria-label="Search">
-  <form action="{{ routes.search_url }}" method="get" role="search">
-    <label for="tss-search-input-{{ uid }}" class="tss-sr-only">Search</label>
-    <input
-      id="tss-search-input-{{ uid }}"
-      type="search"
-      name="q"
-      placeholder="{{ s.search_placeholder | default: 'What are you looking for?' | escape }}"
-      autocomplete="off"
-    >
-    <button type="submit" class="tss-head__icon" aria-label="Search">
-      {% render 'tss-icon', icon: 'search', size: 20, stroke: 1.5 %}
-    </button>
-  </form>
-  <button type="button" class="tss-search__close" data-tss-close>Close</button>
+{%- liquid
+  assign search_terms = s.search_suggestions | newline_to_br | split: '<br />'
+  assign popular = s.search_popular
+  if popular == blank
+    assign popular = collections.all
+  endif
+-%}
+<div
+  id="tss-search-{{ uid }}"
+  class="tss-section"
+  data-open="false"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Search"
+  data-suggest-url="{{ routes.predictive_search_url }}"
+  data-search-url="{{ routes.search_url }}"
+  data-money-format="{{ shop.money_format | strip_html | escape }}"
+>
+  <div class="tss-search__top">
+    <div class="tss-search__close-row">
+      <button type="button" class="tss-search__close" aria-label="Close search" data-tss-close>
+        {% render 'tss-icon', icon: 'x', size: 20, stroke: 1.5 %}
+      </button>
+    </div>
+
+    <form action="{{ routes.search_url }}" method="get" role="search">
+      <label for="tss-search-input-{{ uid }}" class="tss-sr-only">Search</label>
+      <span class="tss-search__glass">
+        {% render 'tss-icon', icon: 'search', size: 16, stroke: 1.5 %}
+      </span>
+      <input
+        id="tss-search-input-{{ uid }}"
+        type="search"
+        name="q"
+        placeholder="{{ s.search_placeholder | default: 'Search the house.' | escape }}"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+      >
+      <span class="tss-search__rule" aria-hidden="true"></span>
+      <button type="button" class="tss-search__clear" aria-label="Clear search" data-tss-clear hidden>
+        {% render 'tss-icon', icon: 'x', size: 14, stroke: 1.5 %}
+      </button>
+    </form>
+  </div>
+
+  <div class="tss-search__body">
+    <div class="tss-search__inner">
+      <div data-view="idle">
+        {%- if s.search_suggestions != blank -%}
+          <p class="tss-search__label">Suggested</p>
+          <ul class="tss-search__list">
+            {%- for term in search_terms -%}
+              {%- assign term = term | strip -%}
+              {%- if term != blank -%}
+                <li>
+                  <a class="tss-search__suggest" href="{{ routes.search_url }}?q={{ term | url_encode }}">
+                    <span>{{ term | escape }}</span>
+                    {% render 'tss-icon', icon: 'chevron-right', size: 16, stroke: 1.5 %}
+                  </a>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+
+        {%- if s.show_search_popular and popular.products_count > 0 -%}
+          <p class="tss-search__label">Popular right now</p>
+          <div class="tss-search__rail">
+            {%- for product in popular.products limit: 8 -%}
+              <a class="tss-search__card" href="{{ product.url }}">
+                <div class="tss-search__card-media">
+                  {%- if product.featured_image -%}
+                    {{
+                      product.featured_image
+                      | image_url: width: 1200
+                      | image_tag:
+                        widths: '300,450,600,900,1200',
+                        sizes: '(min-width: 64rem) 300px, 40vw',
+                        loading: 'lazy',
+                        alt: product.featured_image.alt | default: product.title
+                    }}
+                  {%- else -%}
+                    {{ 'product-1' | placeholder_svg_tag }}
+                  {%- endif -%}
+                </div>
+                {%- if product.vendor != blank -%}
+                  <p class="tss-search__vendor">{{ product.vendor | escape }}</p>
+                {%- endif -%}
+                <h3 class="tss-search__title">{{ product.title | escape }}</h3>
+                <p class="tss-search__price">{{ product.price | money }}</p>
+              </a>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div data-view="results" hidden aria-live="polite"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -702,6 +1054,138 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeAll();
     });
+
+    {% raw %}
+    // Live search — Shopify's predictive search JSON, debounced. An empty
+    // field shows the suggested terms and popular rail again.
+    if (search) {
+      var field = search.querySelector('input[type="search"]');
+      var clear = search.querySelector('[data-tss-clear]');
+      var idle = search.querySelector('[data-view="idle"]');
+      var results = search.querySelector('[data-view="results"]');
+      var moneyFormat = search.getAttribute('data-money-format') || '{{ amount }}';
+      var timer = null;
+      var pending = null;
+
+      function esc(str) {
+        return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      function money(value) {
+        var n = parseFloat(value);
+        if (isNaN(n)) return '';
+        function group(num, decimals, thousands, point) {
+          var parts = num.toFixed(decimals).split('.');
+          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousands);
+          return parts.join(point);
+        }
+        return moneyFormat.replace(/\{\{\s*(\w+)\s*\}\}/, function (_, key) {
+          if (key === 'amount_no_decimals') return group(n, 0, ',', '.');
+          if (key === 'amount_with_comma_separator') return group(n, 2, '.', ',');
+          if (key === 'amount_no_decimals_with_comma_separator') return group(n, 0, '.', ',');
+          if (key === 'amount_with_apostrophe_separator') return group(n, 2, "'", '.');
+          return group(n, 2, ',', '.');
+        });
+      }
+
+      // Keeps the typed term full ink and dims the rest of the title.
+      function highlight(title, q) {
+        var i = title.toLowerCase().indexOf(q.toLowerCase());
+        if (i < 0) return esc(title);
+        return esc(title.slice(0, i)) + '<mark>' + esc(title.slice(i, i + q.length)) + '</mark>' + esc(title.slice(i + q.length));
+      }
+
+      function img(src, alt) {
+        if (!src) return '';
+        var sep = src.indexOf('?') > -1 ? '&' : '?';
+        return '<img src="' + esc(src + sep + 'width=240') + '" alt="' + esc(alt) + '" loading="lazy" width="56" height="56">';
+      }
+
+      function row(item, q, withPrice) {
+        var image = item.featured_image ? item.featured_image.url : item.image;
+        return (
+          '<a class="tss-search__row" href="' + esc(item.url) + '">' +
+            '<div class="tss-search__thumb">' + img(image, item.title) + '</div>' +
+            '<div class="tss-search__row-text">' +
+              (item.vendor ? '<p class="tss-search__vendor">' + esc(item.vendor) + '</p>' : '') +
+              '<h3 class="tss-search__title">' + highlight(item.title, q) + '</h3>' +
+            '</div>' +
+            (withPrice ? '<span class="tss-search__price">' + esc(money(item.price)) + '</span>' : '') +
+          '</a>'
+        );
+      }
+
+      function render(q, data) {
+        var r = (data && data.resources && data.resources.results) || {};
+        var products = r.products || [];
+        var cols = r.collections || [];
+        var html = '';
+        if (products.length) {
+          html += '<section><p class="tss-search__label">Products</p>';
+          products.forEach(function (p) { html += row(p, q, true); });
+          html += '</section>';
+        }
+        if (cols.length) {
+          html += '<section><p class="tss-search__label">Collections</p>';
+          cols.forEach(function (c) { html += row(c, q, false); });
+          html += '</section>';
+        }
+        if (!html) {
+          html = '<p class="tss-search__empty">Nothing in the house for “' + esc(q) + '” yet.</p>';
+        } else {
+          html +=
+            '<a class="tss-search__all tss-link-gold" href="' +
+            esc(search.getAttribute('data-search-url') + '?q=' + encodeURIComponent(q)) +
+            '">View all results →</a>';
+        }
+        results.innerHTML = html;
+      }
+
+      function show(q) {
+        var has = q.length > 0;
+        clear.hidden = !has;
+        idle.hidden = has;
+        results.hidden = !has;
+      }
+
+      function run() {
+        var q = field.value.trim();
+        show(q);
+        if (!q) return;
+        if (pending) pending.abort();
+        pending = new AbortController();
+        var url =
+          search.getAttribute('data-suggest-url') +
+          '.json?q=' + encodeURIComponent(q) +
+          '&resources[type]=product,collection' +
+          '&resources[limit]=6' +
+          '&resources[options][unavailable_products]=last';
+        fetch(url, { signal: pending.signal })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (field.value.trim() === q) render(q, data);
+          })
+          .catch(function () {});
+      }
+
+      field.addEventListener('input', function () {
+        clearTimeout(timer);
+        if (!field.value.trim()) {
+          show('');
+          return;
+        }
+        timer = setTimeout(run, 180);
+      });
+
+      clear.addEventListener('click', function () {
+        field.value = '';
+        show('');
+        field.focus();
+      });
+    }
+    {% endraw %}
 
     // Hide on scroll down, reveal on scroll up
     var last = window.scrollY;
@@ -746,7 +1230,22 @@
     { "type": "image_picker", "id": "logo", "label": "Logo", "info": "Falls back to the wordmark below." },
     { "type": "text", "id": "wordmark", "label": "Wordmark", "default": "THE SUNNAH STORE" },
     { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
-    { "type": "text", "id": "search_placeholder", "label": "Search placeholder", "default": "What are you looking for?" },
+    { "type": "header", "content": "Search" },
+    { "type": "text", "id": "search_placeholder", "label": "Search placeholder", "default": "Search the house." },
+    {
+      "type": "textarea",
+      "id": "search_suggestions",
+      "label": "Suggested searches",
+      "info": "One per line. Shown before the shopper types; each opens search results for that term.",
+      "default": "Eid Gifts\nQuran\nPrayer Mats\nAttar\nChildren's Books"
+    },
+    { "type": "checkbox", "id": "show_search_popular", "label": "Show popular products", "default": true },
+    {
+      "type": "collection",
+      "id": "search_popular",
+      "label": "Popular products collection",
+      "info": "First 8 products show as a rail under the suggestions. Falls back to all products."
+    },
     {
       "type": "checkbox",
       "id": "show_desktop_nav",

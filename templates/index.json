@@ -243,15 +243,16 @@
     "sunnah_collection_cards_kcP4wQ": {
       "type": "sunnah-collection-cards",
       "blocks": {
-        "card_rfWfzm": {
+        "card_pJfzUD": {
           "type": "card",
           "settings": {
-            "collection": "academic",
-            "fallback_title": "",
-            "icon": "shopify://shop_images/books_c127b4ef-9fa4-4f1b-935f-bbf053ce51e4.png",
-            "category_label": "Knowledge",
+            "collection": "flower",
+            "fallback_title": "Flower",
+            "icon": "shopify://shop_images/Flowers_bbd554d0-4ae9-4927-9f25-e3bac3c64803.png",
+            "category_label": "Beauty",
             "category_color": "#b8860b",
-            "quote": "Islamic Books\"Convey from me, even if it is one verse.\""
+            "description": "The oldest way to say it.",
+            "quote": "Fresh Flowers\"Allah is beautiful and He loves beauty.\""
           }
         },
         "card_i9frey": {
@@ -262,18 +263,20 @@
             "icon": "shopify://shop_images/Perfume_d0898be3-e858-4e92-82d1-b30146c8a0df.png",
             "category_label": "Fragrance",
             "category_color": "#b8860b",
+            "description": "Remembered every time it's worn.",
             "quote": "Attar & Perfume\"The Prophet ﷺ never refused a gift of fragrance.\""
           }
         },
-        "card_pJfzUD": {
+        "card_rfWfzm": {
           "type": "card",
           "settings": {
-            "collection": "flower",
-            "fallback_title": "Flower",
-            "icon": "shopify://shop_images/Flowers_bbd554d0-4ae9-4927-9f25-e3bac3c64803.png",
-            "category_label": "Beauty",
+            "collection": "academic",
+            "fallback_title": "",
+            "icon": "shopify://shop_images/books_c127b4ef-9fa4-4f1b-935f-bbf053ce51e4.png",
+            "category_label": "Knowledge",
             "category_color": "#b8860b",
-            "quote": "Fresh Flowers\"Allah is beautiful and He loves beauty.\""
+            "description": "Read long after the occasion is forgotten.",
+            "quote": "Islamic Books\"Convey from me, even if it is one verse.\""
           }
         },
         "card_QXmQjz": {
@@ -284,14 +287,15 @@
             "icon": "shopify://shop_images/chocolate_93bc8288-e575-4c30-8a21-2e84d5d64512.png",
             "category_label": "Sweetness",
             "category_color": "#b8860b",
+            "description": "Shared before the ribbon's off.",
             "quote": "Halal Chocolates\"The Prophet ﷺ loved sweet things and honey.\""
           }
         }
       },
       "block_order": [
-        "card_rfWfzm",
-        "card_i9frey",
         "card_pJfzUD",
+        "card_i9frey",
+        "card_rfWfzm",
         "card_QXmQjz"
       ],
       "name": "Sunnah Collection Cards",
@@ -301,13 +305,13 @@
         "eyebrow": "A SUNNAH OF GIVING",
         "eyebrow_size": 10,
         "eyebrow_color": "#b8860b",
-        "heading": "Gifts That Never Age.",
-        "heading_size": 46,
+        "heading": "The gifts that never go wrong",
+        "heading_size": 38,
         "heading_size_mobile": 34,
         "heading_color": "#1c1c1a",
-        "subtext": "",
+        "subtext": "Four things no one has ever minded receiving.",
         "subtext_size": 15,
-        "subtext_color": "#555555",
+        "subtext_color": "#5a5a54",
         "head_bottom_gap": 48,
         "view_all_text": "",
         "view_all_url": "",
@@ -316,11 +320,15 @@
         "columns": 4,
         "columns_tablet": 2,
         "card_gap": 24,
-        "card_radius": 0,
+        "card_radius": 2,
+        "image_ratio": "4 / 5",
+        "show_progress_desktop": false,
         "show_category": false,
         "show_quote": false,
         "card_title_color": "#1c1c1a",
         "card_title_size": 22,
+        "desc_color": "#6b6b64",
+        "desc_size": 14,
         "quote_color": "#5a5a54",
         "quote_size": 14,
         "card_link_label": "Shop →",

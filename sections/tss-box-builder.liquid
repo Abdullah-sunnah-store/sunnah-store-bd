@@ -1259,7 +1259,7 @@
                     data-price="{{ fv.price }}"
                     data-price-text="{{ fv.price | money | escape }}"
                     data-image="{% if card_image %}{{ card_image | image_url: width: 200 }}{% endif %}"
-                    data-image-lg="{% if card_image %}{{ card_image | image_url: width: 900 }}{% endif %}"
+                    data-image-lg="{% if card_image %}{{ card_image | image_url: width: 1800 }}{% endif %}"
                   >
                     <button
                       type="button"
@@ -1303,7 +1303,7 @@
                             data-price="{{ v.price }}"
                             data-price-text="{{ v.price | money | escape }}"
                             data-image="{% if v.image %}{{ v.image | image_url: width: 200 }}{% else %}{{ product.featured_image | image_url: width: 200 }}{% endif %}"
-                            data-image-lg="{% if v.image %}{{ v.image | image_url: width: 900 }}{% else %}{{ product.featured_image | image_url: width: 900 }}{% endif %}"
+                            data-image-lg="{% if v.image %}{{ v.image | image_url: width: 1800 }}{% else %}{{ product.featured_image | image_url: width: 1800 }}{% endif %}"
                             {% unless v.available %}disabled{% endunless %}
                             {% if v.id == fv.id %}selected{% endif %}
                           >

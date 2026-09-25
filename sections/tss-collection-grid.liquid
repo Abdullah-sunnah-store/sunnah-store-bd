@@ -602,10 +602,10 @@
                     {%- if product.featured_media -%}
                       {{
                         product.featured_media
-                        | image_url: width: 900
+                        | image_url: width: 5760
                         | image_tag:
                           class: 'tss-cgrid__img',
-                          widths: '240,320,480,640,900',
+                          widths: '240,320,480,640,900,1200,1600,2000',
                           sizes: '(min-width: 64rem) 300px, 46vw',
                           loading: 'lazy',
                           alt: product.featured_media.alt | default: product.title
