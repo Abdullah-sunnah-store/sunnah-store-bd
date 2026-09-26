@@ -70,18 +70,28 @@
   #tss-makers-{{ uid }} .tss-makers__name {
     margin-top: 20px;
     font-family: var(--tss-serif);
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 500;
     color: var(--tss-ink);
   }
 
   #tss-makers-{{ uid }} .tss-makers__desc {
-    margin-top: 8px;
+    margin-top: 6px;
     max-width: 34ch;
-    font-size: 15px;
-    font-weight: 300;
-    line-height: 1.65;
-    color: rgb(28 28 26 / 0.7);
+    font-size: 10px;
+    line-height: 1.5;
+    color: rgb(28 28 26 / 0.5);
+  }
+
+  /* Match the name / detail pairing in TSS 04 · Most gifted. */
+  @media screen and (min-width: 64rem) {
+    #tss-makers-{{ uid }} .tss-makers__name {
+      font-size: 26px;
+    }
+
+    #tss-makers-{{ uid }} .tss-makers__desc {
+      font-size: 12px;
+    }
   }
 
   #tss-makers-{{ uid }} .tss-makers__link {

@@ -184,7 +184,8 @@
             "product": "leather-covered-holy-quran-color-coded-tajweed-rules",
             "image_asset": "tss-gift-03.jpg",
             "vendor": "",
-            "title": "",
+            "title": "Leather Covered Quran",
+            "subtitle": "Colour Coded Tajweed Rules",
             "price": "",
             "link": ""
           }
@@ -195,7 +196,8 @@
             "product": "four-quls-calligraphy-frame",
             "image_asset": "tss-gift-02.jpg",
             "vendor": "",
-            "title": "",
+            "title": "Four Quls Calligraphy",
+            "subtitle": "Glass Frame",
             "price": "",
             "link": ""
           }
@@ -206,7 +208,8 @@
             "product": "hajj-daily-reminder-mug",
             "image_asset": "tss-gift-01.jpg",
             "vendor": "",
-            "title": "",
+            "title": "One Day, In Sha Allah",
+            "subtitle": "Hajj Reminder Mug",
             "price": "",
             "link": ""
           }
@@ -217,7 +220,8 @@
             "product": "wedding-package-turkish-sunnah-premium-gift-box",
             "image_asset": "tss-gift-04.jpg",
             "vendor": "",
-            "title": "",
+            "title": "Turkish Wedding Package",
+            "subtitle": "Minimal Gift Box",
             "price": "",
             "link": ""
           }
@@ -234,6 +238,7 @@
         "eyebrow": "Loved This Season",
         "title": "Most gifted\nthis season",
         "lede": "An edit, not a shelf — the four our visitors reached for most this season, in the order they chose them.",
+        "split_title": true,
         "button_label": "See all bestsellers →",
         "button_link": "shopify://collections/bestsellers",
         "padding_top": 80,

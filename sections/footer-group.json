@@ -60,6 +60,7 @@
     },
     "tss_sticky_nav": {
       "type": "tss-sticky-nav",
+      "disabled": true,
       "blocks": {
         "n1": {
           "type": "item",
