@@ -54,9 +54,13 @@
             {%- if section.settings.show_category and b.category_label != blank -%}
               <p class="scc-category" style="color:{{ b.category_color }};">{{ b.category_label }}</p>
             {%- endif -%}
+            {%- comment -%} Vendor / title / subtitle, as in TSS 04 · Most gifted. {%- endcomment -%}
             <p class="scc-col-name">{{ col_title }}</p>
             {%- if b.description != blank -%}
               <p class="scc-desc">{{ b.description }}</p>
+            {%- endif -%}
+            {%- if b.subtitle != blank -%}
+              <p class="scc-subtitle">{{ b.subtitle }}</p>
             {%- endif -%}
             {%- if section.settings.show_quote and b.quote != blank -%}
               <p class="scc-quote">&ldquo;{{ b.quote }}&rdquo;</p>
@@ -217,12 +221,24 @@
     text-align: left;
   }
 
+  /* Title line — the serif title in Most gifted. */
   #scc-{{ sid }} .scc-desc {
-    margin: 10px 0 0;
+    margin: 8px 0 0;
+    font-family: var(--tss-serif);
+    font-size: {{ section.settings.card_title_size }}px;
+    font-weight: 500;
+    line-height: 1.25;
+    text-wrap: balance;
+    color: {{ section.settings.card_title_color }};
+  }
+
+  /* Subtitle line — the italic detail in Most gifted. */
+  #scc-{{ sid }} .scc-subtitle {
+    margin: 6px 0 0;
     font-family: var(--tss-sans);
     font-size: {{ section.settings.desc_size }}px;
-    font-weight: 300;
-    line-height: 1.6;
+    font-style: italic;
+    line-height: 1.5;
     color: {{ section.settings.desc_color }};
   }
 
@@ -235,15 +251,16 @@
     text-transform: uppercase;
   }
 
+  /* Vendor line — the collection name, small caps like the Most gifted vendor. */
   #scc-{{ sid }} .scc-col-name {
     margin: 0;
-    max-width: 20ch;
-    font-family: var(--tss-serif);
-    font-size: {{ section.settings.card_title_size }}px;
+    font-family: var(--tss-sans);
+    font-size: 10px;
     font-weight: 500;
-    line-height: 1.25;
-    text-wrap: balance;
-    color: {{ section.settings.card_title_color }};
+    line-height: 1.5;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgb(28 28 26 / 0.5);
   }
 
   #scc-{{ sid }} .scc-quote {
@@ -353,6 +370,19 @@
       {%- endunless %}
     }
 
+    /* Same desktop step-up as the Most gifted vendor, title and subtitle. */
+    #scc-{{ sid }} .scc-col-name {
+      font-size: 12px;
+    }
+
+    #scc-{{ sid }} .scc-desc {
+      font-size: {{ section.settings.card_title_size | plus: 4 }}px;
+    }
+
+    #scc-{{ sid }} .scc-subtitle {
+      font-size: {{ section.settings.desc_size | plus: 2 }}px;
+    }
+
     #scc-{{ sid }} .scc-grid {
       grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
     }
@@ -410,8 +440,8 @@
     { "type": "checkbox", "id": "show_quote",    "label": "Show quote",          "default": false },
     { "type": "color",  "id": "card_title_color", "label": "Title color",     "default": "#1C1C1A" },
     { "type": "range",  "id": "card_title_size",  "label": "Title size (px)", "min": 14, "max": 32, "step": 1, "default": 22 },
-    { "type": "color", "id": "desc_color", "label": "Description color",     "default": "#6B6B64" },
-    { "type": "range", "id": "desc_size",  "label": "Description size (px)", "min": 11, "max": 18, "step": 1, "default": 14 },
+    { "type": "color", "id": "desc_color", "label": "Subtitle color",     "default": "#6B6B64" },
+    { "type": "range", "id": "desc_size",  "label": "Subtitle size (px)", "min": 10, "max": 18, "step": 1, "default": 14 },
     { "type": "color", "id": "quote_color", "label": "Quote color",    "default": "#5A5A54" },
     { "type": "range", "id": "quote_size",  "label": "Quote size (px)","min": 10, "max": 18, "step": 1, "default": 14 },
     { "type": "text",  "id": "card_link_label", "label": "Card link label", "info": "Gold link under each card, like \"Read →\" in the Journal. Leave empty to hide.", "default": "Shop →" },
@@ -438,7 +468,8 @@
         { "type": "image_picker", "id": "icon",            "label": "Icon image" },
         { "type": "text",         "id": "category_label",  "label": "Category label (e.g. KNOWLEDGE)" },
         { "type": "color",        "id": "category_color",  "label": "Category label color", "default": "#B8860B" },
-        { "type": "text",         "id": "description",     "label": "Description", "info": "One short line under the title." },
+        { "type": "text",         "id": "description",     "label": "Title", "info": "Serif line under the collection name." },
+        { "type": "text",         "id": "subtitle",        "label": "Subtitle", "info": "Small italic line under the title." },
         { "type": "textarea",     "id": "quote",           "label": "Quote text" }
       ]
     }
