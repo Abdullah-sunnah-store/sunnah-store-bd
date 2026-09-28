@@ -258,7 +258,7 @@
             "category_label": "Beauty",
             "category_color": "#b8860b",
             "description": "The oldest way to say it.",
-            "subtitle": "Fresh Flowers",
+            "subtitle": "",
             "quote": "Fresh Flowers\"Allah is beautiful and He loves beauty.\""
           }
         },
@@ -271,7 +271,7 @@
             "category_label": "Fragrance",
             "category_color": "#b8860b",
             "description": "Remembered every time it's worn.",
-            "subtitle": "Attar & Perfume",
+            "subtitle": "",
             "quote": "Attar & Perfume\"The Prophet ﷺ never refused a gift of fragrance.\""
           }
         },
@@ -284,7 +284,7 @@
             "category_label": "Knowledge",
             "category_color": "#b8860b",
             "description": "Read long after the occasion is forgotten.",
-            "subtitle": "Islamic Books",
+            "subtitle": "",
             "quote": "Islamic Books\"Convey from me, even if it is one verse.\""
           }
         },
@@ -297,7 +297,7 @@
             "category_label": "Sweetness",
             "category_color": "#b8860b",
             "description": "Shared before the ribbon's off.",
-            "subtitle": "Halal Chocolates",
+            "subtitle": "",
             "quote": "Halal Chocolates\"The Prophet ﷺ loved sweet things and honey.\""
           }
         }
@@ -431,6 +431,7 @@
     },
     "tss_08_shop_all": {
       "type": "tss-shop-all",
+      "disabled": true,
       "name": "TSS 08 · Shop all",
       "settings": {
         "image_asset": "tss-shop-all.jpg",
@@ -449,7 +450,7 @@
           "type": "promise",
           "settings": {
             "icon": "badge-check",
-            "label": "Halal & Ethically Sourced"
+            "label": "Ethically Sourced"
           }
         },
         "p2": {
@@ -459,25 +460,17 @@
             "label": "Gift-Ready Packaging"
           }
         },
-        "p3": {
-          "type": "promise",
-          "settings": {
-            "icon": "hand-coins",
-            "label": "Cash on Delivery (BD)"
-          }
-        },
         "p4": {
           "type": "promise",
           "settings": {
             "icon": "undo-2",
-            "label": "Easy Returns"
+            "label": "14 Days Returns"
           }
         }
       },
       "block_order": [
         "p1",
         "p2",
-        "p3",
         "p4"
       ],
       "name": "TSS 09 · Promises",

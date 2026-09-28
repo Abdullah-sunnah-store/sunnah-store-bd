@@ -1,7 +1,7 @@
 {% comment %}
   TSS 09 — Our promises
   Quiet ivory-2 band: outline icon over a short uppercase line, 2-up on
-  handsets and 4-up from 40rem.
+  handsets and 4-up from 40rem — or 3-up everywhere when there are 3 blocks.
 {% endcomment %}
 
 {% render 'tss-base' %}
@@ -27,11 +27,18 @@
     padding-inline: var(--tss-gutter);
   }
 
-  @media (min-width: 40rem) {
+  {%- if section.blocks.size == 3 -%}
     #tss-promises-{{ uid }} .tss-promises__grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      max-width: 40rem;
     }
-  }
+  {%- else -%}
+    @media (min-width: 40rem) {
+      #tss-promises-{{ uid }} .tss-promises__grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+  {%- endif -%}
 
   #tss-promises-{{ uid }} li {
     display: flex;
@@ -52,6 +59,18 @@
     letter-spacing: 0.14em;
     line-height: 1.5;
     color: rgb(28 28 26 / 0.7);
+  }
+
+  /* Desktop: each promise on one line. */
+  @media (min-width: 64rem) {
+    #tss-promises-{{ uid }} .tss-promises__grid {
+      max-width: 48rem;
+    }
+
+    #tss-promises-{{ uid }} .tss-promises__label {
+      max-width: none;
+      white-space: nowrap;
+    }
   }
 </style>
 
