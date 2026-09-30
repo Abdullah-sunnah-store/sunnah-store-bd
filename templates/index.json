@@ -41,9 +41,9 @@
       ],
       "name": "TSS 01 · Hero",
       "settings": {
-        "image": "shopify://shop_images/Frame_Banner_Image_for_Website.png",
+        "image": "shopify://shop_images/Shahadah_Frame_-_Cover_Image_V_02_Firefly_Upscaler_2x_scale_jpg.jpg",
         "image_asset": "tss-hero.jpg",
-        "height": 75,
+        "height": 90,
         "show_scroll_line": true,
         "eyebrow": "Curated Islamic Gifting",
         "title": "The few we chose this month.",
@@ -126,7 +126,7 @@
         "m2": {
           "type": "maker",
           "settings": {
-            "image": "shopify://shop_images/25eb9547-Nikah-Nama-05-jpg.webp",
+            "image": "shopify://shop_images/Wedding_Frame_-_Wood_Color.jpg",
             "image_asset": "tss-maker-amina.jpg",
             "name": "Islamic Life Redesign",
             "description": "Nikah Nama",
@@ -137,7 +137,7 @@
         "m3": {
           "type": "maker",
           "settings": {
-            "image": "shopify://shop_images/Love_Mercy_Mug-1.jpg",
+            "image": "shopify://shop_images/Love_Mercy_Mug_Front.jpg",
             "image_asset": "tss-maker-noor.jpg",
             "name": "Ceramix",
             "description": "Love & Duas Mug",
@@ -148,7 +148,7 @@
         "m4": {
           "type": "maker",
           "settings": {
-            "image": "shopify://shop_images/Cherry_Hijab_Blue_CBE_4.jpg",
+            "image": "shopify://shop_images/Hijab_-_05_ce5c3f6b-953e-4180-9329-4cddd8be4d06.jpg",
             "image_asset": "tss-maker-qalam.jpg",
             "name": "Qudsiyah",
             "description": "Hijab Box",
@@ -195,6 +195,7 @@
           "type": "item",
           "settings": {
             "product": "four-quls-calligraphy-frame",
+            "image": "shopify://shop_images/Four_Quls_Calligraphy_Frame_Black___New.jpg",
             "image_asset": "tss-gift-02.jpg",
             "vendor": "",
             "title": "Four Quls Calligraphy",
@@ -207,6 +208,7 @@
           "type": "item",
           "settings": {
             "product": "hajj-daily-reminder-mug",
+            "image": "shopify://shop_images/Hajj_Mug_Front.jpg",
             "image_asset": "tss-gift-01.jpg",
             "vendor": "",
             "title": "One Day, In Sha Allah",
@@ -219,6 +221,7 @@
           "type": "item",
           "settings": {
             "product": "wedding-package-turkish-sunnah-premium-gift-box",
+            "image": "shopify://shop_images/Turkish_Wedding_Package.jpg",
             "image_asset": "tss-gift-04.jpg",
             "vendor": "",
             "title": "Turkish Wedding Package",
@@ -254,7 +257,7 @@
           "settings": {
             "collection": "flower",
             "fallback_title": "Flower",
-            "icon": "shopify://shop_images/Flowers_bbd554d0-4ae9-4927-9f25-e3bac3c64803.png",
+            "icon": "shopify://shop_images/Flower_Bouquet_-_01.jpg",
             "category_label": "Beauty",
             "category_color": "#b8860b",
             "description": "The oldest way to say it.",
@@ -267,7 +270,7 @@
           "settings": {
             "collection": "fragrances",
             "fallback_title": "Atter",
-            "icon": "shopify://shop_images/Perfume_d0898be3-e858-4e92-82d1-b30146c8a0df.png",
+            "icon": "shopify://shop_images/Mysterious_Melody_Perfume.jpg",
             "category_label": "Fragrance",
             "category_color": "#b8860b",
             "description": "Remembered every time it's worn.",
@@ -280,7 +283,7 @@
           "settings": {
             "collection": "academic",
             "fallback_title": "",
-            "icon": "shopify://shop_images/books_c127b4ef-9fa4-4f1b-935f-bbf053ce51e4.png",
+            "icon": "shopify://shop_images/Is_He_the_Messenger_Book.jpg",
             "category_label": "Knowledge",
             "category_color": "#b8860b",
             "description": "Read long after the occasion is forgotten.",
@@ -293,7 +296,7 @@
           "settings": {
             "collection": "chocolate",
             "fallback_title": "Chocolate",
-            "icon": "shopify://shop_images/chocolate_93bc8288-e575-4c30-8a21-2e84d5d64512.png",
+            "icon": "shopify://shop_images/Ferrero_Rocher_Chocolate_-_02.jpg",
             "category_label": "Sweetness",
             "category_color": "#b8860b",
             "description": "Shared before the ribbon's off.",
@@ -373,6 +376,7 @@
           "type": "article",
           "settings": {
             "article": "",
+            "image": "shopify://shop_images/Hijab_Gift_Box.jpg",
             "image_asset": "tss-journal-1.jpg",
             "title": "The Manners of Giving",
             "link": "shopify://blogs/news"
@@ -382,6 +386,7 @@
           "type": "article",
           "settings": {
             "article": "",
+            "image": "shopify://shop_images/Mysterious_Melody_Perfume.jpg",
             "image_asset": "tss-journal-2.jpg",
             "title": "Why We Chose Attar",
             "link": "shopify://blogs/news"
@@ -391,6 +396,7 @@
           "type": "article",
           "settings": {
             "article": "",
+            "image": "shopify://shop_images/825271634_1399284975625005_807107543585682861_n.jpg",
             "image_asset": "tss-journal-3.jpg",
             "title": "A House Without Walls",
             "link": "shopify://blogs/news"
@@ -400,6 +406,7 @@
           "type": "article",
           "settings": {
             "article": "",
+            "image": "shopify://shop_images/Ferrero_Rocher_Chocolate_-_01.jpg",
             "image_asset": "tss-journal-4.jpg",
             "title": "On Wrapping, Slowly",
             "link": "shopify://blogs/news"
