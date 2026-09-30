@@ -221,15 +221,14 @@
     text-align: left;
   }
 
-  /* Title line — the serif title in Most gifted. */
+  /* Description line — small muted sans under the serif name. */
   #scc-{{ sid }} .scc-desc {
-    margin: 8px 0 0;
-    font-family: var(--tss-serif);
-    font-size: {{ section.settings.card_title_size }}px;
-    font-weight: 500;
-    line-height: 1.25;
-    text-wrap: balance;
-    color: {{ section.settings.card_title_color }};
+    margin: 12px 0 0;
+    font-family: var(--tss-sans);
+    font-size: {{ section.settings.desc_size | minus: 1 }}px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: {{ section.settings.desc_color }};
   }
 
   /* Subtitle line — the italic detail in Most gifted. */
@@ -251,16 +250,14 @@
     text-transform: uppercase;
   }
 
-  /* Vendor line — the collection name, small caps like the Most gifted vendor. */
+  /* Title line — the collection name in the serif. */
   #scc-{{ sid }} .scc-col-name {
     margin: 0;
-    font-family: var(--tss-sans);
-    font-size: 10px;
-    font-weight: 500;
-    line-height: 1.5;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: rgb(28 28 26 / 0.5);
+    font-family: var(--tss-serif);
+    font-size: {{ section.settings.card_title_size | minus: 2 }}px;
+    font-weight: 400;
+    line-height: 1.25;
+    color: {{ section.settings.card_title_color }};
   }
 
   #scc-{{ sid }} .scc-quote {
@@ -372,11 +369,11 @@
 
     /* Same desktop step-up as the Most gifted vendor, title and subtitle. */
     #scc-{{ sid }} .scc-col-name {
-      font-size: 12px;
+      font-size: {{ section.settings.card_title_size }}px;
     }
 
     #scc-{{ sid }} .scc-desc {
-      font-size: {{ section.settings.card_title_size | plus: 4 }}px;
+      font-size: {{ section.settings.desc_size }}px;
     }
 
     #scc-{{ sid }} .scc-subtitle {

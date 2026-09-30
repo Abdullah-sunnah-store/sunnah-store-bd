@@ -70,9 +70,15 @@
   #tss-makers-{{ uid }} .tss-makers__name {
     margin-top: 20px;
     font-family: var(--tss-serif);
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 500;
     color: var(--tss-ink);
+  }
+
+  @media screen and (min-width: 64rem) {
+    #tss-makers-{{ uid }} .tss-makers__name {
+      font-size: 26px;
+    }
   }
 
   #tss-makers-{{ uid }} .tss-makers__desc {
