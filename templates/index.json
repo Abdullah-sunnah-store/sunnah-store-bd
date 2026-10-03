@@ -268,7 +268,7 @@
         "card_i9frey": {
           "type": "card",
           "settings": {
-            "collection": "fragrances",
+            "collection": "perfume",
             "fallback_title": "Atter",
             "icon": "shopify://shop_images/Mysterious_Melody_Perfume.jpg",
             "category_label": "Fragrance",
@@ -281,8 +281,8 @@
         "card_rfWfzm": {
           "type": "card",
           "settings": {
-            "collection": "academic",
-            "fallback_title": "",
+            "collection": "books",
+            "fallback_title": "Books",
             "icon": "shopify://shop_images/Is_He_the_Messenger_Book.jpg",
             "category_label": "Knowledge",
             "category_color": "#b8860b",

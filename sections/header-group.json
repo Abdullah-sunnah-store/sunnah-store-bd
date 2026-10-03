@@ -47,11 +47,13 @@
       ],
       "name": "TSS · Header",
       "settings": {
-        "logo": "shopify://shop_images/Tss_footer_Logo.png",
         "wordmark": "THE SUNNAH STORE",
-        "menu": "main-menu-2",
+        "menu": "main-menu-2-horizon",
         "search_placeholder": "Search the house.",
         "search_suggestions": "Eid Gifts\nQuran\nPrayer Mats\nAttar\nChildren's Books",
+        "show_search_popular": true,
+        "search_popular": "",
+        "show_desktop_nav": true,
         "show_utility": true,
         "notice_seconds": 5
       }
