@@ -1,0 +1,578 @@
+{% comment %}
+  TSS — Journal index
+  The blog listing: a green masthead, the newest article as a lead story, then
+  the rest as a grid of portrait cards with pagination.
+
+  Every image is held to a fixed shape, so uploads of any proportion line up.
+{% endcomment %}
+
+{% render 'tss-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign per_page = s.per_page | default: 10
+
+  case s.card_ratio
+    when 'square'
+      assign card_ratio = '1 / 1'
+    when 'landscape'
+      assign card_ratio = '4 / 3'
+    else
+      assign card_ratio = '4 / 5'
+  endcase
+
+  case s.lead_ratio
+    when 'portrait'
+      assign lead_ratio = '4 / 5'
+    when 'square'
+      assign lead_ratio = '1 / 1'
+    when 'wide'
+      assign lead_ratio = '3 / 2'
+    else
+      assign lead_ratio = '4 / 3'
+  endcase
+-%}
+
+<style>
+  #tss-blog-{{ uid }} {
+    background: var(--tss-ivory);
+  }
+
+  /* ---------- masthead ---------- */
+  #tss-blog-{{ uid }} .tss-blog__mast {
+    background: var(--tss-green);
+    padding: {{ s.mast_padding_mobile | default: 72 }}px var(--tss-gutter) 32px;
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__mast-inner,
+  #tss-blog-{{ uid }} .tss-blog__inner {
+    max-width: calc(var(--tss-max) - (2 * var(--tss-gutter)));
+    margin-inline: auto;
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__mast .tss-eyebrow {
+    color: var(--tss-gold-bright);
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__heading {
+    margin-top: 12px;
+    font-family: var(--tss-serif);
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--tss-ivory);
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__lede {
+    margin-top: 12px;
+    max-width: 40ch;
+    font-family: var(--tss-serif);
+    font-size: 17px;
+    font-style: italic;
+    line-height: 1.5;
+    text-wrap: pretty;
+    color: rgb(245 240 232 / 0.85);
+  }
+
+  /* ---------- shared card type ---------- */
+  #tss-blog-{{ uid }} .tss-blog__link {
+    display: block;
+    text-decoration: none;
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__media {
+    overflow: hidden;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__media img,
+  #tss-blog-{{ uid }} .tss-blog__media svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: {{ card_ratio }};
+    object-fit: cover;
+    transition: transform 1.2s var(--tss-ease);
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__link:hover .tss-blog__media img {
+    transform: scale(1.03);
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__meta {
+    margin-top: 20px;
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__title {
+    margin-top: 8px;
+    max-width: 22ch;
+    font-family: var(--tss-serif);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: normal;
+    text-transform: none;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+    color: var(--tss-ink);
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__excerpt {
+    margin-top: 8px;
+    max-width: 42ch;
+    font-family: var(--tss-serif);
+    font-size: 16px;
+    font-style: italic;
+    line-height: 1.5;
+    text-wrap: pretty;
+    color: rgb(28 28 26 / 0.7);
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__read {
+    margin-top: 16px;
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__link:hover .tss-link-gold {
+    border-color: var(--tss-green-mid);
+    color: var(--tss-green-mid);
+  }
+
+  /* ---------- lead story ---------- */
+  #tss-blog-{{ uid }} .tss-blog__lead {
+    padding-bottom: 8px;
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__lead .tss-blog__media img,
+  #tss-blog-{{ uid }} .tss-blog__lead .tss-blog__media svg {
+    aspect-ratio: 4 / 5;
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__lead-text {
+    padding-inline: var(--tss-gutter);
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__lead .tss-blog__title {
+    max-width: 18ch;
+    font-size: 30px;
+    line-height: 1.1;
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__lead .tss-blog__excerpt {
+    font-size: 17px;
+    color: rgb(28 28 26 / 0.75);
+  }
+
+  /* ---------- grid ---------- */
+  #tss-blog-{{ uid }} .tss-blog__body {
+    padding: 0 var(--tss-gutter) {{ s.mobile_padding_bottom | default: 64 }}px;
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__grid > li {
+    min-width: 0;
+    border-bottom: 1px solid rgb(8 41 30 / 0.12);
+    padding-block: 40px;
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__empty {
+    padding-block: 64px;
+    font-family: var(--tss-serif);
+    font-size: 19px;
+    font-style: italic;
+    text-align: center;
+    color: rgb(28 28 26 / 0.65);
+  }
+
+  /* ---------- pagination ---------- */
+  #tss-blog-{{ uid }} .tss-blog__pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 48px;
+    font-size: 14px;
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__pagination a,
+  #tss-blog-{{ uid }} .tss-blog__pagination span {
+    display: grid;
+    place-items: center;
+    min-width: 44px;
+    height: 44px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    padding-inline: 12px;
+    text-decoration: none;
+    color: var(--tss-green);
+    transition: border-color 0.4s ease, background-color 0.4s ease, color 0.4s ease;
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__pagination a {
+    border-color: rgb(8 41 30 / 0.18);
+  }
+
+  #tss-blog-{{ uid }} .tss-blog__pagination a:hover,
+  #tss-blog-{{ uid }} .tss-blog__pagination [aria-current] {
+    border-color: var(--tss-green-mid);
+    background: var(--tss-green-mid);
+    color: var(--tss-ivory);
+  }
+
+  @media screen and (min-width: 40rem) {
+    #tss-blog-{{ uid }} .tss-blog__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 48px 24px;
+      padding-top: 48px;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__grid > li {
+      border-bottom: 0;
+      padding-block: 0;
+    }
+  }
+
+  @media screen and (min-width: 64rem) {
+    #tss-blog-{{ uid }} .tss-blog__mast {
+      padding-block: {{ s.mast_padding | default: 96 }}px 48px;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__heading {
+      margin-top: 16px;
+      font-size: 56px;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__lede {
+      margin-top: 16px;
+      max-width: 48ch;
+      font-size: 20px;
+    }
+
+    /* Lead story: image and text side by side inside the page measure, so the
+       photograph is a fixed share of the row instead of the full screen. */
+    #tss-blog-{{ uid }} .tss-blog__lead {
+      padding: 64px var(--tss-gutter) 0;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__lead .tss-blog__link {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: center;
+      gap: 64px;
+      max-width: calc(var(--tss-max) - (2 * var(--tss-gutter)));
+      margin-inline: auto;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__lead .tss-blog__media img,
+    #tss-blog-{{ uid }} .tss-blog__lead .tss-blog__media svg {
+      aspect-ratio: {{ lead_ratio }};
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__lead-text {
+      padding-inline: 0;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__lead .tss-blog__meta {
+      margin-top: 0;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__lead .tss-blog__title {
+      margin-top: 16px;
+      font-size: 44px;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__lead .tss-blog__excerpt {
+      margin-top: 16px;
+      font-size: 19px;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__lead .tss-blog__read {
+      margin-top: 24px;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__body {
+      padding-bottom: {{ s.padding_bottom | default: 96 }}px;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__grid {
+      grid-template-columns: repeat({{ s.columns | default: 3 }}, minmax(0, 1fr));
+      gap: 64px 32px;
+      padding-top: 72px;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__pagination {
+      margin-top: 72px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #tss-blog-{{ uid }} .tss-blog__media img {
+      transition: none;
+    }
+
+    #tss-blog-{{ uid }} .tss-blog__link:hover .tss-blog__media img {
+      transform: none;
+    }
+  }
+</style>
+
+{%- paginate blog.articles by per_page -%}
+  {%- liquid
+    assign has_lead = false
+    if s.show_lead and paginate.current_page == 1 and blog.articles.size > 0
+      assign has_lead = true
+    endif
+    assign grid_offset = 0
+    if has_lead
+      assign grid_offset = 1
+    endif
+    assign grid_count = blog.articles.size | minus: grid_offset
+  -%}
+
+  <div id="tss-blog-{{ uid }}" class="tss-section">
+    <header class="tss-blog__mast">
+      <div class="tss-blog__mast-inner">
+        {%- if s.eyebrow != blank -%}
+          <p class="tss-eyebrow">{{ s.eyebrow | escape }}</p>
+        {%- endif -%}
+        <h1 class="tss-blog__heading">{{ s.title | default: blog.title | escape }}</h1>
+        {%- if s.lede != blank -%}
+          <p class="tss-blog__lede">{{ s.lede | escape }}</p>
+        {%- endif -%}
+      </div>
+    </header>
+
+    {%- if has_lead -%}
+      {%- liquid
+        assign lead = blog.articles.first
+        assign lead_words = lead.content | strip_html | split: ' ' | size
+        assign lead_minutes = lead_words | divided_by: 200 | at_least: 1
+      -%}
+      <article class="tss-blog__lead">
+        <a class="tss-blog__link" href="{{ lead.url }}">
+          <div class="tss-blog__media">
+            {% render 'tss-image',
+              image: lead.image,
+              class: 'tss-blog__img',
+              widths: '480,640,800,1000',
+              sizes: '(min-width: 64rem) 700px, 100vw',
+              alt: lead.title,
+              loading: 'eager',
+              priority: true,
+              placeholder: 'lifestyle-1'
+            %}
+          </div>
+          <div class="tss-blog__lead-text">
+            <p class="tss-eyebrow tss-blog__meta">
+              {%- if s.show_date -%}
+                {{ lead.published_at | time_tag: format: 'date' }}
+              {%- endif -%}
+              {%- if s.show_date and s.show_read_time %} · {% endif -%}
+              {%- if s.show_read_time -%}
+                {{ lead_minutes }} {{ s.read_time_label | default: 'min read' | escape }}
+              {%- endif -%}
+            </p>
+            <h2 class="tss-blog__title">{{ lead.title | escape }}</h2>
+            {%- if s.show_excerpt -%}
+              <p class="tss-blog__excerpt">
+                {{ lead.excerpt_or_content | strip_html | truncatewords: 36 }}
+              </p>
+            {%- endif -%}
+            <p class="tss-blog__read">
+              <span class="tss-link-gold">{{ s.read_label | default: 'Read →' | escape }}</span>
+            </p>
+          </div>
+        </a>
+      </article>
+    {%- endif -%}
+
+    <div class="tss-blog__body">
+      <div class="tss-blog__inner">
+        {%- if blog.articles.size == 0 -%}
+          <p class="tss-blog__empty">{{ s.empty_text | default: 'Nothing here yet. Come back soon.' | escape }}</p>
+        {%- elsif grid_count > 0 -%}
+          <ul class="tss-blog__grid">
+            {%- for entry in blog.articles offset: grid_offset -%}
+              {%- liquid
+                assign words = entry.content | strip_html | split: ' ' | size
+                assign minutes = words | divided_by: 200 | at_least: 1
+              -%}
+              <li>
+                <article>
+                  <a class="tss-blog__link" href="{{ entry.url }}">
+                    <div class="tss-blog__media">
+                      {% render 'tss-image',
+                        image: entry.image,
+                        class: 'tss-blog__img',
+                        widths: '320,480,640,800',
+                        sizes: '(min-width: 64rem) 400px, (min-width: 40rem) 46vw, 100vw',
+                        alt: entry.title,
+                        placeholder: 'lifestyle-2'
+                      %}
+                    </div>
+                    <p class="tss-eyebrow tss-blog__meta">
+                      {%- if s.show_date -%}
+                        {{ entry.published_at | time_tag: format: 'date' }}
+                      {%- endif -%}
+                      {%- if s.show_date and s.show_read_time %} · {% endif -%}
+                      {%- if s.show_read_time -%}
+                        {{ minutes }} {{ s.read_time_label | default: 'min read' | escape }}
+                      {%- endif -%}
+                    </p>
+                    {%- if has_lead -%}
+                      <h3 class="tss-blog__title">{{ entry.title | escape }}</h3>
+                    {%- else -%}
+                      <h2 class="tss-blog__title">{{ entry.title | escape }}</h2>
+                    {%- endif -%}
+                    {%- if s.show_excerpt -%}
+                      <p class="tss-blog__excerpt">
+                        {{ entry.excerpt_or_content | strip_html | truncatewords: 24 }}
+                      </p>
+                    {%- endif -%}
+                    <p class="tss-blog__read">
+                      <span class="tss-link-gold">{{ s.read_label | default: 'Read →' | escape }}</span>
+                    </p>
+                  </a>
+                </article>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+
+        {%- if paginate.pages > 1 -%}
+          <nav class="tss-blog__pagination" aria-label="{{ s.pagination_label | default: 'Journal pages' | escape }}">
+            {%- if paginate.previous -%}
+              <a href="{{ paginate.previous.url }}" rel="prev">←<span class="tss-sr-only">{{ paginate.previous.title | escape }}</span></a>
+            {%- endif -%}
+            {%- for part in paginate.parts -%}
+              {%- if part.is_link -%}
+                <a href="{{ part.url }}">{{ part.title }}</a>
+              {%- elsif part.title contains 'hellip' or part.title == '…' -%}
+                <span>{{ part.title }}</span>
+              {%- else -%}
+                <span aria-current="page">{{ part.title }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if paginate.next -%}
+              <a href="{{ paginate.next.url }}" rel="next">→<span class="tss-sr-only">{{ paginate.next.title | escape }}</span></a>
+            {%- endif -%}
+          </nav>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "TSS · Journal index",
+  "tag": "section",
+  "enabled_on": { "templates": ["blog"] },
+  "settings": [
+    { "type": "header", "content": "Masthead" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Reading Room" },
+    { "type": "text", "id": "title", "label": "Heading", "info": "Leave empty to use the blog's name." },
+    {
+      "type": "textarea",
+      "id": "lede",
+      "label": "Supporting text",
+      "default": "Slower reading on giving, faith and the making of beautiful things."
+    },
+    { "type": "header", "content": "Articles" },
+    {
+      "type": "checkbox",
+      "id": "show_lead",
+      "label": "Show the newest article as a large lead story",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "lead_ratio",
+      "label": "Lead image shape (desktop)",
+      "options": [
+        { "value": "portrait", "label": "Portrait 4:5" },
+        { "value": "square", "label": "Square" },
+        { "value": "landscape", "label": "Landscape 4:3" },
+        { "value": "wide", "label": "Wide 3:2" }
+      ],
+      "default": "landscape"
+    },
+    {
+      "type": "select",
+      "id": "card_ratio",
+      "label": "Card image shape",
+      "options": [
+        { "value": "portrait", "label": "Portrait 4:5" },
+        { "value": "square", "label": "Square" },
+        { "value": "landscape", "label": "Landscape 4:3" }
+      ],
+      "default": "portrait"
+    },
+    { "type": "range", "id": "columns", "label": "Columns (desktop)", "min": 2, "max": 4, "step": 1, "default": 3 },
+    {
+      "type": "range",
+      "id": "per_page",
+      "label": "Articles per page",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "default": 10
+    },
+    { "type": "checkbox", "id": "show_date", "label": "Show date", "default": true },
+    { "type": "checkbox", "id": "show_read_time", "label": "Show reading time", "default": true },
+    { "type": "text", "id": "read_time_label", "label": "Reading time label", "default": "min read" },
+    { "type": "checkbox", "id": "show_excerpt", "label": "Show excerpt", "default": true },
+    { "type": "text", "id": "read_label", "label": "Read link label", "default": "Read →" },
+    { "type": "text", "id": "empty_text", "label": "Empty text", "default": "Nothing here yet. Come back soon." },
+    { "type": "text", "id": "pagination_label", "label": "Pagination label", "default": "Journal pages" },
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "range",
+      "id": "mast_padding",
+      "label": "Masthead top padding",
+      "min": 40,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "mast_padding_mobile",
+      "label": "Masthead top padding (mobile)",
+      "min": 24,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_bottom",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    }
+  ]
+}
+{% endschema %}

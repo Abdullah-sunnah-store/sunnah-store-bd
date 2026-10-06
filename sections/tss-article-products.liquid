@@ -1,0 +1,286 @@
+{% comment %}
+  TSS — The pieces in this letter
+  Products related to the article being read, shown beneath the body.
+
+  Sources, first match wins:
+    1. the article metafield custom.related_products (a product list)
+    2. any product linked from the article body
+    3. the fallback collection chosen on the section
+  The section renders nothing when all three come up empty.
+{% endcomment %}
+
+{% render 'tss-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign limit = s.limit | default: 4
+  assign shown = 0
+-%}
+
+{%- capture cards -%}
+  {%- liquid
+    assign related = article.metafields.custom.related_products.value
+
+    if related.handle != blank
+      assign shown = 1
+      render 'tss-article-product', product: related, button_label: s.button_label, from_label: s.from_label
+    elsif related != blank
+      for item in related limit: limit
+        assign shown = shown | plus: 1
+        render 'tss-article-product', product: item, button_label: s.button_label, from_label: s.from_label
+      endfor
+    endif
+
+    if shown == 0 and s.use_linked
+      assign seen = '|'
+      assign parts = article.content | split: '/products/'
+      for part in parts offset: 1
+        if shown >= limit
+          break
+        endif
+        assign handle = part | split: '"' | first | split: "'" | first | split: '?' | first | split: '#' | first | split: '/' | first | strip
+        assign key = handle | append: '|' | prepend: '|'
+        if handle == blank or seen contains key
+          continue
+        endif
+        assign seen = seen | append: handle | append: '|'
+        assign item = all_products[handle]
+        if item.title == blank
+          continue
+        endif
+        assign shown = shown | plus: 1
+        render 'tss-article-product', product: item, button_label: s.button_label, from_label: s.from_label
+      endfor
+    endif
+
+    if shown == 0 and s.collection != blank
+      for item in s.collection.products limit: limit
+        assign shown = shown | plus: 1
+        render 'tss-article-product', product: item, button_label: s.button_label, from_label: s.from_label
+      endfor
+    endif
+  -%}
+{%- endcapture -%}
+
+{%- if shown > 0 -%}
+  <style>
+    #tss-ap-{{ uid }} {
+      border-top: 1px solid rgb(8 41 30 / 0.12);
+      background: var(--tss-ivory);
+      padding-block: {{ s.mobile_padding_top | default: 56 }}px {{ s.mobile_padding_bottom | default: 56 }}px;
+    }
+
+    #tss-ap-{{ uid }} .tss-ap__inner {
+      max-width: calc({{ s.content_width | default: 680 }}px + (2 * var(--tss-gutter)));
+      margin-inline: auto;
+      padding-inline: var(--tss-gutter);
+    }
+
+    #tss-ap-{{ uid }} .tss-ap__grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 32px;
+      margin-top: 24px;
+    }
+
+    #tss-ap-{{ uid }} .tss-ap__card {
+      display: flex;
+      gap: 20px;
+      min-width: 0;
+    }
+
+    #tss-ap-{{ uid }} .tss-ap__media {
+      display: block;
+      flex: 0 0 38%;
+      max-width: 220px;
+      align-self: flex-start;
+      background: var(--tss-ivory-2);
+    }
+
+    #tss-ap-{{ uid }} .tss-ap__img,
+    #tss-ap-{{ uid }} .tss-ap__media svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+    }
+
+    #tss-ap-{{ uid }} .tss-ap__info {
+      display: flex;
+      flex: 1 1 0;
+      flex-direction: column;
+      align-items: flex-start;
+      min-width: 0;
+    }
+
+    #tss-ap-{{ uid }} .tss-ap__vendor {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(28 28 26 / 0.55);
+    }
+
+    #tss-ap-{{ uid }} .tss-ap__name {
+      margin-top: 4px;
+      font-family: var(--tss-serif);
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.3;
+      letter-spacing: normal;
+      text-transform: none;
+      overflow-wrap: anywhere;
+      color: var(--tss-ink);
+    }
+
+    #tss-ap-{{ uid }} .tss-ap__name a {
+      text-decoration: none;
+    }
+
+    #tss-ap-{{ uid }} .tss-ap__name a:hover {
+      color: var(--tss-green-mid);
+    }
+
+    #tss-ap-{{ uid }} .tss-ap__price {
+      margin-block: 4px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--tss-gold);
+    }
+
+    /* auto pushes the button to the foot of the image when the title is short;
+       16px is the floor when the title wraps. */
+    #tss-ap-{{ uid }} .tss-ap__btn {
+      margin-top: auto;
+      padding: 10px 20px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media screen and (min-width: 64rem) {
+      #tss-ap-{{ uid }} {
+        padding-block: {{ s.padding_top | default: 72 }}px {{ s.padding_bottom | default: 72 }}px;
+      }
+
+      #tss-ap-{{ uid }} .tss-ap__inner--many {
+        max-width: calc(1080px + (2 * var(--tss-gutter)));
+      }
+
+      #tss-ap-{{ uid }} .tss-ap__inner--many .tss-ap__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 40px 48px;
+      }
+
+      #tss-ap-{{ uid }} .tss-ap__name {
+        font-size: 22px;
+      }
+    }
+  </style>
+
+  <section id="tss-ap-{{ uid }}" class="tss-section" aria-labelledby="tss-ap-heading-{{ uid }}">
+    <div class="tss-ap__inner{% if shown > 1 %} tss-ap__inner--many{% endif %}">
+      <h2 class="tss-eyebrow" id="tss-ap-heading-{{ uid }}">
+        {%- if shown > 1 -%}
+          {{ s.title_many | default: 'The Pieces in This Letter' | escape }}
+        {%- else -%}
+          {{ s.title | default: 'The Piece in This Letter' | escape }}
+        {%- endif -%}
+      </h2>
+
+      <div class="tss-ap__grid">
+        {{ cards }}
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "TSS · Article products",
+  "tag": "section",
+  "enabled_on": { "templates": ["article"] },
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading (one product)", "default": "The Piece in This Letter" },
+    {
+      "type": "text",
+      "id": "title_many",
+      "label": "Heading (several products)",
+      "default": "The Pieces in This Letter"
+    },
+    { "type": "header", "content": "Products" },
+    {
+      "type": "paragraph",
+      "content": "Products come from the article metafield custom.related_products when it is filled in."
+    },
+    {
+      "type": "checkbox",
+      "id": "use_linked",
+      "label": "Otherwise use products linked in the article",
+      "default": true
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Fallback collection",
+      "info": "Used when the article has no related or linked products. Leave empty to hide the section instead."
+    },
+    { "type": "range", "id": "limit", "label": "Products", "min": 1, "max": 8, "step": 1, "default": 4 },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "View this piece" },
+    { "type": "text", "id": "from_label", "label": "\"From\" label", "default": "From" },
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Width (one product)",
+      "min": 520,
+      "max": 880,
+      "step": 20,
+      "unit": "px",
+      "default": 680
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_top",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_bottom",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    }
+  ],
+  "presets": [{ "name": "TSS · Article products" }]
+}
+{% endschema %}

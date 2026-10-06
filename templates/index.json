@@ -376,40 +376,40 @@
           "type": "article",
           "settings": {
             "article": "",
-            "image": "shopify://shop_images/Hijab_Gift_Box.jpg",
+            "image": "shopify://shop_images/photo_6208327058769778496_y.jpg",
             "image_asset": "tss-journal-1.jpg",
             "title": "The Manners of Giving",
-            "link": "shopify://blogs/news"
+            "link": "shopify://blogs/news/the-manners-of-giving"
           }
         },
         "a2": {
           "type": "article",
           "settings": {
             "article": "",
-            "image": "shopify://shop_images/Mysterious_Melody_Perfume.jpg",
+            "image": "shopify://shop_images/photo_6208327058769778497_y.jpg",
             "image_asset": "tss-journal-2.jpg",
             "title": "Why We Chose Attar",
-            "link": "shopify://blogs/news"
+            "link": "shopify://blogs/news/why-we-chose-attar"
           }
         },
         "a3": {
           "type": "article",
           "settings": {
             "article": "",
-            "image": "shopify://shop_images/825271634_1399284975625005_807107543585682861_n.jpg",
+            "image": "shopify://shop_images/photo_6208327058769778498_y.jpg",
             "image_asset": "tss-journal-3.jpg",
             "title": "A House Without Walls",
-            "link": "shopify://blogs/news"
+            "link": "shopify://blogs/news/a-house-without-walls"
           }
         },
         "a4": {
           "type": "article",
           "settings": {
             "article": "",
-            "image": "shopify://shop_images/Ferrero_Rocher_Chocolate_-_01.jpg",
+            "image": "shopify://shop_images/photo_6208327058769778499_y.jpg",
             "image_asset": "tss-journal-4.jpg",
             "title": "On Wrapping, Slowly",
-            "link": "shopify://blogs/news"
+            "link": "shopify://blogs/news/on-wrapping-slowly"
           }
         }
       },
@@ -424,7 +424,7 @@
         "eyebrow": "The Reading Room",
         "title": "From the Journal",
         "lede": "Slower reading on giving, faith and the making of beautiful things.",
-        "blog": "",
+        "blog": "news",
         "article_limit": 4,
         "read_label": "Read →",
         "button_label": "Read the Journal",

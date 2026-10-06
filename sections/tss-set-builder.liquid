@@ -1,0 +1,2550 @@
+{% comment %}
+  TSS — Set builder ("Buy Two, Receive Four")
+
+  One page that sells pieces from several collections as a mixed set:
+
+    1. Gallery and introduction.
+    2. The pieces — a tray that fills as pieces are chosen, a tab per
+       collection, ready-made sets that fill the tray in one tap, and either
+       stepper cards (mugs) or a swatch picker (hijab colours).
+    3. Steps — optional add-ons, each answered with a yes or a no.
+    4. A fixed bar with the milestones, the running total and Add to Bag, and a
+       summary sheet that reads the order back.
+
+  Add to Bag puts every line in the cart and goes straight to checkout.
+
+  The theme cannot change what Shopify charges. The offer price shown here is
+  arithmetic for the customer's benefit; the matching discount has to exist in
+  Shopify (automatic, or the code in the "Discount code" setting, which is
+  carried to checkout).
+{% endcomment %}
+
+{% render 'tss-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+
+  assign slide_blocks = section.blocks | where: 'type', 'slide'
+  assign group_blocks = section.blocks | where: 'type', 'group'
+  assign set_blocks = section.blocks | where: 'type', 'set'
+  assign step_blocks = section.blocks | where: 'type', 'step'
+
+  assign offer_min = s.offer_min | default: 4
+  assign low_stock = s.low_stock | default: 10
+-%}
+
+<style>
+  #tss-sb-{{ uid }} {
+    --tss-sb-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+    background: var(--tss-ivory);
+    padding-bottom: 200px;
+  }
+
+  /* This page carries its own fixed bar: the mobile quick-nav would sit under
+     it and the WhatsApp launcher on top of it. */
+  [id^='tss-sticky-'] {
+    display: none !important;
+  }
+
+  /* body-prefixed: tss-base.css is linked again by later sections, so an
+     equal-weight rule here loses to its own 68px offset. */
+  body .whatsapp-float {
+    bottom: calc(200px + env(safe-area-inset-bottom)) !important;
+  }
+
+  body .whatsapp-popup {
+    bottom: calc(270px + env(safe-area-inset-bottom)) !important;
+  }
+
+  @media screen and (min-width: 64rem) {
+    body .whatsapp-float {
+      bottom: calc(124px + env(safe-area-inset-bottom)) !important;
+    }
+
+    body .whatsapp-popup {
+      bottom: calc(194px + env(safe-area-inset-bottom)) !important;
+    }
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__page {
+    max-width: var(--tss-max);
+    margin-inline: auto;
+  }
+
+  #tss-sb-{{ uid }} button {
+    cursor: pointer;
+  }
+
+  #tss-sb-{{ uid }} button:disabled {
+    cursor: not-allowed;
+  }
+
+  #tss-sb-{{ uid }} :focus-visible {
+    outline: 2px solid var(--tss-gold);
+    outline-offset: 2px;
+  }
+
+  #tss-sb-{{ uid }} [hidden] {
+    display: none !important;
+  }
+
+  /* ---------- gallery ---------- */
+  #tss-sb-{{ uid }} .tss-sb__gallery {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__gallery::-webkit-scrollbar,
+  #tss-sb-{{ uid }} .tss-sb__rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__slide img,
+  #tss-sb-{{ uid }} .tss-sb__slide svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: {{ s.gallery_ratio | default: '4 / 5' }};
+    object-fit: cover;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__gallery-bar {
+    height: 2px;
+    margin-top: 8px;
+    background: rgb(26 74 58 / 0.15);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__gallery-bar > span {
+    display: block;
+    height: 100%;
+    background: var(--tss-gold);
+    transition: transform 0.25s var(--tss-sb-ease);
+  }
+
+  /* ---------- intro ---------- */
+  #tss-sb-{{ uid }} .tss-sb__intro {
+    padding: 32px var(--tss-gutter) 40px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__title {
+    margin-top: 12px;
+    font-family: var(--tss-serif);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: normal;
+    text-transform: none;
+    text-wrap: balance;
+    color: var(--tss-ink);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__lede {
+    margin-top: 12px;
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.65;
+    text-wrap: pretty;
+    color: rgb(28 28 26 / 0.7);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__price-line {
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--tss-gold);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__small {
+    margin-top: 16px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  /* ---------- sections ---------- */
+  #tss-sb-{{ uid }} .tss-sb__block {
+    padding: 40px var(--tss-gutter);
+    transition: opacity 0.4s var(--tss-sb-ease);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__block[data-step] {
+    scroll-margin-top: 96px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__block[data-step]:focus {
+    outline: none;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__block[data-locked='true'] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__h {
+    margin-bottom: 20px;
+    font-family: var(--tss-serif);
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--tss-ink);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__h span {
+    color: rgb(28 28 26 / 0.45);
+  }
+
+  /* ---------- tray ---------- */
+  #tss-sb-{{ uid }} .tss-sb__tray-label {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__slot {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border: 1px dashed var(--tss-green-mid);
+    border-radius: 2px;
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+    color: var(--tss-green-mid);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__slot--filled {
+    background: var(--tss-ivory-2);
+    animation: tss-sb-in-{{ uid }} 0.25s var(--tss-sb-ease);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__slot-x {
+    position: absolute;
+    inset-block-start: 2px;
+    inset-inline-end: 2px;
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border: 0;
+    border-radius: 50%;
+    padding: 0;
+    background: var(--tss-green);
+    color: var(--tss-ivory);
+  }
+
+  /* A 44px hit area around the 18px remove dot. */
+  #tss-sb-{{ uid }} .tss-sb__slot-x::after {
+    content: '';
+    position: absolute;
+    inset: -13px;
+  }
+
+  @keyframes tss-sb-in-{{ uid }} {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* ---------- tabs ---------- */
+  #tss-sb-{{ uid }} .tss-sb__tabs {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+    border-bottom: 1px solid rgb(26 74 58 / 0.15);
+    scroll-margin-top: 96px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__tab {
+    position: relative;
+    border: 0;
+    padding: 12px 0;
+    background: transparent;
+    font-size: 14px;
+    color: rgb(28 28 26 / 0.7);
+    transition: color 0.25s ease;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__tab[aria-selected='true'] {
+    color: var(--tss-ink);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__tab[aria-selected='true']::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -1px;
+    height: 1px;
+    background: var(--tss-gold);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__panel {
+    padding-top: 20px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__panel > * + * {
+    margin-top: 24px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__note {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  /* ---------- rails (sets, piece cards) ---------- */
+  #tss-sb-{{ uid }} .tss-sb__rail {
+    display: flex;
+    gap: 12px;
+    margin-inline: calc(-1 * var(--tss-gutter));
+    padding: 0 var(--tss-gutter) 4px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__rail > * {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__set {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 240px;
+    border: 1px solid rgb(26 74 58 / 0.2);
+    padding: 16px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__set h3 {
+    font-family: var(--tss-serif);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__set p {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__text-btn {
+    align-self: flex-start;
+    margin-top: 12px;
+    border: 0;
+    padding: 6px 0;
+    background: transparent;
+    font-size: 14px;
+    color: var(--tss-gold);
+    text-underline-offset: 2px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__text-btn:hover {
+    text-decoration: underline;
+  }
+
+  /* Piece cards wrap into a grid at every width, two across on a phone, so
+     the whole range is on the page without scrolling sideways. */
+  #tss-sb-{{ uid }} .tss-sb__rail--cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border: 1px solid rgb(26 74 58 / 0.15);
+    padding: 8px;
+    transition: border-color 0.25s ease;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__card[data-chosen='true'] {
+    border-color: var(--tss-gold);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__thumb {
+    border: 1px solid rgb(26 74 58 / 0.15);
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__thumb img,
+  #tss-sb-{{ uid }} .tss-sb__thumb svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__card-name {
+    display: -webkit-box;
+    min-height: 2.6em;
+    margin-top: 8px;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__card-price {
+    margin-top: 2px;
+    font-size: 12px;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__left {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--tss-gold);
+  }
+
+  /* ---------- stepper ---------- */
+  #tss-sb-{{ uid }} .tss-sb__stepper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__stepper button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgb(26 74 58 / 0.2);
+    border-radius: 2px;
+    padding: 0;
+    background: transparent;
+    color: var(--tss-ink);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__stepper button:disabled {
+    opacity: 0.3;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__stepper output {
+    width: 24px;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  /* ---------- swatch picker ---------- */
+  #tss-sb-{{ uid }} .tss-sb__preview {
+    max-width: 420px;
+    margin-inline: auto;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__preview img {
+    aspect-ratio: 4 / 3;
+    transition: opacity 0.4s var(--tss-sb-ease);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__preview-name {
+    margin-top: 16px;
+    font-family: var(--tss-serif);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__swatch {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    padding: 0;
+    background: var(--tss-ivory-2) center / cover no-repeat;
+    transition: box-shadow 0.25s var(--tss-sb-ease);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__swatch[aria-pressed='true'] {
+    box-shadow: 0 0 0 2px var(--tss-ivory), 0 0 0 4px var(--tss-gold);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__badge {
+    position: absolute;
+    inset-block-start: -4px;
+    inset-inline-end: -4px;
+    display: grid;
+    place-items: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    padding-inline: 4px;
+    background: var(--tss-gold);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--tss-ivory);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__pick-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__pick-row .tss-sb__stepper,
+  #tss-sb-{{ uid }} .tss-sb__pick-row .tss-sb__left {
+    margin-top: 0;
+  }
+
+  /* ---------- choice cards (steps) ---------- */
+  #tss-sb-{{ uid }} .tss-sb__choices > * + * {
+    margin-top: 16px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__choice {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: 64px;
+    border: 1px solid rgb(26 74 58 / 0.2);
+    border-radius: 2px;
+    padding: 20px;
+    background: var(--tss-ivory);
+    font: inherit;
+    text-align: start;
+    color: inherit;
+    transition: background-color 0.3s var(--tss-sb-ease), border-color 0.3s var(--tss-sb-ease);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__choice[data-selected='true'] {
+    border-color: var(--tss-green-mid);
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__choice[data-selected='true']::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 16px;
+    inset-inline-end: 16px;
+    width: 12px;
+    height: 6px;
+    border: solid var(--tss-green-mid);
+    border-width: 0 0 1.6px 1.6px;
+    transform: rotate(-45deg);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__choice-media {
+    margin-bottom: 16px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__choice-media img {
+    aspect-ratio: 4 / 3;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__choice h3 {
+    padding-inline-end: 32px;
+    font-family: var(--tss-serif);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__choice-copy {
+    margin-top: 6px;
+    padding-inline-end: 32px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: rgb(28 28 26 / 0.7);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__choice-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    margin-top: 16px;
+    font-size: 14px;
+    color: rgb(28 28 26 / 0.7);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__choice-row .tss-sb__stepper {
+    margin-top: 0;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__gold {
+    color: var(--tss-gold);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__plain {
+    padding-inline-end: 32px;
+    font-size: 14px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__pick {
+    display: block;
+    width: 100%;
+    margin-top: 16px;
+    border: 1px solid var(--tss-green-mid);
+    border-radius: 2px;
+    padding: 12px 16px;
+    background: transparent;
+    font-size: 13px;
+    color: var(--tss-green);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__pick[aria-pressed='true'] {
+    background: var(--tss-green-mid);
+    color: var(--tss-ivory);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__chip {
+    position: relative;
+    min-height: 44px;
+    border: 1px solid rgb(26 74 58 / 0.2);
+    border-radius: 2px;
+    padding: 8px 14px;
+    background: transparent;
+    font-size: 13px;
+    color: var(--tss-ink);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__chip[aria-pressed='true'] {
+    border-color: var(--tss-gold);
+    box-shadow: inset 0 0 0 1px var(--tss-gold);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__message {
+    margin-top: 16px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__message textarea {
+    display: block;
+    width: 100%;
+    border: 1px solid rgb(26 74 58 / 0.2);
+    border-radius: 2px;
+    padding: 12px;
+    background: var(--tss-ivory);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--tss-ink);
+    resize: none;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__message p {
+    margin-top: 4px;
+    font-size: 12px;
+    text-align: end;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  /* ---------- fixed bar ---------- */
+  #tss-sb-{{ uid }} .tss-sb__bar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 60;
+    border-top: 1px solid rgb(26 74 58 / 0.15);
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--tss-ivory);
+    box-shadow: 0 -8px 24px rgb(8 41 30 / 0.06);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__bar-inner {
+    max-width: var(--tss-max);
+    margin-inline: auto;
+    padding: 14px var(--tss-gutter) 10px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__meter {
+    position: relative;
+    height: 2px;
+    border-radius: 2px;
+    background: rgb(26 74 58 / 0.15);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__meter-fill {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    border-radius: 2px;
+    background: var(--tss-gold);
+    transition: width 0.4s var(--tss-sb-ease);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__mark {
+    position: absolute;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgb(26 74 58 / 0.4);
+    transform: translate(-50%, -50%);
+    transition: background-color 0.3s ease;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__mark span {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: rgb(28 28 26 / 0.4);
+    transform: translateX(-50%);
+    transition: color 0.3s ease;
+  }
+
+  /* The last label would run off the edge when centred on its dot. */
+  #tss-sb-{{ uid }} .tss-sb__mark--end span {
+    left: auto;
+    right: -3px;
+    transform: none;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__mark[data-reached='true'] {
+    background: var(--tss-gold);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__mark[data-reached='true'] span {
+    color: var(--tss-gold);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 44px;
+    padding-block: 28px 12px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__count {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__total {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--tss-gold);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__hint {
+    font-size: 13px;
+    text-align: end;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__view {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    padding: 12px 0;
+    background: transparent;
+    font-size: 13px;
+    color: var(--tss-ink);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__submit {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-radius: 2px;
+    padding: 17px 24px;
+    background: var(--tss-green);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--tss-ivory);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__submit:hover:not(:disabled) {
+    background: var(--tss-green-mid);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__submit:disabled {
+    background: rgb(28 28 26 / 0.12);
+    color: rgb(28 28 26 / 0.45);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__foot {
+    min-height: 17px;
+    padding-top: 6px;
+    font-size: 11px;
+    text-align: center;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__foot[data-error='true'] {
+    color: #a3301f;
+  }
+
+  /* ---------- summary sheet ---------- */
+  #tss-sb-{{ uid }} .tss-sb__sheet {
+    width: 100%;
+    max-width: 560px;
+    max-height: 80vh;
+    margin: auto auto 0;
+    border: 0;
+    border-radius: 4px 4px 0 0;
+    padding: 0;
+    overflow-y: auto;
+    background: var(--tss-ivory);
+    color: var(--tss-ink);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__sheet::backdrop {
+    background: rgb(0 0 0 / 0.4);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__sheet[open] {
+    animation: tss-sb-up-{{ uid }} 0.4s var(--tss-sb-ease);
+  }
+
+  @keyframes tss-sb-up-{{ uid }} {
+    from {
+      transform: translateY(100%);
+    }
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__sheet-head {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgb(26 74 58 / 0.15);
+    padding: 8px 8px 8px var(--tss-gutter);
+    background: var(--tss-ivory);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__sheet-head h2 {
+    font-family: var(--tss-serif);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__close {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--tss-ink);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__lines {
+    padding-inline: var(--tss-gutter);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__lines li {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid rgb(26 74 58 / 0.1);
+    padding-block: 12px;
+    font-size: 14px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__lines li > :last-child {
+    flex: 0 0 auto;
+    color: rgb(28 28 26 / 0.7);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__sums {
+    padding: 16px var(--tss-gutter) 24px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__sums p {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__regular {
+    font-size: 14px;
+    text-decoration: line-through;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__sum {
+    margin-top: 4px;
+    font-family: var(--tss-serif);
+    font-size: 18px;
+  }
+
+  @media screen and (min-width: 64rem) {
+    #tss-sb-{{ uid }} {
+      padding-bottom: 140px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__top {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: center;
+      gap: 56px;
+      padding: 40px var(--tss-gutter) 8px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__top > :only-child {
+      grid-column: 1 / -1;
+      max-width: 720px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__gallery-wrap {
+      min-width: 0;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__intro {
+      padding: 0;
+    }
+
+    /* Steps: the offer and the "no" side by side. */
+    #tss-sb-{{ uid }} .tss-sb__choices {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      align-items: start;
+      gap: 24px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__choices > * + * {
+      margin-top: 0;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__choice-media {
+      max-width: 360px;
+    }
+
+    /* Swatch picker: the photograph beside the colours. */
+    #tss-sb-{{ uid }} [data-swatch-picker] {
+      display: grid;
+      grid-template-columns: 420px minmax(0, 1fr);
+      grid-auto-rows: min-content;
+      align-content: center;
+      column-gap: 48px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__preview {
+      grid-row: 1 / span 5;
+      width: 100%;
+      margin: 0;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__preview-name {
+      margin-top: 0;
+      font-size: 26px;
+    }
+
+    /* Bar: count, milestones and the button on one line. */
+    #tss-sb-{{ uid }} .tss-sb__bar-inner {
+      display: grid;
+      grid-template-columns: minmax(180px, auto) minmax(0, 1fr) 280px;
+      grid-template-areas:
+        'info meter submit'
+        'hint meter foot';
+      align-items: center;
+      column-gap: 48px;
+      padding-block: 16px 12px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__status {
+      display: contents;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__status > :first-child {
+      grid-area: info;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__status > :last-child {
+      grid-area: hint;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__hint {
+      text-align: start;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__view {
+      padding-block: 4px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__meter {
+      grid-area: meter;
+      margin-bottom: 14px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__submit {
+      grid-area: submit;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__foot {
+      grid-area: foot;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__title {
+      font-size: 44px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__lede {
+      font-size: 16px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__h {
+      font-size: 30px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__block {
+      padding-block: 48px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__rail--cards {
+      grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__sheet {
+      margin: auto;
+      border-radius: 4px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #tss-sb-{{ uid }} *,
+    #tss-sb-{{ uid }} *::backdrop {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+
+{%- capture icon_minus -%}
+  <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true"><path d="M2.5 8H13.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+{%- endcapture -%}
+{%- capture icon_plus -%}
+  <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true"><path d="M8 2.5V13.5M2.5 8H13.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+{%- endcapture -%}
+{%- capture icon_close -%}
+  <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M3.5 3.5L12.5 12.5M12.5 3.5L3.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+{%- endcapture -%}
+
+<div id="tss-sb-{{ uid }}" class="tss-section" data-tss-set-builder>
+  <div class="tss-sb__page">
+    <div class="tss-sb__top">
+    {%- if slide_blocks.size > 0 -%}
+      <div class="tss-sb__gallery-wrap">
+        <div
+          class="tss-sb__gallery"
+          data-gallery
+          role="region"
+          tabindex="0"
+          aria-label="{{ s.gallery_label | default: 'Photographs' | escape }}"
+        >
+          {%- for block in slide_blocks -%}
+            <div class="tss-sb__slide" {{ block.shopify_attributes }}>
+              {%- if forloop.first -%}
+                {% render 'tss-image',
+                  image: block.settings.image,
+                  class: 'tss-sb__slide-img',
+                  widths: '480,720,960',
+                  sizes: '(min-width: 64rem) 720px, 100vw',
+                  alt: block.settings.alt,
+                  priority: true,
+                  placeholder: 'lifestyle-1'
+                %}
+              {%- else -%}
+                {% render 'tss-image',
+                  image: block.settings.image,
+                  class: 'tss-sb__slide-img',
+                  widths: '480,720,960',
+                  sizes: '(min-width: 64rem) 720px, 100vw',
+                  alt: block.settings.alt,
+                  placeholder: 'lifestyle-2'
+                %}
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+        {%- if slide_blocks.size > 1 -%}
+          <div class="tss-sb__gallery-bar" aria-hidden="true">
+            <span data-gallery-bar style="width: calc(100% / {{ slide_blocks.size }});"></span>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <header class="tss-sb__intro">
+      {%- if s.eyebrow != blank -%}
+        <p class="tss-eyebrow">{{ s.eyebrow | escape }}</p>
+      {%- endif -%}
+      <h1 class="tss-sb__title">{{ s.title | default: page.title | escape }}</h1>
+      {%- if s.lede != blank -%}
+        <p class="tss-sb__lede">{{ s.lede | escape }}</p>
+      {%- endif -%}
+      {%- if s.price_line != blank -%}
+        <p class="tss-sb__price-line">{{ s.price_line | escape }}</p>
+      {%- endif -%}
+      {%- if s.note != blank -%}
+        <p class="tss-sb__small">{{ s.note | escape }}</p>
+      {%- endif -%}
+    </header>
+    </div>
+
+    <section class="tss-sb__block" aria-labelledby="tss-sb-pieces-{{ uid }}">
+      <h2 class="tss-sb__h" id="tss-sb-pieces-{{ uid }}">
+        {{ s.pieces_label | default: 'The pieces.' | escape }}
+        <span>{{ s.pieces_question | default: 'Start with a set, or choose your own.' | escape }}</span>
+      </h2>
+
+      <p class="tss-sb__tray-label" data-tray-label aria-live="polite"></p>
+      <div class="tss-sb__slots" data-slots></div>
+
+      {%- if group_blocks.size > 0 -%}
+        <div class="tss-sb__tabs" role="tablist" data-tabs aria-label="{{ s.pieces_label | default: 'The pieces' | escape }}">
+          {%- for block in group_blocks -%}
+            <button
+              type="button"
+              class="tss-sb__tab"
+              role="tab"
+              id="tss-sb-tab-{{ block.id }}"
+              aria-controls="tss-sb-panel-{{ block.id }}"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              {% unless forloop.first %}tabindex="-1"{% endunless %}
+              data-tab="{{ block.id }}"
+            >
+              {{- block.settings.label | default: block.settings.collection.title | escape -}}
+            </button>
+          {%- endfor -%}
+        </div>
+
+        {%- for block in group_blocks -%}
+          {%- liquid
+            assign g = block.settings
+            assign group_label = g.label | default: g.collection.title
+            assign product_limit = g.limit | default: 24
+          -%}
+          <div
+            class="tss-sb__panel"
+            role="tabpanel"
+            id="tss-sb-panel-{{ block.id }}"
+            aria-labelledby="tss-sb-tab-{{ block.id }}"
+            data-panel="{{ block.id }}"
+            data-group-label="{{ group_label | escape }}"
+            {% unless forloop.first %}hidden{% endunless %}
+            {{ block.shopify_attributes }}
+          >
+            {%- assign has_sets = false -%}
+            {%- capture sets_html -%}
+              {%- for set_block in set_blocks -%}
+                {%- liquid
+                  assign sb = set_block.settings
+                  if sb.tab != group_label or sb.products.count == 0
+                    continue
+                  endif
+                  assign has_sets = true
+                  assign set_ids = ''
+                  assign set_names = ''
+                  for item in sb.products
+                    assign iv = item.selected_or_first_available_variant
+                    assign set_ids = set_ids | append: iv.id | append: ','
+                    assign set_names = set_names | append: item.title | append: ' · '
+                  endfor
+                  assign last = set_names.size | minus: 3
+                  assign set_names = set_names | slice: 0, last
+                -%}
+                <div class="tss-sb__set" {{ set_block.shopify_attributes }}>
+                  <div>
+                    <h3>{{ sb.name | default: 'Set' | escape }}</h3>
+                    <p>{{ set_names | escape }}</p>
+                  </div>
+                  <button type="button" class="tss-sb__text-btn" data-add-set="{{ set_ids }}">
+                    {{- s.add_set_label | default: 'Add this set' | escape -}}
+                    <span class="tss-sr-only">: {{ sb.name | escape }}</span>
+                  </button>
+                </div>
+              {%- endfor -%}
+            {%- endcapture -%}
+
+            {%- if has_sets -%}
+              <div class="tss-sb__rail">{{ sets_html }}</div>
+            {%- endif -%}
+
+            {%- if g.note != blank -%}
+              <p class="tss-sb__note">{{ g.note | escape }}</p>
+            {%- endif -%}
+
+            {%- if g.collection == blank or g.collection.products.size == 0 -%}
+              <p class="tss-sb__note">{{ s.empty_label | default: 'Nothing here just yet.' | escape }}</p>
+
+            {%- elsif g.style == 'swatches' -%}
+              <div data-swatch-picker>
+                <div class="tss-sb__thumb tss-sb__preview">
+                  <img alt="" width="800" height="600" data-preview-img hidden>
+                </div>
+                <h3 class="tss-sb__preview-name" data-preview-name></h3>
+                <p class="tss-sb__note" data-preview-price></p>
+
+                <div class="tss-sb__swatches">
+                  {%- for item in g.collection.products limit: product_limit -%}
+                    {%- for variant in item.variants -%}
+                      {%- liquid
+                        unless variant.available
+                          continue
+                        endunless
+                        assign piece_name = item.title
+                        unless item.has_only_default_variant
+                          assign piece_name = item.title | append: ' — ' | append: variant.title
+                        endunless
+                        assign piece_image = variant.featured_image | default: item.featured_image
+                        assign piece_max = 99
+                        if variant.inventory_management == 'shopify' and variant.inventory_policy == 'deny'
+                          assign piece_max = variant.inventory_quantity | at_least: 0
+                        endif
+                      -%}
+                      <button
+                        type="button"
+                        class="tss-sb__swatch"
+                        aria-pressed="false"
+                        aria-label="{{ piece_name | escape }}"
+                        {% if piece_image %}
+                          style="background-image: url('{{ piece_image | image_url: width: 120, height: 120, crop: 'center' }}');"
+                        {% endif %}
+                        data-piece="{{ variant.id }}"
+                        data-name="{{ piece_name | escape }}"
+                        data-price="{{ variant.price }}"
+                        data-max="{{ piece_max }}"
+                        data-group="{{ block.id }}"
+                        {% if piece_image %}
+                          data-thumb="{{ piece_image | image_url: width: 160, height: 160, crop: 'center' }}"
+                          data-large="{{ piece_image | image_url: width: 900 }}"
+                        {% endif %}
+                      >
+                        <span class="tss-sb__badge" data-badge hidden></span>
+                      </button>
+                    {%- endfor -%}
+                  {%- endfor -%}
+                </div>
+
+                <div class="tss-sb__pick-row">
+                  <div class="tss-sb__stepper" data-swatch-stepper>
+                    <button type="button" data-dec aria-label="{{ s.remove_one_label | default: 'Remove one' | escape }}">{{ icon_minus }}</button>
+                    <output aria-live="polite">0</output>
+                    <button type="button" data-inc aria-label="{{ s.add_one_label | default: 'Add one' | escape }}">{{ icon_plus }}</button>
+                  </div>
+                  <p class="tss-sb__left" data-preview-left hidden></p>
+                </div>
+              </div>
+
+            {%- else -%}
+              <div class="tss-sb__rail tss-sb__rail--cards">
+                {%- for item in g.collection.products limit: product_limit -%}
+                  {%- for variant in item.variants -%}
+                    {%- liquid
+                      unless variant.available
+                        continue
+                      endunless
+                      assign piece_name = item.title
+                      unless item.has_only_default_variant
+                        assign piece_name = item.title | append: ' — ' | append: variant.title
+                      endunless
+                      assign piece_image = variant.featured_image | default: item.featured_image
+                      assign piece_max = 99
+                      if variant.inventory_management == 'shopify' and variant.inventory_policy == 'deny'
+                        assign piece_max = variant.inventory_quantity | at_least: 0
+                      endif
+                    -%}
+                    <article
+                      class="tss-sb__card"
+                      data-piece="{{ variant.id }}"
+                      data-name="{{ piece_name | escape }}"
+                      data-price="{{ variant.price }}"
+                      data-max="{{ piece_max }}"
+                      data-group="{{ block.id }}"
+                      {% if piece_image %}
+                        data-thumb="{{ piece_image | image_url: width: 160, height: 160, crop: 'center' }}"
+                      {% endif %}
+                    >
+                      <div class="tss-sb__thumb">
+                        {% render 'tss-image',
+                          image: piece_image,
+                          class: 'tss-sb__card-img',
+                          widths: '160,240,320',
+                          sizes: '160px',
+                          alt: piece_name,
+                          placeholder: 'product-1'
+                        %}
+                      </div>
+                      <h3 class="tss-sb__card-name">{{ piece_name | escape }}</h3>
+                      <p class="tss-sb__card-price">{{ variant.price | money }}</p>
+                      <div class="tss-sb__stepper">
+                        <button type="button" data-dec aria-label="{{ s.remove_one_label | default: 'Remove one' | escape }} {{ piece_name | escape }}">{{ icon_minus }}</button>
+                        <output aria-live="polite">0</output>
+                        <button type="button" data-inc aria-label="{{ s.add_one_label | default: 'Add one' | escape }} {{ piece_name | escape }}">{{ icon_plus }}</button>
+                      </div>
+                      {%- if piece_max <= low_stock -%}
+                        <p class="tss-sb__left">{{ piece_max }} {{ s.left_label | default: 'left' | escape }}</p>
+                      {%- endif -%}
+                    </article>
+                  {%- endfor -%}
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+
+      {%- if s.pieces_note != blank -%}
+        <p class="tss-sb__small">{{ s.pieces_note | escape }}</p>
+      {%- endif -%}
+    </section>
+
+    {%- for block in step_blocks -%}
+      {%- liquid
+        assign b = block.settings
+        assign extra = b.product
+        if extra == blank
+          continue
+        endif
+        assign extra_name = b.name | default: extra.title
+        assign extra_variants = extra.variants | where: 'available', true
+        if extra_variants.size == 0
+          continue
+        endif
+        assign extra_first = extra_variants.first
+        assign extra_image = b.image | default: extra.featured_image
+      -%}
+      <section
+        class="tss-sb__block"
+        data-step="{{ block.id }}"
+        data-mode="{{ b.mode }}"
+        data-name="{{ extra_name | escape }}"
+        data-show-tab="{{ b.show_tab | escape }}"
+        data-match-tab="{{ b.match_tab | escape }}"
+        data-free-at="{{ b.free_at | default: 0 }}"
+        data-locked="true"
+        aria-labelledby="tss-sb-step-{{ block.id }}"
+        {{ block.shopify_attributes }}
+      >
+        <h2 class="tss-sb__h" id="tss-sb-step-{{ block.id }}">
+          {{ b.label | escape }}
+          <span>{{ b.question | escape }}</span>
+        </h2>
+
+        <div class="tss-sb__choices">
+          <div class="tss-sb__choice" data-accept data-selected="false">
+            {%- if extra_image != blank -%}
+              <div class="tss-sb__thumb tss-sb__choice-media">
+                {% render 'tss-image',
+                  image: extra_image,
+                  class: 'tss-sb__choice-img',
+                  widths: '480,720',
+                  sizes: '(min-width: 64rem) 680px, 90vw',
+                  alt: extra_name
+                %}
+              </div>
+            {%- endif -%}
+
+            <h3>{{ extra_name | escape }}</h3>
+            {%- if b.copy != blank -%}
+              <p class="tss-sb__choice-copy">{{ b.copy | escape }}</p>
+            {%- endif -%}
+            {%- if b.small_note != blank -%}
+              <p class="tss-sb__small">{{ b.small_note | escape }}</p>
+            {%- endif -%}
+
+            {%- if b.mode == 'stepper' and extra_variants.size > 1 -%}
+              <p class="tss-sb__choice-row"><span class="tss-sb__gold">{{ extra_first.price | money }}</span></p>
+              <div class="tss-sb__chips">
+                {%- for variant in extra_variants -%}
+                  <button
+                    type="button"
+                    class="tss-sb__chip"
+                    aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+                    data-option="{{ variant.id }}"
+                    data-name="{{ variant.title | escape }}"
+                    data-price="{{ variant.price }}"
+                  >
+                    {{- variant.title | escape -}}
+                    <span class="tss-sb__badge" data-badge hidden></span>
+                  </button>
+                {%- endfor -%}
+              </div>
+              <div class="tss-sb__choice-row">
+                <div class="tss-sb__stepper" data-step-stepper>
+                  <button type="button" data-dec aria-label="{{ s.remove_one_label | default: 'Remove one' | escape }} {{ extra_name | escape }}">{{ icon_minus }}</button>
+                  <output aria-live="polite">0</output>
+                  <button type="button" data-inc aria-label="{{ s.add_one_label | default: 'Add one' | escape }} {{ extra_name | escape }}">{{ icon_plus }}</button>
+                </div>
+                <span data-option-name>{{ extra_first.title | escape }}</span>
+              </div>
+              <p class="tss-sb__small" data-option-summary hidden></p>
+
+            {%- elsif b.mode == 'stepper' -%}
+              <div class="tss-sb__choice-row" data-option="{{ extra_first.id }}" data-name="" data-price="{{ extra_first.price }}">
+                <span class="tss-sb__gold">{{ extra_first.price | money }}</span>
+                <div class="tss-sb__stepper" data-step-stepper>
+                  <button type="button" data-dec aria-label="{{ s.remove_one_label | default: 'Remove one' | escape }} {{ extra_name | escape }}">{{ icon_minus }}</button>
+                  <output aria-live="polite">0</output>
+                  <button type="button" data-inc aria-label="{{ s.add_one_label | default: 'Add one' | escape }} {{ extra_name | escape }}">{{ icon_plus }}</button>
+                </div>
+              </div>
+
+            {%- else -%}
+              <p class="tss-sb__choice-row" data-option="{{ extra_first.id }}" data-name="" data-price="{{ extra_first.price }}">
+                <span data-match-text data-template="{{ b.match_text | escape }}"></span>
+                <span class="tss-sb__gold" data-step-price>{{ extra_first.price | money }}</span>
+              </p>
+              <button type="button" class="tss-sb__pick" data-pick aria-pressed="false">
+                {{- b.accept_label | default: 'Add this' | escape -}}
+                <span class="tss-sr-only">: {{ extra_name | escape }}</span>
+              </button>
+
+              {%- if b.ask_message -%}
+                <div class="tss-sb__message" data-message-wrap hidden>
+                  <label class="tss-sr-only" for="tss-sb-msg-{{ block.id }}">{{ b.message_placeholder | default: 'Your message' | escape }}</label>
+                  <textarea
+                    id="tss-sb-msg-{{ block.id }}"
+                    rows="3"
+                    maxlength="{{ b.message_max | default: 120 }}"
+                    placeholder="{{ b.message_placeholder | default: 'What would you like it to say?' | escape }}"
+                    data-message
+                  ></textarea>
+                  <p><span data-message-count>0</span>/{{ b.message_max | default: 120 }}</p>
+                </div>
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+
+          <button type="button" class="tss-sb__choice" data-decline data-selected="false" aria-pressed="false">
+            <span class="tss-sb__plain">{{ b.decline_label | default: 'No, thank you' | escape }}</span>
+          </button>
+        </div>
+
+        {%- if b.footnote != blank -%}
+          <p class="tss-sb__small">{{ b.footnote | escape }}</p>
+        {%- endif -%}
+      </section>
+    {%- endfor -%}
+  </div>
+
+  <div class="tss-sb__bar">
+    <div class="tss-sb__bar-inner">
+      <div class="tss-sb__meter" aria-hidden="true">
+        <div class="tss-sb__meter-fill" data-meter></div>
+        <div class="tss-sb__mark" data-mark="{{ offer_min }}" data-mark-hint="{{ s.hint_offer | default: 'Choose [n] more to pay half' | escape }}"><span>{{ s.offer_label | default: 'Half price' | escape }}</span></div>
+        {%- if s.milestone_2_count > offer_min and s.milestone_2_label != blank -%}
+          <div class="tss-sb__mark" data-mark="{{ s.milestone_2_count }}" data-mark-hint="{{ s.milestone_2_hint | escape }}"><span>{{ s.milestone_2_label | escape }}</span></div>
+        {%- endif -%}
+        {%- if s.milestone_3_count > s.milestone_2_count and s.milestone_3_label != blank -%}
+          <div class="tss-sb__mark" data-mark="{{ s.milestone_3_count }}" data-mark-hint="{{ s.milestone_3_hint | escape }}"><span>{{ s.milestone_3_label | escape }}</span></div>
+        {%- endif -%}
+      </div>
+
+      <div class="tss-sb__status">
+        <div>
+          <p class="tss-sb__count" data-count></p>
+          <p class="tss-sb__total" data-total hidden></p>
+        </div>
+        <div>
+          <p class="tss-sb__hint" data-hint aria-live="polite"></p>
+          <button type="button" class="tss-sb__view" data-view hidden>
+            {{ s.view_label | default: 'View' | escape }}
+            <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true"><path d="M3.5 6L8 10.5L12.5 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="tss-sb__submit" data-submit disabled>
+        {{- s.submit_label | default: 'Add to Bag' | escape -}}
+      </button>
+      <p class="tss-sb__foot" data-foot role="status"></p>
+    </div>
+  </div>
+
+  <dialog class="tss-sb__sheet" data-sheet aria-labelledby="tss-sb-sheet-{{ uid }}">
+    <div class="tss-sb__sheet-head">
+      <h2 id="tss-sb-sheet-{{ uid }}">{{ s.summary_title | default: 'Your set' | escape }}</h2>
+      <button type="button" class="tss-sb__close" data-sheet-close aria-label="{{ s.close_label | default: 'Close' | escape }}">
+        {{ icon_close }}
+      </button>
+    </div>
+    <ul class="tss-sb__lines" data-lines></ul>
+    <div class="tss-sb__sums">
+      <p class="tss-sb__regular" data-regular hidden>
+        <span>{{ s.regular_label | default: 'Regular price' | escape }}</span>
+        <span data-regular-value></span>
+      </p>
+      <p class="tss-sb__sum">
+        <span>{{ s.total_label | default: 'Total' | escape }}</span>
+        <span class="tss-sb__gold" data-sum></span>
+      </p>
+      {%- if s.summary_note != blank -%}
+        <p class="tss-sb__small">{{ s.summary_note | escape }}</p>
+      {%- endif -%}
+    </div>
+  </dialog>
+</div>
+
+<script>
+  (function () {
+    var root = document.getElementById('tss-sb-{{ uid }}');
+    if (!root || root.__tssSetBuilder) return;
+    root.__tssSetBuilder = true;
+
+    var ADD_URL = {{ routes.cart_add_url | append: '.js' | json }};
+    var CART_URL = {{ routes.cart_url | json }};
+    var CART_UPDATE_URL = {{ routes.cart_update_url | append: '.js' | json }};
+    var MONEY_FORMAT = {{ shop.money_format | strip_html | json }};
+    var OFFER_MIN = {{ offer_min }};
+    var OFFER_PERCENT = {{ s.offer_percent | default: 50 }};
+    var LOW_STOCK = {{ low_stock }};
+    var REQUIRE_ANSWERS = {{ s.require_answers | json }};
+    var AFTER_ADD = {{ s.after_add | default: 'checkout' | json }};
+    var DISCOUNT_CODE = {{ s.discount_code | strip | json }};
+    var OFFER_NAME = {{ s.offer_property | strip | json }};
+    var T = {
+      chosenOf: {{ s.chosen_of_label | default: '[count] of [min] chosen' | json }},
+      chosen: {{ s.chosen_label | default: '[count] chosen' | json }},
+      needPieces: {{ s.need_pieces_text | default: 'Choose at least [min] pieces, then answer each step.' | json }},
+      needAnswers: {{ s.need_answers_text | default: 'Answer each step to continue.' | json }},
+      next: {{ s.next_label | default: 'Continue' | json }},
+      adding: {{ s.adding_label | default: 'Adding…' | json }},
+      error: {{ s.error_text | default: 'Something went wrong. Please try again.' | json }},
+      remove: {{ s.remove_label | default: 'Remove' | json }},
+      addAnother: {{ s.add_another_label | default: 'Add another piece' | json }},
+      left: {{ s.left_label | default: 'left' | json }},
+      included: {{ s.included_label | default: 'Included' | json }},
+      message: {{ s.message_property | default: 'Message' | json }},
+      offerKey: {{ s.offer_property_key | default: 'Offer' | json }}
+    };
+
+    // Shopify's money_format is a Liquid fragment, not a number format, so
+    // render the one placeholder it carries rather than guessing at currency.
+    function money(cents) {
+      var value = (cents || 0) / 100;
+      function withCommas(n) {
+        var parts = n.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return parts.join('.');
+      }
+      return String(MONEY_FORMAT).replace(/\{\{\s*(\w+)\s*\}\}/, function (_, token) {
+        switch (token) {
+          case 'amount_no_decimals':
+            return withCommas(String(Math.round(value)));
+          case 'amount_with_comma_separator':
+            return withCommas(value.toFixed(2)).replace(/,/g, ' ').replace('.', ',');
+          case 'amount_no_decimals_with_comma_separator':
+            return withCommas(String(Math.round(value))).replace(/,/g, '.');
+          case 'amount_no_decimals_with_space_separator':
+            return withCommas(String(Math.round(value))).replace(/,/g, ' ');
+          default:
+            return withCommas(value.toFixed(2));
+        }
+      });
+    }
+
+    function fill(text, values) {
+      return String(text).replace(/\[(\w+)\]/g, function (match, key) {
+        return key in values ? values[key] : match;
+      });
+    }
+
+    function each(list, fn) {
+      Array.prototype.forEach.call(list, fn);
+    }
+
+    /* ---------- pieces ---------- */
+    var pieces = {};
+    var pieceEls = root.querySelectorAll('[data-piece]');
+    each(pieceEls, function (el) {
+      var id = el.getAttribute('data-piece');
+      pieces[id] = {
+        id: id,
+        el: el,
+        name: el.getAttribute('data-name'),
+        price: parseInt(el.getAttribute('data-price'), 10) || 0,
+        max: parseInt(el.getAttribute('data-max'), 10) || 0,
+        group: el.getAttribute('data-group'),
+        thumb: el.getAttribute('data-thumb') || '',
+        large: el.getAttribute('data-large') || ''
+      };
+    });
+
+    var groupLabels = {};
+    each(root.querySelectorAll('[data-panel]'), function (panel) {
+      groupLabels[panel.getAttribute('data-panel')] = panel.getAttribute('data-group-label');
+    });
+
+    var state = {
+      qty: {},
+      order: [],
+      answered: {},
+      steps: {},
+      busy: false
+    };
+
+    function setQty(id, value) {
+      var piece = pieces[id];
+      if (!piece) return;
+      var next = Math.max(0, Math.min(piece.max, value));
+      state.qty[id] = next;
+      if (next > 0 && state.order.indexOf(id) === -1) state.order.push(id);
+      render();
+    }
+
+    function qtyOf(id) {
+      return state.qty[id] || 0;
+    }
+
+    /* ---------- steps ---------- */
+    var stepEls = root.querySelectorAll('[data-step]');
+    each(stepEls, function (el) {
+      var id = el.getAttribute('data-step');
+      var options = [];
+      each(el.querySelectorAll('[data-option]'), function (optionEl) {
+        options.push({
+          id: optionEl.getAttribute('data-option'),
+          name: optionEl.getAttribute('data-name') || '',
+          price: parseInt(optionEl.getAttribute('data-price'), 10) || 0,
+          el: optionEl
+        });
+      });
+      state.steps[id] = {
+        id: id,
+        el: el,
+        mode: el.getAttribute('data-mode') || 'stepper',
+        name: el.getAttribute('data-name'),
+        showTab: el.getAttribute('data-show-tab'),
+        matchTab: el.getAttribute('data-match-tab'),
+        freeAt: parseInt(el.getAttribute('data-free-at'), 10) || 0,
+        options: options,
+        active: options.length ? options[0].id : null,
+        qty: {},
+        picked: false,
+        message: ''
+      };
+    });
+
+    function countInTab(label) {
+      var total = 0;
+      for (var id in state.qty) {
+        if (!label || groupLabels[pieces[id].group] === label) total += qtyOf(id);
+      }
+      return total;
+    }
+
+    function totalCount() {
+      return countInTab('');
+    }
+
+    /* Lines a step contributes: [{ id, name, quantity, price, free, message }] */
+    function stepLines(step, count) {
+      var lines = [];
+      if (step.mode === 'stepper') {
+        step.options.forEach(function (option) {
+          var quantity = step.qty[option.id] || 0;
+          if (quantity > 0) {
+            lines.push({
+              id: option.id,
+              name: option.name ? step.name + ' — ' + option.name : step.name,
+              quantity: quantity,
+              price: option.price
+            });
+          }
+        });
+        return lines;
+      }
+      if (!step.picked || !step.options.length) return lines;
+      var quantity = step.mode === 'match' ? countInTab(step.matchTab) : 1;
+      if (quantity < 1) return lines;
+      lines.push({
+        id: step.options[0].id,
+        name: step.name,
+        quantity: quantity,
+        price: step.options[0].price,
+        free: step.freeAt > 0 && count >= step.freeAt,
+        message: step.message
+      });
+      return lines;
+    }
+
+    function stepVisible(step) {
+      return !step.showTab || countInTab(step.showTab) > 0;
+    }
+
+    /* ---------- totals ---------- */
+    function totals() {
+      var count = 0;
+      var regular = 0;
+      for (var id in state.qty) {
+        count += qtyOf(id);
+        regular += qtyOf(id) * pieces[id].price;
+      }
+      var unlocked = count >= OFFER_MIN;
+      var piecesTotal = unlocked ? Math.round((regular * (100 - OFFER_PERCENT)) / 100) : regular;
+      var extras = 0;
+      var extrasRegular = 0;
+      var extraLines = [];
+      for (var key in state.steps) {
+        var step = state.steps[key];
+        if (!stepVisible(step)) continue;
+        stepLines(step, count).forEach(function (line) {
+          extraLines.push(line);
+          extrasRegular += line.price * line.quantity;
+          if (!line.free) extras += line.price * line.quantity;
+        });
+      }
+      return {
+        count: count,
+        unlocked: unlocked,
+        regular: regular + extrasRegular,
+        total: piecesTotal + extras,
+        extraLines: extraLines
+      };
+    }
+
+    /* ---------- render ---------- */
+    var els = {
+      trayLabel: root.querySelector('[data-tray-label]'),
+      slots: root.querySelector('[data-slots]'),
+      tabs: root.querySelector('[data-tabs]'),
+      meter: root.querySelector('[data-meter]'),
+      marks: root.querySelectorAll('[data-mark]'),
+      count: root.querySelector('[data-count]'),
+      total: root.querySelector('[data-total]'),
+      hint: root.querySelector('[data-hint]'),
+      view: root.querySelector('[data-view]'),
+      submit: root.querySelector('[data-submit]'),
+      foot: root.querySelector('[data-foot]'),
+      sheet: root.querySelector('[data-sheet]'),
+      lines: root.querySelector('[data-lines]'),
+      regular: root.querySelector('[data-regular]'),
+      regularValue: root.querySelector('[data-regular-value]'),
+      sum: root.querySelector('[data-sum]')
+    };
+
+    var marks = [];
+    each(els.marks, function (mark) {
+      marks.push({
+        el: mark,
+        value: parseInt(mark.getAttribute('data-mark'), 10) || 0,
+        hint: mark.getAttribute('data-mark-hint') || ''
+      });
+    });
+    var meterMax = marks.length ? marks[marks.length - 1].value : OFFER_MIN;
+    marks.forEach(function (mark, index) {
+      mark.el.style.left = (mark.value / meterMax) * 100 + '%';
+      if (index === marks.length - 1) mark.el.classList.add('tss-sb__mark--end');
+    });
+    var submitLabel = els.submit.textContent;
+
+    function el(tag, className, text) {
+      var node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    function renderTray(count) {
+      els.trayLabel.textContent =
+        count <= OFFER_MIN ? fill(T.chosenOf, { count: count, min: OFFER_MIN }) : fill(T.chosen, { count: count });
+
+      els.slots.textContent = '';
+      state.order.forEach(function (id) {
+        var piece = pieces[id];
+        for (var i = 0; i < qtyOf(id); i++) {
+          var slot = el('div', 'tss-sb__slot tss-sb__slot--filled');
+          if (piece.thumb) {
+            var img = el('img');
+            img.src = piece.thumb;
+            img.alt = piece.name;
+            img.width = 56;
+            img.height = 56;
+            slot.appendChild(img);
+          }
+          var remove = el('button', 'tss-sb__slot-x');
+          remove.type = 'button';
+          remove.setAttribute('aria-label', T.remove + ' ' + piece.name);
+          remove.setAttribute('data-remove', id);
+          remove.innerHTML =
+            '<svg viewBox="0 0 16 16" width="8" height="8" fill="none" aria-hidden="true"><path d="M3.5 3.5L12.5 12.5M12.5 3.5L3.5 12.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+          slot.appendChild(remove);
+          els.slots.appendChild(slot);
+        }
+      });
+
+      // Empty places up to the offer; past it, one "add another" place.
+      if (count < OFFER_MIN) {
+        for (var n = count; n < OFFER_MIN; n++) els.slots.appendChild(el('div', 'tss-sb__slot'));
+      } else {
+        var more = el('button', 'tss-sb__slot');
+        more.type = 'button';
+        more.setAttribute('aria-label', T.addAnother);
+        more.setAttribute('data-more', '');
+        more.innerHTML =
+          '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M8 2.5V13.5M2.5 8H13.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+        els.slots.appendChild(more);
+      }
+    }
+
+    function renderStepper(wrap, value, max) {
+      if (!wrap) return;
+      wrap.querySelector('output').textContent = value;
+      wrap.querySelector('[data-dec]').disabled = value <= 0;
+      wrap.querySelector('[data-inc]').disabled = value >= max;
+    }
+
+    function renderPieces() {
+      for (var id in pieces) {
+        var piece = pieces[id];
+        var quantity = qtyOf(id);
+        if (piece.el.classList.contains('tss-sb__card')) {
+          piece.el.setAttribute('data-chosen', quantity > 0 ? 'true' : 'false');
+          renderStepper(piece.el.querySelector('.tss-sb__stepper'), quantity, piece.max);
+        } else {
+          var badge = piece.el.querySelector('[data-badge]');
+          badge.hidden = quantity < 1;
+          badge.textContent = quantity;
+        }
+      }
+
+      each(root.querySelectorAll('[data-swatch-picker]'), function (picker) {
+        var current = picker.querySelector('.tss-sb__swatch[aria-pressed="true"]');
+        if (!current) return;
+        var piece = pieces[current.getAttribute('data-piece')];
+        renderStepper(picker.querySelector('[data-swatch-stepper]'), qtyOf(piece.id), piece.max);
+      });
+    }
+
+    function selectSwatch(swatch) {
+      var picker = swatch.closest('[data-swatch-picker]');
+      var piece = pieces[swatch.getAttribute('data-piece')];
+      each(picker.querySelectorAll('.tss-sb__swatch'), function (other) {
+        other.setAttribute('aria-pressed', other === swatch ? 'true' : 'false');
+      });
+      var img = picker.querySelector('[data-preview-img]');
+      if (piece.large) {
+        img.src = piece.large;
+        img.alt = piece.name;
+        img.hidden = false;
+      } else {
+        img.hidden = true;
+      }
+      picker.querySelector('[data-preview-name]').textContent = piece.name;
+      picker.querySelector('[data-preview-price]').textContent = money(piece.price);
+      var left = picker.querySelector('[data-preview-left]');
+      left.hidden = piece.max > LOW_STOCK;
+      left.textContent = piece.max + ' ' + T.left;
+      renderStepper(picker.querySelector('[data-swatch-stepper]'), qtyOf(piece.id), piece.max);
+    }
+
+    function renderSteps(count) {
+      var open = true;
+      var allAnswered = true;
+      state.pending = null;
+
+      for (var key in state.steps) {
+        var step = state.steps[key];
+        var visible = stepVisible(step);
+        step.el.hidden = !visible;
+        if (!visible) continue;
+
+        // Each step waits for the one before it, as the reference does.
+        step.el.setAttribute('data-locked', REQUIRE_ANSWERS && !open ? 'true' : 'false');
+
+        var lines = stepLines(step, count);
+        var has = lines.length > 0;
+        var answered = !!state.answered[step.id];
+        var accept = step.el.querySelector('[data-accept]');
+        var decline = step.el.querySelector('[data-decline]');
+        accept.setAttribute('data-selected', answered && has ? 'true' : 'false');
+        decline.setAttribute('data-selected', answered && !has ? 'true' : 'false');
+        decline.setAttribute('aria-pressed', answered && !has ? 'true' : 'false');
+
+        if (step.mode === 'stepper') {
+          var activeQty = step.qty[step.active] || 0;
+          renderStepper(step.el.querySelector('[data-step-stepper]'), activeQty, 99);
+          var summary = [];
+          step.options.forEach(function (option) {
+            var quantity = step.qty[option.id] || 0;
+            var badge = option.el.querySelector('[data-badge]');
+            if (badge) {
+              badge.hidden = quantity < 1;
+              badge.textContent = quantity;
+              option.el.setAttribute('aria-pressed', option.id === step.active ? 'true' : 'false');
+            }
+            if (quantity > 0 && option.name) summary.push(option.name + ' × ' + quantity);
+            if (option.id === step.active) {
+              var nameEl = step.el.querySelector('[data-option-name]');
+              if (nameEl) nameEl.textContent = option.name;
+            }
+          });
+          var summaryEl = step.el.querySelector('[data-option-summary]');
+          if (summaryEl) {
+            summaryEl.hidden = summary.length === 0;
+            summaryEl.textContent = summary.join(' · ');
+          }
+        } else {
+          var pick = step.el.querySelector('[data-pick]');
+          pick.setAttribute('aria-pressed', step.picked ? 'true' : 'false');
+          var matchCount = step.mode === 'match' ? countInTab(step.matchTab) : 1;
+          var matchText = step.el.querySelector('[data-match-text]');
+          if (matchText) matchText.textContent = fill(matchText.getAttribute('data-template'), { count: matchCount });
+          var priceEl = step.el.querySelector('[data-step-price]');
+          var free = step.freeAt > 0 && count >= step.freeAt;
+          priceEl.textContent = free ? T.included : money(step.options[0].price * Math.max(1, matchCount));
+          var messageWrap = step.el.querySelector('[data-message-wrap]');
+          if (messageWrap) messageWrap.hidden = !step.picked;
+        }
+
+        if (!answered) {
+          allAnswered = false;
+          if (!state.pending) state.pending = step.el;
+        }
+        open = open && answered;
+      }
+      return allAnswered;
+    }
+
+    function renderBar(sums, allAnswered) {
+      var count = sums.count;
+      els.meter.style.width = Math.min(100, (count / meterMax) * 100) + '%';
+      marks.forEach(function (mark) {
+        mark.el.setAttribute('data-reached', count >= mark.value ? 'true' : 'false');
+      });
+
+      els.count.textContent = fill(T.chosen, { count: count });
+      els.total.hidden = count < 1;
+      els.total.textContent = money(sums.total);
+
+      var hint = '';
+      for (var i = 0; i < marks.length; i++) {
+        if (count < marks[i].value) {
+          hint = fill(marks[i].hint, { n: marks[i].value - count });
+          break;
+        }
+      }
+      els.hint.textContent = hint;
+      els.hint.hidden = !hint;
+      els.view.hidden = !!hint || count < 1;
+
+      var enough = count >= OFFER_MIN;
+      var ready = enough && (!REQUIRE_ANSWERS || allAnswered);
+      // With enough pieces the button stays live: until the steps are answered
+      // it leads to the next one instead of sitting greyed out off-screen.
+      els.submit.disabled = !enough || state.busy;
+      if (!state.busy) els.submit.textContent = enough && !ready ? T.next : submitLabel;
+      if (!state.busy && els.foot.getAttribute('data-error') !== 'true') {
+        els.foot.textContent = ready
+          ? ''
+          : enough
+          ? T.needAnswers
+          : fill(T.needPieces, { min: OFFER_MIN });
+      }
+    }
+
+    function renderSheet(sums) {
+      els.lines.textContent = '';
+      function line(label, amount) {
+        var item = el('li');
+        item.appendChild(el('span', '', label));
+        item.appendChild(el('span', '', amount));
+        els.lines.appendChild(item);
+      }
+      state.order.forEach(function (id) {
+        var quantity = qtyOf(id);
+        if (quantity < 1) return;
+        var piece = pieces[id];
+        var unit = sums.unlocked ? Math.round((piece.price * (100 - OFFER_PERCENT)) / 100) : piece.price;
+        line(piece.name + ' × ' + quantity, money(unit * quantity));
+      });
+      sums.extraLines.forEach(function (extra) {
+        line(extra.name + ' × ' + extra.quantity, extra.free ? T.included : money(extra.price * extra.quantity));
+      });
+      els.regular.hidden = sums.regular <= sums.total;
+      els.regularValue.textContent = money(sums.regular);
+      els.sum.textContent = money(sums.total);
+    }
+
+    function render() {
+      var sums = totals();
+      renderTray(sums.count);
+      renderPieces();
+      var allAnswered = renderSteps(sums.count);
+      renderBar(sums, allAnswered);
+      renderSheet(sums);
+    }
+
+    /* ---------- tabs ---------- */
+    function openTab(id, focus) {
+      each(root.querySelectorAll('[data-tab]'), function (tab) {
+        var on = tab.getAttribute('data-tab') === id;
+        tab.setAttribute('aria-selected', on ? 'true' : 'false');
+        tab.tabIndex = on ? 0 : -1;
+        if (on && focus) tab.focus();
+      });
+      each(root.querySelectorAll('[data-panel]'), function (panel) {
+        panel.hidden = panel.getAttribute('data-panel') !== id;
+      });
+    }
+
+    if (els.tabs) {
+      els.tabs.addEventListener('keydown', function (event) {
+        if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+        var tabs = Array.prototype.slice.call(els.tabs.querySelectorAll('[data-tab]'));
+        var at = tabs.indexOf(document.activeElement);
+        if (at === -1) return;
+        var step = event.key === 'ArrowRight' ? 1 : -1;
+        if (getComputedStyle(els.tabs).direction === 'rtl') step = -step;
+        var next = tabs[(at + step + tabs.length) % tabs.length];
+        openTab(next.getAttribute('data-tab'), true);
+        event.preventDefault();
+      });
+    }
+
+    /* ---------- events ---------- */
+    function answer(step) {
+      state.answered[step.id] = true;
+      els.foot.removeAttribute('data-error');
+    }
+
+    root.addEventListener('click', function (event) {
+      var target = event.target;
+      els.foot.removeAttribute('data-error');
+
+      var tab = target.closest('[data-tab]');
+      if (tab) return openTab(tab.getAttribute('data-tab'));
+
+      var remove = target.closest('[data-remove]');
+      if (remove) return setQty(remove.getAttribute('data-remove'), qtyOf(remove.getAttribute('data-remove')) - 1);
+
+      if (target.closest('[data-more]')) {
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        return els.tabs && els.tabs.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      }
+
+      var setButton = target.closest('[data-add-set]');
+      if (setButton) {
+        setButton
+          .getAttribute('data-add-set')
+          .split(',')
+          .forEach(function (id) {
+            if (!id || !pieces[id]) return;
+            state.qty[id] = Math.min(pieces[id].max, qtyOf(id) + 1);
+            if (state.qty[id] > 0 && state.order.indexOf(id) === -1) state.order.push(id);
+          });
+        return render();
+      }
+
+      var swatch = target.closest('.tss-sb__swatch');
+      if (swatch) return selectSwatch(swatch);
+
+      var stepEl = target.closest('[data-step]');
+      var change = target.closest('[data-inc], [data-dec]');
+      var delta = change && change.hasAttribute('data-inc') ? 1 : -1;
+
+      if (change && !stepEl) {
+        var card = change.closest('[data-piece]');
+        var id = card
+          ? card.getAttribute('data-piece')
+          : change.closest('[data-swatch-picker]').querySelector('.tss-sb__swatch[aria-pressed="true"]').getAttribute('data-piece');
+        return setQty(id, qtyOf(id) + delta);
+      }
+
+      if (!stepEl) {
+        if (target.closest('[data-view]')) return els.sheet.showModal();
+        if (target.closest('[data-sheet-close]') || target === els.sheet) return els.sheet.close();
+        if (target.closest('[data-submit]')) return submit();
+        return;
+      }
+
+      var step = state.steps[stepEl.getAttribute('data-step')];
+
+      if (change) {
+        step.qty[step.active] = Math.max(0, Math.min(99, (step.qty[step.active] || 0) + delta));
+        answer(step);
+        return render();
+      }
+
+      var chip = target.closest('.tss-sb__chip');
+      if (chip) {
+        step.active = chip.getAttribute('data-option');
+        return render();
+      }
+
+      if (target.closest('[data-pick]')) {
+        step.picked = !step.picked;
+        answer(step);
+        render();
+        var message = step.picked && stepEl.querySelector('[data-message]');
+        if (message) message.focus();
+        return;
+      }
+
+      if (target.closest('[data-decline]')) {
+        step.qty = {};
+        step.picked = false;
+        step.message = '';
+        var field = stepEl.querySelector('[data-message]');
+        if (field) {
+          field.value = '';
+          stepEl.querySelector('[data-message-count]').textContent = '0';
+        }
+        answer(step);
+        return render();
+      }
+    });
+
+    root.addEventListener('input', function (event) {
+      var field = event.target.closest('[data-message]');
+      if (!field) return;
+      var step = state.steps[field.closest('[data-step]').getAttribute('data-step')];
+      step.message = field.value;
+      field.closest('[data-message-wrap]').querySelector('[data-message-count]').textContent = field.value.length;
+    });
+
+    /* ---------- gallery progress ---------- */
+    var gallery = root.querySelector('[data-gallery]');
+    var galleryBar = root.querySelector('[data-gallery-bar]');
+    if (gallery && galleryBar) {
+      gallery.addEventListener(
+        'scroll',
+        function () {
+          var index = Math.round(Math.abs(gallery.scrollLeft) / gallery.clientWidth);
+          var rtl = getComputedStyle(gallery).direction === 'rtl';
+          galleryBar.style.transform = 'translateX(' + (rtl ? -index : index) * 100 + '%)';
+        },
+        { passive: true }
+      );
+    }
+
+    /* ---------- add to bag ---------- */
+    function submit() {
+      if (state.busy || els.submit.disabled) return;
+      if (REQUIRE_ANSWERS && state.pending) {
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        state.pending.setAttribute('tabindex', '-1');
+        state.pending.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+        state.pending.focus({ preventScroll: true });
+        return;
+      }
+      var sums = totals();
+      var items = [];
+
+      state.order.forEach(function (id) {
+        var quantity = qtyOf(id);
+        if (quantity < 1) return;
+        var item = { id: parseInt(id, 10), quantity: quantity };
+        if (OFFER_NAME) {
+          item.properties = {};
+          item.properties[T.offerKey] = OFFER_NAME;
+        }
+        items.push(item);
+      });
+
+      sums.extraLines.forEach(function (extra) {
+        var item = { id: parseInt(extra.id, 10), quantity: extra.quantity };
+        if (extra.message) {
+          item.properties = {};
+          item.properties[T.message] = extra.message;
+        }
+        items.push(item);
+      });
+
+      state.busy = true;
+      els.submit.disabled = true;
+      els.submit.textContent = T.adding;
+      els.foot.removeAttribute('data-error');
+      els.foot.textContent = '';
+
+      // Anything from an earlier visit to this page is replaced, not added to.
+      // Without this a second tap (or coming back from checkout) doubles the
+      // set, and Shopify refuses the whole request once a piece runs past its
+      // stock. Lines for other products are left alone.
+      var wanted = {};
+      items.forEach(function (item) {
+        wanted[item.id] = true;
+      });
+
+      fetch(CART_URL + '.js', { headers: { Accept: 'application/json' } })
+        .then(function (response) {
+          return response.ok ? response.json() : { items: [] };
+        })
+        .then(function (cart) {
+          var updates = {};
+          var stale = false;
+          (cart.items || []).forEach(function (line) {
+            if (!wanted[line.variant_id]) return;
+            updates[line.key] = 0;
+            stale = true;
+          });
+          if (!stale) return null;
+          return fetch(CART_UPDATE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ updates: updates })
+          });
+        })
+        .then(function () {
+          return fetch(ADD_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ items: items })
+          });
+        })
+        .then(function (response) {
+          return response.json().then(function (body) {
+            if (!response.ok) throw new Error(body.description || body.message || T.error);
+            return body;
+          });
+        })
+        .then(function () {
+          if (AFTER_ADD === 'cart') {
+            window.location.href = CART_URL;
+            return;
+          }
+          window.location.href = '/checkout' + (DISCOUNT_CODE ? '?discount=' + encodeURIComponent(DISCOUNT_CODE) : '');
+        })
+        .catch(function (error) {
+          state.busy = false;
+          els.submit.textContent = submitLabel;
+          els.foot.setAttribute('data-error', 'true');
+          els.foot.textContent = (error && error.message) || T.error;
+          render();
+        });
+    }
+
+    // Returning with the back button restores the page from cache mid-submit.
+    window.addEventListener('pageshow', function (event) {
+      if (!event.persisted) return;
+      state.busy = false;
+      els.submit.textContent = submitLabel;
+      render();
+    });
+
+    each(root.querySelectorAll('[data-swatch-picker]'), function (picker) {
+      var first = picker.querySelector('.tss-sb__swatch');
+      if (first) selectSwatch(first);
+    });
+
+    // ?start=<tab label> opens on that tab, so ads can land on hijabs or mugs.
+    var start = new URLSearchParams(window.location.search).get('start');
+    if (start) {
+      for (var groupId in groupLabels) {
+        if (groupLabels[groupId].toLowerCase() === start.toLowerCase()) openTab(groupId);
+      }
+    }
+
+    render();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "TSS · Set builder",
+  "tag": "section",
+  "enabled_on": { "templates": ["page"] },
+  "settings": [
+    { "type": "header", "content": "Introduction" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Buy Two · Receive Four" },
+    { "type": "text", "id": "title", "label": "Headline", "default": "One for each of them." },
+    {
+      "type": "textarea",
+      "id": "lede",
+      "label": "Supporting text",
+      "default": "Mugs and hijabs to give, or to keep. Choose any four and pay for two — add more, and every piece stays half price."
+    },
+    { "type": "text", "id": "price_line", "label": "Price line" },
+    { "type": "text", "id": "note", "label": "Small note" },
+    {
+      "type": "select",
+      "id": "gallery_ratio",
+      "label": "Gallery image shape",
+      "options": [
+        { "value": "4 / 5", "label": "Portrait 4:5" },
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 3", "label": "Landscape 4:3" },
+        { "value": "16 / 9", "label": "Wide 16:9" }
+      ],
+      "default": "4 / 3"
+    },
+    { "type": "header", "content": "Offer" },
+    {
+      "type": "paragraph",
+      "content": "These settings control what the page shows. Create the matching discount in Shopify so checkout charges the same price."
+    },
+    { "type": "range", "id": "offer_min", "label": "Pieces needed for the offer", "min": 2, "max": 8, "step": 1, "default": 4 },
+    {
+      "type": "range",
+      "id": "offer_percent",
+      "label": "Discount on pieces",
+      "min": 5,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    { "type": "text", "id": "offer_label", "label": "Offer milestone label", "default": "Half price" },
+    { "type": "text", "id": "hint_offer", "label": "Offer hint", "default": "Choose [n] more to pay half" },
+    { "type": "range", "id": "milestone_2_count", "label": "Second milestone at", "min": 0, "max": 20, "step": 1, "default": 6 },
+    { "type": "text", "id": "milestone_2_label", "label": "Second milestone label", "default": "Free delivery", "info": "Leave empty to hide." },
+    { "type": "text", "id": "milestone_2_hint", "label": "Second milestone hint", "default": "[n] more, and delivery is on us" },
+    { "type": "range", "id": "milestone_3_count", "label": "Third milestone at", "min": 0, "max": 20, "step": 1, "default": 8 },
+    { "type": "text", "id": "milestone_3_label", "label": "Third milestone label", "default": "Gift box", "info": "Leave empty to hide." },
+    { "type": "text", "id": "milestone_3_hint", "label": "Third milestone hint", "default": "[n] more, and the gift box is included" },
+    { "type": "header", "content": "Checkout" },
+    {
+      "type": "select",
+      "id": "after_add",
+      "label": "After Add to Bag",
+      "options": [
+        { "value": "checkout", "label": "Go to checkout" },
+        { "value": "cart", "label": "Go to the cart" }
+      ],
+      "default": "checkout"
+    },
+    {
+      "type": "text",
+      "id": "discount_code",
+      "label": "Discount code",
+      "info": "Applied at checkout. Leave empty if the discount is automatic."
+    },
+    {
+      "type": "text",
+      "id": "offer_property",
+      "label": "Note on each piece",
+      "default": "Buy Two, Receive Four",
+      "info": "Shown on the order beside each piece. Leave empty for none."
+    },
+    {
+      "type": "checkbox",
+      "id": "require_answers",
+      "label": "Every step must be answered before Add to Bag",
+      "default": true
+    },
+    { "type": "header", "content": "Pieces" },
+    { "type": "text", "id": "pieces_label", "label": "Heading", "default": "The pieces." },
+    { "type": "text", "id": "pieces_question", "label": "Heading, second part", "default": "Start with a set, or choose your own." },
+    { "type": "text", "id": "pieces_note", "label": "Note under the pieces", "default": "Mugs and hijabs count together." },
+    { "type": "range", "id": "low_stock", "label": "Show \"left\" at or below", "min": 0, "max": 50, "step": 1, "default": 10 },
+    { "type": "header", "content": "Labels" },
+    { "type": "text", "id": "submit_label", "label": "Button", "default": "Add to Bag" },
+    { "type": "text", "id": "next_label", "label": "Button while steps remain", "default": "Continue" },
+    { "type": "text", "id": "add_set_label", "label": "Add set", "default": "Add this set" },
+    { "type": "text", "id": "chosen_of_label", "label": "Tray count", "default": "[count] of [min] chosen" },
+    { "type": "text", "id": "chosen_label", "label": "Bar count", "default": "[count] chosen" },
+    { "type": "text", "id": "need_pieces_text", "label": "Not enough pieces", "default": "Choose at least [min] pieces, then answer each step." },
+    { "type": "text", "id": "need_answers_text", "label": "Steps unanswered", "default": "Answer each step to continue." },
+    { "type": "text", "id": "error_text", "label": "Error", "default": "Something went wrong. Please try again." },
+    { "type": "text", "id": "view_label", "label": "View summary", "default": "View" },
+    { "type": "text", "id": "summary_title", "label": "Summary heading", "default": "Your set" },
+    { "type": "text", "id": "regular_label", "label": "Regular price", "default": "Regular price" },
+    { "type": "text", "id": "total_label", "label": "Total", "default": "Total" },
+    { "type": "text", "id": "summary_note", "label": "Summary note", "default": "Delivery is added at checkout." },
+    { "type": "text", "id": "included_label", "label": "Included", "default": "Included" }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Gallery image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "alt", "label": "Description", "info": "Read out by screen readers." }
+      ]
+    },
+    {
+      "type": "group",
+      "name": "Tab",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Tab label", "default": "Mugs" },
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Layout",
+          "options": [
+            { "value": "cards", "label": "Cards with steppers (mugs)" },
+            { "value": "swatches", "label": "Colour swatches (hijabs)" }
+          ],
+          "default": "cards"
+        },
+        { "type": "text", "id": "note", "label": "Price note", "info": "For example: Every mug ৳699 · half price from four pieces." },
+        { "type": "range", "id": "limit", "label": "Products to show", "min": 4, "max": 50, "step": 1, "default": 24 }
+      ]
+    },
+    {
+      "type": "set",
+      "name": "Ready-made set",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Name", "default": "The Family Set" },
+        { "type": "text", "id": "tab", "label": "Show under tab", "default": "Mugs", "info": "Must match a tab label exactly." },
+        {
+          "type": "product_list",
+          "id": "products",
+          "label": "Pieces",
+          "limit": 8,
+          "info": "Each must be in one of the tab collections."
+        }
+      ]
+    },
+    {
+      "type": "step",
+      "name": "Add-on step",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Heading", "default": "To go with it." },
+        { "type": "text", "id": "question", "label": "Heading, second part", "default": "A lid for each mug?" },
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "text", "id": "name", "label": "Name", "info": "Leave empty to use the product title." },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Leave empty to use the product image." },
+        { "type": "textarea", "id": "copy", "label": "Description" },
+        { "type": "text", "id": "small_note", "label": "Small note" },
+        {
+          "type": "select",
+          "id": "mode",
+          "label": "Quantity",
+          "options": [
+            { "value": "stepper", "label": "Customer chooses how many" },
+            { "value": "match", "label": "One for each piece from a tab" },
+            { "value": "single", "label": "Just one" }
+          ],
+          "default": "stepper"
+        },
+        {
+          "type": "text",
+          "id": "match_tab",
+          "label": "Tab to match",
+          "info": "For \"one for each piece\". Must match a tab label; empty counts every piece.",
+          "visible_if": "{{ block.settings.mode == 'match' }}"
+        },
+        {
+          "type": "text",
+          "id": "match_text",
+          "label": "Line beside the price",
+          "default": "One for each of your [count] mugs",
+          "visible_if": "{{ block.settings.mode == 'match' }}"
+        },
+        {
+          "type": "text",
+          "id": "accept_label",
+          "label": "Yes button",
+          "default": "Add this",
+          "visible_if": "{{ block.settings.mode != 'stepper' }}"
+        },
+        { "type": "text", "id": "decline_label", "label": "No option", "default": "No, thank you" },
+        {
+          "type": "text",
+          "id": "show_tab",
+          "label": "Only show with pieces from tab",
+          "info": "Must match a tab label. Leave empty to always show."
+        },
+        {
+          "type": "checkbox",
+          "id": "ask_message",
+          "label": "Ask for a message",
+          "default": false,
+          "visible_if": "{{ block.settings.mode != 'stepper' }}"
+        },
+        {
+          "type": "text",
+          "id": "message_placeholder",
+          "label": "Message placeholder",
+          "default": "What would you like it to say?",
+          "visible_if": "{{ block.settings.ask_message }}"
+        },
+        {
+          "type": "range",
+          "id": "message_max",
+          "label": "Message length",
+          "min": 40,
+          "max": 300,
+          "step": 10,
+          "default": 120,
+          "visible_if": "{{ block.settings.ask_message }}"
+        },
+        {
+          "type": "range",
+          "id": "free_at",
+          "label": "Shown as included from",
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "default": 0,
+          "info": "Pieces needed for this to show as \"Included\". 0 is never. Needs a matching discount in Shopify.",
+          "visible_if": "{{ block.settings.mode == 'single' }}"
+        },
+        { "type": "text", "id": "footnote", "label": "Footnote" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TSS · Set builder",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "group", "settings": { "label": "Mugs", "style": "cards" } },
+        { "type": "group", "settings": { "label": "Hijabs", "style": "swatches" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

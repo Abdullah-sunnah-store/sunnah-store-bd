@@ -1,0 +1,206 @@
+{% comment %}
+  TSS — Keep reading
+  The next articles from the same blog, beneath the one being read.
+
+  Starts from the article after the current one and wraps round to the newest,
+  so the last post in the blog still has something to offer. A snap rail on
+  phones and tablets; equal columns across the container on desktop.
+{% endcomment %}
+
+{% render 'tss-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign limit = s.limit | default: 3
+
+  assign pool = blog.articles
+  assign total = pool.size
+
+  # -1 when the article sits beyond the first page of the blog; the rail then
+  # simply opens with the newest posts.
+  assign current_index = -1
+  for entry in pool
+    if entry.id == article.id
+      assign current_index = forloop.index0
+      break
+    endif
+  endfor
+
+  assign available = total
+  if current_index > -1
+    assign available = total | minus: 1
+  endif
+  assign count = limit | at_most: available
+-%}
+
+{%- if count > 0 -%}
+  <style>
+    #tss-more-{{ uid }} {
+      background: var(--tss-ivory);
+      padding-block: {{ s.mobile_padding_top | default: 56 }}px {{ s.mobile_padding_bottom | default: 64 }}px;
+    }
+
+    #tss-more-{{ uid }} .tss-more__head {
+      padding-inline: var(--tss-gutter);
+    }
+
+    #tss-more-{{ uid }} .tss-rail {
+      margin-top: 32px;
+    }
+
+    #tss-more-{{ uid }} .tss-more__card a {
+      display: block;
+      text-decoration: none;
+    }
+
+    #tss-more-{{ uid }} .tss-more__title {
+      margin-top: 20px;
+      max-width: 20ch;
+      font-family: var(--tss-serif);
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.25;
+      letter-spacing: normal;
+      text-transform: none;
+      text-wrap: balance;
+      color: var(--tss-ink);
+    }
+
+    #tss-more-{{ uid }} .tss-more__read {
+      margin-top: 12px;
+    }
+
+    #tss-more-{{ uid }} .tss-more__card a:hover .tss-link-gold {
+      border-color: var(--tss-green-mid);
+      color: var(--tss-green-mid);
+    }
+
+    @media screen and (min-width: 64rem) {
+      #tss-more-{{ uid }} {
+        padding-block: {{ s.padding_top | default: 72 }}px {{ s.padding_bottom | default: 96 }}px;
+      }
+
+      #tss-more-{{ uid }} .tss-more__head {
+        max-width: var(--tss-max);
+        margin-inline: auto;
+      }
+
+      /* Equal columns filling the container, in place of the base rail's fixed
+         quarter-width cards that left a blank column beside three posts. */
+      #tss-more-{{ uid }} .tss-rail > * {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        max-width: calc((var(--tss-max) - (2 * var(--tss-gutter)) - 24px) / 2);
+      }
+
+      #tss-more-{{ uid }} .tss-progress {
+        display: none;
+      }
+
+      #tss-more-{{ uid }} .tss-more__title {
+        font-size: 24px;
+      }
+    }
+  </style>
+
+  <section id="tss-more-{{ uid }}" class="tss-section" aria-labelledby="tss-more-heading-{{ uid }}">
+    <div class="tss-more__head">
+      <h2 class="tss-eyebrow" id="tss-more-heading-{{ uid }}">{{ s.title | default: 'Keep Reading' | escape }}</h2>
+    </div>
+
+    <div
+      class="tss-rail"
+      role="region"
+      tabindex="0"
+      aria-labelledby="tss-more-heading-{{ uid }}"
+      data-progress="tss-more-progress-{{ uid }}"
+    >
+      {%- for i in (1..count) -%}
+        {%- liquid
+          assign position = current_index | plus: i | modulo: total
+          assign entry = pool[position]
+        -%}
+        <article class="tss-more__card">
+          <a href="{{ entry.url }}">
+            <div class="tss-clip">
+              <div>
+                {% render 'tss-image',
+                  image: entry.image,
+                  widths: '320,480,640,800',
+                  sizes: '(min-width: 64rem) 400px, (min-width: 40rem) 46vw, 78vw',
+                  alt: entry.title,
+                  placeholder: 'lifestyle-2'
+                %}
+              </div>
+            </div>
+            <div class="tss-rise">
+              <h3 class="tss-more__title">{{ entry.title | escape }}</h3>
+              <p class="tss-more__read">
+                <span class="tss-link-gold">{{ s.read_label | default: 'Read →' | escape }}</span>
+              </p>
+            </div>
+          </a>
+        </article>
+      {%- endfor -%}
+    </div>
+
+    <div class="tss-progress" id="tss-more-progress-{{ uid }}" aria-hidden="true"><span></span></div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "TSS · Keep reading",
+  "tag": "section",
+  "enabled_on": { "templates": ["article"] },
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Keep Reading" },
+    { "type": "range", "id": "limit", "label": "Articles", "min": 2, "max": 4, "step": 1, "default": 3 },
+    { "type": "text", "id": "read_label", "label": "Read link label", "default": "Read →" },
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_top",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_bottom",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "presets": [{ "name": "TSS · Keep reading" }]
+}
+{% endschema %}

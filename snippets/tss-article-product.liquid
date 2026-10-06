@@ -1,0 +1,46 @@
+{% comment %}
+  TSS article product — one "piece in this letter" card: portrait image beside
+  the maker, name, price and a link through to the product.
+
+  Accepts:
+    product      - the product to show
+    button_label - label for the link button
+    from_label   - prefix used when the price varies
+
+  Usage:
+    {% render 'tss-article-product', product: item, button_label: s.button_label, from_label: s.from_label %}
+{% endcomment %}
+
+<article class="tss-ap__card tss-rise">
+  <a class="tss-ap__media" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+    {% render 'tss-image',
+      image: product.featured_image,
+      class: 'tss-ap__img',
+      widths: '240,360,480',
+      sizes: '(min-width: 64rem) 220px, 38vw',
+      alt: product.title,
+      placeholder: 'product-2'
+    %}
+  </a>
+
+  <div class="tss-ap__info">
+    {%- if product.vendor != blank -%}
+      <p class="tss-ap__vendor">{{ product.vendor | escape }}</p>
+    {%- endif -%}
+
+    <h3 class="tss-ap__name"><a href="{{ product.url }}">{{ product.title | escape }}</a></h3>
+
+    <p class="tss-ap__price">
+      {%- if product.price_varies -%}
+        {{ from_label | default: 'From' | escape }} {{ product.price_min | money }}
+      {%- else -%}
+        {{ product.price | money }}
+      {%- endif -%}
+    </p>
+
+    <a href="{{ product.url }}" class="tss-btn tss-btn--outline-green tss-ap__btn">
+      {{- button_label | default: 'View this piece' | escape -}}
+      <span class="tss-sr-only">: {{ product.title | escape }}</span>
+    </a>
+  </div>
+</article>

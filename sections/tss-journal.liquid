@@ -95,6 +95,14 @@
     color: var(--tss-ink);
   }
 
+  #tss-journal-{{ uid }} .tss-journal__title a {
+    text-decoration: none;
+  }
+
+  #tss-journal-{{ uid }} .tss-journal__title a:hover {
+    color: var(--tss-green-mid);
+  }
+
   #tss-journal-{{ uid }} .tss-journal__link {
     margin-top: 12px;
   }
@@ -129,17 +137,17 @@
         {%- for article in blog_obj.articles limit: article_limit -%}
           <article>
             <div class="tss-clip">
-              <div>
+              <a href="{{ article.url }}" tabindex="-1" aria-hidden="true">
                 {% render 'tss-image',
                   image: article.image,
                   sizes: '(min-width: 64rem) 24vw, (min-width: 40rem) 46vw, 78vw',
                   alt: article.title,
                   placeholder: 'lifestyle-2'
                 %}
-              </div>
+              </a>
             </div>
             <div class="tss-rise">
-              <h3 class="tss-journal__title">{{ article.title | escape }}</h3>
+              <h3 class="tss-journal__title"><a href="{{ article.url }}">{{ article.title | escape }}</a></h3>
               <div class="tss-journal__link">
                 <a href="{{ article.url }}" class="tss-link-gold">
                   {{- s.read_label | default: 'Read →' | escape -}}
@@ -175,7 +183,12 @@
           -%}
           <article {{ block.shopify_attributes }}>
             <div class="tss-clip">
-              <div>
+              {%- comment -%}
+                The image and title link to the article as well as the Read
+                link. The image link is hidden from keyboard and screen readers
+                so each card is announced once, by its title.
+              {%- endcomment -%}
+              {%- capture card_image -%}
                 {% render 'tss-image',
                   image: a_image,
                   asset: b.image_asset,
@@ -183,11 +196,22 @@
                   alt: a_title,
                   placeholder: 'lifestyle-2'
                 %}
-              </div>
+              {%- endcapture -%}
+              {%- if a_url != blank -%}
+                <a href="{{ a_url }}" tabindex="-1" aria-hidden="true">{{ card_image }}</a>
+              {%- else -%}
+                <div>{{ card_image }}</div>
+              {%- endif -%}
             </div>
             <div class="tss-rise">
               {%- if a_title != blank -%}
-                <h3 class="tss-journal__title">{{ a_title | escape }}</h3>
+                <h3 class="tss-journal__title">
+                  {%- if a_url != blank -%}
+                    <a href="{{ a_url }}">{{ a_title | escape }}</a>
+                  {%- else -%}
+                    {{ a_title | escape }}
+                  {%- endif -%}
+                </h3>
               {%- endif -%}
               <div class="tss-journal__link">
                 <a href="{{ a_url | default: '#' }}" class="tss-link-gold">

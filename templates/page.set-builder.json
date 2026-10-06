@@ -1,0 +1,76 @@
+{
+  "sections": {
+    "main": {
+      "type": "tss-set-builder",
+      "blocks": {
+        "slide_1": {
+          "type": "slide",
+          "settings": {
+            "alt": ""
+          }
+        },
+        "tab_mugs": {
+          "type": "group",
+          "settings": {
+            "label": "Mugs",
+            "collection": "mugs",
+            "style": "cards",
+            "note": "Half price from four pieces.",
+            "limit": 36
+          }
+        },
+        "tab_pashmina": {
+          "type": "group",
+          "settings": {
+            "label": "Pashmina",
+            "collection": "pashmina-hijab",
+            "style": "swatches",
+            "note": "Half price from four pieces.",
+            "limit": 36
+          }
+        },
+        "tab_cherry": {
+          "type": "group",
+          "settings": {
+            "label": "Cherry",
+            "collection": "cherry-hijab",
+            "style": "swatches",
+            "note": "Half price from four pieces.",
+            "limit": 36
+          }
+        },
+        "step_lid": {
+          "type": "step",
+          "settings": {
+            "label": "To go with it.",
+            "question": "A lid for each mug?",
+            "product": "lid-start-with-bismillah",
+            "name": "",
+            "copy": "Bismillah before the first sip. A lid that keeps the reminder on the mug, and the tea warm beneath it.",
+            "small_note": "",
+            "mode": "match",
+            "match_tab": "Mugs",
+            "match_text": "One for each of your [count] mugs",
+            "accept_label": "Add the lids",
+            "decline_label": "Just the mugs",
+            "show_tab": "Mugs",
+            "ask_message": false,
+            "free_at": 0,
+            "footnote": "Extras are priced as shown. They are not part of Buy Two, Receive Four and do not count toward your set."
+          }
+        }
+      },
+      "block_order": [
+        "slide_1",
+        "tab_mugs",
+        "tab_pashmina",
+        "tab_cherry",
+        "step_lid"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
