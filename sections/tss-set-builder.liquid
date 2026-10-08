@@ -5,9 +5,12 @@
 
     1. Gallery and introduction.
     2. The pieces — a tray that fills as pieces are chosen, a tab per
-       collection, ready-made sets that fill the tray in one tap, and either
+       collection, ready-made sets that fill the tray in one tap, product
+       cards for extras sold beside them, and either
        stepper cards (mugs) or a swatch picker (hijab colours).
-    3. Steps — optional add-ons, each answered with a yes or a no.
+    3. Steps — optional add-ons, each answered with a yes or a no. They appear
+       once the offer is reached and unlock one at a time, with nothing chosen
+       for the customer.
     4. A fixed bar with the milestones, the running total and Add to Bag, and a
        summary sheet that reads the order back.
 
@@ -28,6 +31,7 @@
   assign slide_blocks = section.blocks | where: 'type', 'slide'
   assign group_blocks = section.blocks | where: 'type', 'group'
   assign set_blocks = section.blocks | where: 'type', 'set'
+  assign offer_blocks = section.blocks | where: 'type', 'offer'
   assign step_blocks = section.blocks | where: 'type', 'step'
 
   assign offer_min = s.offer_min | default: 4
@@ -334,7 +338,10 @@
     scroll-snap-align: start;
   }
 
+  /* Positioned so the visually hidden button text is clipped with its card in
+     the rail; left to the page it sits off-screen and widens the document. */
   #tss-sb-{{ uid }} .tss-sb__set {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -357,6 +364,10 @@
     font-size: 12px;
     line-height: 1.5;
     color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__set .tss-sb__gold {
+    color: var(--tss-gold);
   }
 
   #tss-sb-{{ uid }} .tss-sb__text-btn {
@@ -503,6 +514,7 @@
     border-radius: 50%;
     padding: 0;
     background: var(--tss-ivory-2) center / cover no-repeat;
+    box-shadow: inset 0 0 0 1px rgb(28 28 26 / 0.08);
     transition: box-shadow 0.25s var(--tss-sb-ease);
   }
 
@@ -962,16 +974,10 @@
       padding: 0;
     }
 
-    /* Steps: the offer and the "no" side by side. */
-    #tss-sb-{{ uid }} .tss-sb__choices {
-      display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-      align-items: start;
-      gap: 24px;
-    }
-
-    #tss-sb-{{ uid }} .tss-sb__choices > * + * {
-      margin-top: 0;
+    /* Steps: one centred column, the "no" beneath the offer as on a phone. */
+    #tss-sb-{{ uid }} .tss-sb__block[data-step] > * {
+      max-width: 720px;
+      margin-inline: auto;
     }
 
     #tss-sb-{{ uid }} .tss-sb__choice-media {
@@ -1182,6 +1188,8 @@
             assign g = block.settings
             assign group_label = g.label | default: g.collection.title
             assign product_limit = g.limit | default: 24
+            assign exclude_word = g.exclude | strip | downcase
+            assign swatch_lines = g.swatch_colours | newline_to_br | split: '<br />'
           -%}
           <div
             class="tss-sb__panel"
@@ -1204,13 +1212,22 @@
                   assign has_sets = true
                   assign set_ids = ''
                   assign set_names = ''
+                  assign set_qty = sb.quantity | default: 1
                   for item in sb.products
                     assign iv = item.selected_or_first_available_variant
-                    assign set_ids = set_ids | append: iv.id | append: ','
-                    assign set_names = set_names | append: item.title | append: ' · '
+                    # One id per piece: the script adds one for each id it reads.
+                    for i in (1..set_qty)
+                      assign set_ids = set_ids | append: iv.id | append: ','
+                    endfor
+                    assign set_names = set_names | append: item.title
+                    if set_qty > 1
+                      assign set_names = set_names | append: ' × ' | append: set_qty
+                    endif
+                    assign set_names = set_names | append: ' · '
                   endfor
                   assign last = set_names.size | minus: 3
                   assign set_names = set_names | slice: 0, last
+                  assign set_names = sb.description | default: set_names
                 -%}
                 <div class="tss-sb__set" {{ set_block.shopify_attributes }}>
                   <div>
@@ -1220,6 +1237,42 @@
                   <button type="button" class="tss-sb__text-btn" data-add-set="{{ set_ids }}">
                     {{- s.add_set_label | default: 'Add this set' | escape -}}
                     <span class="tss-sr-only">: {{ sb.name | escape }}</span>
+                  </button>
+                </div>
+              {%- endfor -%}
+
+              {%- for offer_block in offer_blocks -%}
+                {%- liquid
+                  assign ob = offer_block.settings
+                  if ob.tab != group_label or ob.product == blank
+                    continue
+                  endif
+                  assign ov = ob.product.selected_or_first_available_variant
+                  unless ov.available
+                    continue
+                  endunless
+                  assign has_sets = true
+                  assign offer_name = ob.name | default: ob.product.title
+                -%}
+                <div class="tss-sb__set" {{ offer_block.shopify_attributes }}>
+                  <div>
+                    <h3>{{ offer_name | escape }}</h3>
+                    {%- if ob.description != blank -%}
+                      <p>{{ ob.description | escape }}</p>
+                    {%- endif -%}
+                    <p class="tss-sb__gold">{{ ov.price | money }}</p>
+                  </div>
+                  <button
+                    type="button"
+                    class="tss-sb__text-btn"
+                    aria-pressed="false"
+                    data-offer="{{ ov.id }}"
+                    data-name="{{ offer_name | escape }}"
+                    data-price="{{ ov.price }}"
+                    data-added-label="{{ ob.added_label | default: 'Added · Remove' | escape }}"
+                  >
+                    <span data-offer-label>{{ ob.add_label | default: 'Add this' | escape }}</span>
+                    <span class="tss-sr-only">: {{ offer_name | escape }}</span>
                   </button>
                 </div>
               {%- endfor -%}
@@ -1251,6 +1304,12 @@
                         unless variant.available
                           continue
                         endunless
+                        if exclude_word != blank
+                          assign item_title = item.title | downcase
+                          if item_title contains exclude_word
+                            continue
+                          endif
+                        endif
                         assign piece_name = item.title
                         unless item.has_only_default_variant
                           assign piece_name = item.title | append: ' — ' | append: variant.title
@@ -1260,13 +1319,31 @@
                         if variant.inventory_management == 'shopify' and variant.inventory_policy == 'deny'
                           assign piece_max = variant.inventory_quantity | at_least: 0
                         endif
+                        # The longest colour name found in the piece name wins, so
+                        # "Mint Green" is not painted as "Mint".
+                        assign piece_colour = ''
+                        assign best_size = 0
+                        assign piece_lower = piece_name | downcase
+                        for line in swatch_lines
+                          assign pair = line | split: ':'
+                          if pair.size < 2
+                            continue
+                          endif
+                          assign colour_name = pair[0] | strip | downcase
+                          if colour_name != blank and colour_name.size > best_size and piece_lower contains colour_name
+                            assign best_size = colour_name.size
+                            assign piece_colour = pair[1] | strip | remove: ';' | remove: '"'
+                          endif
+                        endfor
                       -%}
                       <button
                         type="button"
                         class="tss-sb__swatch"
                         aria-pressed="false"
                         aria-label="{{ piece_name | escape }}"
-                        {% if piece_image %}
+                        {% if piece_colour != blank %}
+                          style="background-color: {{ piece_colour | escape }};"
+                        {% elsif piece_image %}
                           style="background-image: url('{{ piece_image | image_url: width: 120, height: 120, crop: 'center' }}');"
                         {% endif %}
                         data-piece="{{ variant.id }}"
@@ -1303,6 +1380,12 @@
                       unless variant.available
                         continue
                       endunless
+                      if exclude_word != blank
+                        assign item_title = item.title | downcase
+                        if item_title contains exclude_word
+                          continue
+                        endif
+                      endif
                       assign piece_name = item.title
                       unless item.has_only_default_variant
                         assign piece_name = item.title | append: ' — ' | append: variant.title
@@ -1382,6 +1465,7 @@
         data-match-tab="{{ b.match_tab | escape }}"
         data-free-at="{{ b.free_at | default: 0 }}"
         data-locked="true"
+        hidden
         aria-labelledby="tss-sb-step-{{ block.id }}"
         {{ block.shopify_attributes }}
       >
@@ -1413,7 +1497,7 @@
             {%- endif -%}
 
             {%- if b.mode == 'stepper' and extra_variants.size > 1 -%}
-              <p class="tss-sb__choice-row"><span class="tss-sb__gold">{{ extra_first.price | money }}</span></p>
+              <p class="tss-sb__choice-row"><span class="tss-sb__gold" data-option-price>{{ extra_first.price | money }}</span></p>
               <div class="tss-sb__chips">
                 {%- for variant in extra_variants -%}
                   <button
@@ -1423,6 +1507,9 @@
                     data-option="{{ variant.id }}"
                     data-name="{{ variant.title | escape }}"
                     data-price="{{ variant.price }}"
+                    {% if variant.featured_image %}
+                      data-image="{{ variant.featured_image | image_url: width: 720 }}"
+                    {% endif %}
                   >
                     {{- variant.title | escape -}}
                     <span class="tss-sb__badge" data-badge hidden></span>
@@ -1640,8 +1727,24 @@
       order: [],
       answered: {},
       steps: {},
+      offers: {},
       busy: false
     };
+
+    /* Product cards beside the sets: extras, outside the offer. */
+    var offers = {};
+    each(root.querySelectorAll('[data-offer]'), function (el) {
+      var label = el.querySelector('[data-offer-label]');
+      offers[el.getAttribute('data-offer')] = {
+        id: el.getAttribute('data-offer'),
+        el: el,
+        label: label,
+        name: el.getAttribute('data-name'),
+        price: parseInt(el.getAttribute('data-price'), 10) || 0,
+        addLabel: label.textContent,
+        addedLabel: el.getAttribute('data-added-label')
+      };
+    });
 
     function setQty(id, value) {
       var piece = pieces[id];
@@ -1685,10 +1788,17 @@
       };
     });
 
+    /* label: one tab label, several separated by commas, or '' for every tab. */
     function countInTab(label) {
+      var labels = String(label || '')
+        .split(',')
+        .map(function (part) {
+          return part.trim();
+        })
+        .filter(Boolean);
       var total = 0;
       for (var id in state.qty) {
-        if (!label || groupLabels[pieces[id].group] === label) total += qtyOf(id);
+        if (!labels.length || labels.indexOf(groupLabels[pieces[id].group]) !== -1) total += qtyOf(id);
       }
       return total;
     }
@@ -1753,6 +1863,12 @@
           extrasRegular += line.price * line.quantity;
           if (!line.free) extras += line.price * line.quantity;
         });
+      }
+      for (var offerId in offers) {
+        if (!state.offers[offerId]) continue;
+        extraLines.push({ id: offerId, name: offers[offerId].name, quantity: 1, price: offers[offerId].price });
+        extrasRegular += offers[offerId].price;
+        extras += offers[offerId].price;
       }
       return {
         count: count,
@@ -1876,6 +1992,14 @@
       });
     }
 
+    function renderOffers() {
+      for (var id in offers) {
+        var on = !!state.offers[id];
+        offers[id].el.setAttribute('aria-pressed', on ? 'true' : 'false');
+        offers[id].label.textContent = on ? offers[id].addedLabel : offers[id].addLabel;
+      }
+    }
+
     function selectSwatch(swatch) {
       var picker = swatch.closest('[data-swatch-picker]');
       var piece = pieces[swatch.getAttribute('data-piece')];
@@ -1901,15 +2025,22 @@
     function renderSteps(count) {
       var open = true;
       var allAnswered = true;
+      // In the theme editor the steps stay on the page so they can be edited.
+      var flowOpen = count >= OFFER_MIN || !!(window.Shopify && window.Shopify.designMode);
       state.pending = null;
 
       for (var key in state.steps) {
         var step = state.steps[key];
         var visible = stepVisible(step);
-        step.el.hidden = !visible;
+        // The flow opens once the offer is reached. Every step is then on the
+        // page, but each waits, faded, for the one before it to be answered.
+        step.el.hidden = !visible || !flowOpen;
         if (!visible) continue;
+        if (!flowOpen) {
+          if (!state.answered[step.id]) allAnswered = false;
+          continue;
+        }
 
-        // Each step waits for the one before it, as the reference does.
         step.el.setAttribute('data-locked', REQUIRE_ANSWERS && !open ? 'true' : 'false');
 
         var lines = stepLines(step, count);
@@ -2030,6 +2161,7 @@
       var sums = totals();
       renderTray(sums.count);
       renderPieces();
+      renderOffers();
       var allAnswered = renderSteps(sums.count);
       renderBar(sums, allAnswered);
       renderSheet(sums);
@@ -2096,6 +2228,13 @@
         return render();
       }
 
+      var offerButton = target.closest('[data-offer]');
+      if (offerButton) {
+        var offerId = offerButton.getAttribute('data-offer');
+        state.offers[offerId] = !state.offers[offerId];
+        return render();
+      }
+
       var swatch = target.closest('.tss-sb__swatch');
       if (swatch) return selectSwatch(swatch);
 
@@ -2129,6 +2268,15 @@
       var chip = target.closest('.tss-sb__chip');
       if (chip) {
         step.active = chip.getAttribute('data-option');
+        // Show the chosen option: its own photograph, where it has one, and its price.
+        var chipImage = chip.getAttribute('data-image');
+        var stepImage = stepEl.querySelector('.tss-sb__choice-media img');
+        if (chipImage && stepImage) {
+          stepImage.removeAttribute('srcset');
+          stepImage.src = chipImage;
+        }
+        var chipPrice = stepEl.querySelector('[data-option-price]');
+        if (chipPrice) chipPrice.textContent = money(parseInt(chip.getAttribute('data-price'), 10) || 0);
         return render();
       }
 
@@ -2429,7 +2577,20 @@
           "default": "cards"
         },
         { "type": "text", "id": "note", "label": "Price note", "info": "For example: Every mug ৳699 · half price from four pieces." },
-        { "type": "range", "id": "limit", "label": "Products to show", "min": 4, "max": 50, "step": 1, "default": 24 }
+        { "type": "range", "id": "limit", "label": "Products to show", "min": 4, "max": 50, "step": 1, "default": 24 },
+        {
+          "type": "text",
+          "id": "exclude",
+          "label": "Hide products with this in the title",
+          "info": "For example: Hamper. Leave empty to show the whole collection."
+        },
+        {
+          "type": "textarea",
+          "id": "swatch_colours",
+          "label": "Swatch colours",
+          "info": "One per line, as Colour name: #hex. A product whose title contains the name gets that colour; any other shows its photograph.",
+          "visible_if": "{{ block.settings.style == 'swatches' }}"
+        }
       ]
     },
     {
@@ -2444,7 +2605,33 @@
           "label": "Pieces",
           "limit": 8,
           "info": "Each must be in one of the tab collections."
-        }
+        },
+        {
+          "type": "range",
+          "id": "quantity",
+          "label": "Of each piece",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 1
+        },
+        { "type": "text", "id": "description", "label": "Description", "info": "Leave empty to list the product titles." }
+      ]
+    },
+    {
+      "type": "offer",
+      "name": "Product card",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "A product offered beside the ready-made sets. It is added at its own price and does not count toward the offer."
+        },
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "text", "id": "name", "label": "Name", "info": "Leave empty to use the product title." },
+        { "type": "text", "id": "tab", "label": "Show under tab", "default": "Mugs", "info": "Must match a tab label exactly." },
+        { "type": "text", "id": "description", "label": "Description" },
+        { "type": "text", "id": "add_label", "label": "Button", "default": "Add this" },
+        { "type": "text", "id": "added_label", "label": "Button once added", "default": "Added · Remove" }
       ]
     },
     {
@@ -2473,7 +2660,7 @@
           "type": "text",
           "id": "match_tab",
           "label": "Tab to match",
-          "info": "For \"one for each piece\". Must match a tab label; empty counts every piece.",
+          "info": "For \"one for each piece\". Must match a tab label, or several separated by commas; empty counts every piece.",
           "visible_if": "{{ block.settings.mode == 'match' }}"
         },
         {
@@ -2495,7 +2682,7 @@
           "type": "text",
           "id": "show_tab",
           "label": "Only show with pieces from tab",
-          "info": "Must match a tab label. Leave empty to always show."
+          "info": "Must match a tab label, or several separated by commas. Leave empty to always show."
         },
         {
           "type": "checkbox",

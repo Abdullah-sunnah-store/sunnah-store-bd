@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -6,6 +15,7 @@
         "slide_1": {
           "type": "slide",
           "settings": {
+            "image": "shopify://shop_images/DSC02030_ProductBeautifier.jpg",
             "alt": ""
           }
         },
@@ -26,7 +36,9 @@
             "collection": "pashmina-hijab",
             "style": "swatches",
             "note": "Half price from four pieces.",
-            "limit": 36
+            "limit": 36,
+            "exclude": "Hamper",
+            "swatch_colours": "Metallic Golden: #e0b479\nBlood Red: #da1f3d\nEmerald Green: #395759\nBlack: #3a3837\nCarob Brown: #d9a57a\nSlate Gray: #8f96b2\nRoyal Maroon: #9e344a\nDark Maroon: #8e3046\nRoyal Blue: #1e5387\nCanon Pink: #ed95a4\nMidnight Maroon: #943d4e\nFlamingo Pink: #db9aae\nGrape Purple: #b6698f"
           }
         },
         "tab_cherry": {
@@ -36,7 +48,90 @@
             "collection": "cherry-hijab",
             "style": "swatches",
             "note": "Half price from four pieces.",
-            "limit": 36
+            "limit": 36,
+            "exclude": "Hamper",
+            "swatch_colours": "Cherry Red: #c82b3f\nWine Dark Purple: #583142\nWatermelon Pink: #e47172\nBottle Green: #0a4245\nBlue: #0f2842\nJapanese Violet: #6a4759\nBlack: #1f1f1f\nDark Wine: #431822\nGrape Purple: #7a3351\nMint: #96a675\nMint Green: #9db8a4"
+          }
+        },
+        "set_family": {
+          "type": "set",
+          "settings": {
+            "name": "The Family Set",
+            "tab": "Mugs",
+            "products": [
+              "father-mug",
+              "mother-mug",
+              "brother-mug",
+              "sister-mug"
+            ],
+            "quantity": 1,
+            "description": "Father · Mother · Brother · Sister"
+          }
+        },
+        "set_siblings": {
+          "type": "set",
+          "settings": {
+            "name": "The Siblings Set",
+            "tab": "Mugs",
+            "products": [
+              "brother-mug",
+              "sister-mug"
+            ],
+            "quantity": 2,
+            "description": "Brother × 2 · Sister × 2"
+          }
+        },
+        "set_bismillah": {
+          "type": "set",
+          "settings": {
+            "name": "The Bismillah Home Set",
+            "tab": "Mugs",
+            "products": [
+              "bismillah-white-motif-design-mug"
+            ],
+            "quantity": 4,
+            "description": "Bismillah White Motif × 4"
+          }
+        },
+        "set_winter": {
+          "type": "set",
+          "settings": {
+            "name": "Winter Deep Colours",
+            "tab": "Pashmina",
+            "products": [
+              "pashmina-hijab-grape-purple",
+              "pashmina-hijab-midnight-maroon",
+              "pashmina-hijab-metallic-golden",
+              "pashmina-hijab-emerald-green"
+            ],
+            "quantity": 1,
+            "description": "Grape Purple · Midnight Maroon · Metallic Golden · Emerald Green"
+          }
+        },
+        "set_neutrals": {
+          "type": "set",
+          "settings": {
+            "name": "Everyday Neutrals",
+            "tab": "Pashmina",
+            "products": [
+              "pashmina-hijab-black",
+              "pashmina-hijab-carob-brown",
+              "pashmina-hijab-slate-gray",
+              "pashmina-hijab-royal-blue"
+            ],
+            "quantity": 1,
+            "description": "Black · Carob Brown · Slate Gray · Royal Blue"
+          }
+        },
+        "offer_mother": {
+          "type": "offer",
+          "settings": {
+            "product": "mother-care-islamic-gift-package",
+            "name": "The Mother Care gift package",
+            "tab": "Pashmina",
+            "description": "The Amma mug, a set of Rabbana dua cards, two hijabs and a scented candle.",
+            "add_label": "Add this",
+            "added_label": "Added · Remove"
           }
         },
         "step_lid": {
@@ -44,7 +139,7 @@
           "settings": {
             "label": "To go with it.",
             "question": "A lid for each mug?",
-            "product": "lid-start-with-bismillah",
+            "product": "lid-harf-harmony",
             "name": "",
             "copy": "Bismillah before the first sip. A lid that keeps the reminder on the mug, and the tea warm beneath it.",
             "small_note": "",
@@ -55,8 +150,90 @@
             "decline_label": "Just the mugs",
             "show_tab": "Mugs",
             "ask_message": false,
+            "message_placeholder": "What would you like it to say?",
+            "message_max": 120,
             "free_at": 0,
             "footnote": "Extras are priced as shown. They are not part of Buy Two, Receive Four and do not count toward your set."
+          }
+        },
+        "step_coasters": {
+          "type": "step",
+          "settings": {
+            "label": "And beneath it.",
+            "question": "A coaster for each?",
+            "product": "coaster-design",
+            "name": "Coasters",
+            "copy": "A place for each mug to rest, and a table kept clean.",
+            "small_note": "",
+            "mode": "stepper",
+            "decline_label": "No coasters",
+            "show_tab": "Mugs",
+            "footnote": "Extras are priced as shown. They are not part of Buy Two, Receive Four and do not count toward your set."
+          }
+        },
+        "step_package": {
+          "type": "step",
+          "settings": {
+            "label": "A gift, complete.",
+            "question": "Or just your own choices?",
+            "product": "pray-moment-budget-friendly-premium-gift-box",
+            "name": "The Pray Moment gift box",
+            "copy": "A Qur'an, a set of dua cards and one hijab.",
+            "small_note": "",
+            "mode": "stepper",
+            "decline_label": "No gift package",
+            "show_tab": "Pashmina, Cherry",
+            "footnote": ""
+          }
+        },
+        "step_pins": {
+          "type": "step",
+          "settings": {
+            "label": "To hold it.",
+            "question": "Magnetic pins, and no holes?",
+            "product": "",
+            "name": "Magnetic hijab pins",
+            "copy": "Holds the fabric without a pin through it. No snags, and no holes in the hijab.",
+            "small_note": "",
+            "mode": "stepper",
+            "decline_label": "No pins",
+            "show_tab": "Pashmina, Cherry",
+            "footnote": "Extras are priced as shown. They are not part of Buy Two, Receive Four and do not count toward your set."
+          }
+        },
+        "step_scrunchie": {
+          "type": "step",
+          "settings": {
+            "label": "To shape it.",
+            "question": "A scrunchie beneath?",
+            "product": "",
+            "name": "The scrunchie",
+            "copy": "Worn beneath the hijab to give it shape. Keeps everything in place through the day.",
+            "small_note": "",
+            "mode": "stepper",
+            "decline_label": "No scrunchie",
+            "show_tab": "Pashmina, Cherry",
+            "footnote": "Extras are priced as shown. They are not part of Buy Two, Receive Four and do not count toward your set."
+          }
+        },
+        "step_gift": {
+          "type": "step",
+          "settings": {
+            "label": "A gift.",
+            "question": "Is this for someone?",
+            "product": "wishcard",
+            "name": "A handwritten card",
+            "copy": "Your message, written by hand on a card and placed with your order.",
+            "small_note": "",
+            "mode": "single",
+            "accept_label": "Add the card",
+            "decline_label": "It's for our own home",
+            "show_tab": "",
+            "ask_message": true,
+            "message_placeholder": "What would you like it to say?",
+            "message_max": 120,
+            "free_at": 0,
+            "footnote": "Written in English or Bangla — tell us which in your message."
           }
         }
       },
@@ -65,9 +242,59 @@
         "tab_mugs",
         "tab_pashmina",
         "tab_cherry",
-        "step_lid"
+        "set_family",
+        "set_siblings",
+        "set_bismillah",
+        "set_winter",
+        "set_neutrals",
+        "offer_mother",
+        "step_lid",
+        "step_coasters",
+        "step_package",
+        "step_pins",
+        "step_scrunchie",
+        "step_gift"
       ],
-      "settings": {}
+      "settings": {
+        "eyebrow": "Buy Two · Receive Four",
+        "title": "One for each of them.",
+        "lede": "Mugs and hijabs to give, or to keep. Choose any four and pay for two — add more, and every piece stays half price.",
+        "price_line": "",
+        "note": "",
+        "gallery_ratio": "4 / 3",
+        "offer_min": 4,
+        "offer_percent": 50,
+        "offer_label": "Half price",
+        "hint_offer": "Choose [n] more to pay half",
+        "milestone_2_count": 6,
+        "milestone_2_label": "",
+        "milestone_2_hint": "[n] more, and delivery is on us",
+        "milestone_3_count": 8,
+        "milestone_3_label": "Gift box",
+        "milestone_3_hint": "[n] more, and the gift box is included",
+        "after_add": "checkout",
+        "discount_code": "",
+        "offer_property": "Buy Two, Receive Four",
+        "require_answers": true,
+        "pieces_label": "The pieces.",
+        "pieces_question": "Start with a set, or choose your own.",
+        "pieces_note": "Mugs and hijabs count together.",
+        "low_stock": 10,
+        "submit_label": "Add to Bag",
+        "next_label": "Continue",
+        "add_set_label": "Add this set",
+        "chosen_of_label": "[count] of [min] chosen",
+        "chosen_label": "[count] chosen",
+        "need_pieces_text": "Choose at least [min] pieces, then answer each step.",
+        "need_answers_text": "Answer each step to continue.",
+        "error_text": "Something went wrong. Please try again.",
+        "view_label": "View",
+        "summary_title": "Your set",
+        "regular_label": "Regular price",
+        "total_label": "Total",
+        "summary_note": "Delivery is added at checkout.",
+        "included_label": "Included"
+      }
     }
   },
   "order": [
