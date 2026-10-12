@@ -637,9 +637,25 @@
     font-size: 14px;
   }
 
+  /* The "no" sits inside the offer card, beneath the "yes" button and the
+     same size. */
+  #tss-sb-{{ uid }} .tss-sb__choice[data-decline] {
+    min-height: 44px;
+    margin-top: 12px;
+    padding: 12px 16px;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__choice[data-decline] .tss-sb__plain {
+    padding-inline-end: 0;
+    font-size: inherit;
+  }
+
   #tss-sb-{{ uid }} .tss-sb__pick {
     display: block;
     width: 100%;
+    min-height: 44px;
     margin-top: 16px;
     border: 1px solid var(--tss-green-mid);
     border-radius: 2px;
@@ -676,6 +692,26 @@
   #tss-sb-{{ uid }} .tss-sb__chip[aria-pressed='true'] {
     border-color: var(--tss-gold);
     box-shadow: inset 0 0 0 1px var(--tss-gold);
+  }
+
+  /* Colour options shown as round swatches, as in the hijab picker. */
+  #tss-sb-{{ uid }} .tss-sb__chip--swatch {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    padding: 0;
+    background: var(--tss-ivory-2) center / cover no-repeat;
+    box-shadow: inset 0 0 0 1px rgb(28 28 26 / 0.08);
+    transition: box-shadow 0.25s var(--tss-sb-ease);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__chip--swatch[aria-pressed='true'] {
+    box-shadow: 0 0 0 2px var(--tss-ivory), 0 0 0 4px var(--tss-gold);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__chips:has(.tss-sb__chip--swatch) {
+    gap: 12px;
   }
 
   #tss-sb-{{ uid }} .tss-sb__message {
@@ -974,14 +1010,29 @@
       padding: 0;
     }
 
-    /* Steps: one centred column, the "no" beneath the offer as on a phone. */
+    /* Steps: one start-aligned column, the "no" beneath the offer as on a phone. */
     #tss-sb-{{ uid }} .tss-sb__block[data-step] > * {
       max-width: 720px;
-      margin-inline: auto;
+    }
+
+    /* The photograph sits at the start, the name, copy and price beside it
+       from the top; the "yes" button and message return to full width below. */
+    #tss-sb-{{ uid }} .tss-sb__choice[data-accept] {
+      display: flow-root;
     }
 
     #tss-sb-{{ uid }} .tss-sb__choice-media {
-      max-width: 360px;
+      float: left;
+      float: inline-start;
+      width: 360px;
+      max-width: 50%;
+      margin-inline-end: 24px;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__choice[data-accept] .tss-sb__pick,
+    #tss-sb-{{ uid }} .tss-sb__choice[data-accept] .tss-sb__message,
+    #tss-sb-{{ uid }} .tss-sb__choice[data-decline] {
+      clear: both;
     }
 
     /* Swatch picker: the photograph beside the colours. */
@@ -1498,12 +1549,52 @@
 
             {%- if b.mode == 'stepper' and extra_variants.size > 1 -%}
               <p class="tss-sb__choice-row"><span class="tss-sb__gold" data-option-price>{{ extra_first.price | money }}</span></p>
+              {%- liquid
+                # Swatch colours: the merchant's own list first, then the colours
+                # saved on the product's option values.
+                assign option_lines = b.swatch_colours | newline_to_br | append: '<br />'
+                for option in extra.options_with_values
+                  for value in option.values
+                    if value.swatch.color
+                      assign option_lines = option_lines | append: value.name | append: ':' | append: value.swatch.color | append: '<br />'
+                    endif
+                  endfor
+                endfor
+                assign option_lines = option_lines | split: '<br />'
+              -%}
               <div class="tss-sb__chips">
                 {%- for variant in extra_variants -%}
+                  {%- liquid
+                    assign option_colour = ''
+                    if b.option_style == 'swatches'
+                      # The longest colour name found in the variant title wins.
+                      assign best_size = 0
+                      assign variant_lower = variant.title | downcase
+                      for line in option_lines
+                        assign pair = line | split: ':'
+                        if pair.size < 2
+                          continue
+                        endif
+                        assign colour_name = pair[0] | strip | downcase
+                        if colour_name != blank and colour_name.size > best_size and variant_lower contains colour_name
+                          assign best_size = colour_name.size
+                          assign option_colour = pair[1] | strip | remove: ';' | remove: '"'
+                        endif
+                      endfor
+                    endif
+                  -%}
                   <button
                     type="button"
-                    class="tss-sb__chip"
+                    class="tss-sb__chip{% if b.option_style == 'swatches' %} tss-sb__chip--swatch{% endif %}"
                     aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+                    {% if b.option_style == 'swatches' %}
+                      aria-label="{{ variant.title | escape }}"
+                      {% if option_colour != blank %}
+                        style="background-color: {{ option_colour | escape }};"
+                      {% elsif variant.featured_image %}
+                        style="background-image: url('{{ variant.featured_image | image_url: width: 120, height: 120, crop: 'center' }}');"
+                      {% endif %}
+                    {% endif %}
                     data-option="{{ variant.id }}"
                     data-name="{{ variant.title | escape }}"
                     data-price="{{ variant.price }}"
@@ -1511,7 +1602,9 @@
                       data-image="{{ variant.featured_image | image_url: width: 720 }}"
                     {% endif %}
                   >
-                    {{- variant.title | escape -}}
+                    {%- unless b.option_style == 'swatches' -%}
+                      {{- variant.title | escape -}}
+                    {%- endunless -%}
                     <span class="tss-sb__badge" data-badge hidden></span>
                   </button>
                 {%- endfor -%}
@@ -1560,11 +1653,11 @@
                 </div>
               {%- endif -%}
             {%- endif -%}
-          </div>
 
-          <button type="button" class="tss-sb__choice" data-decline data-selected="false" aria-pressed="false">
-            <span class="tss-sb__plain">{{ b.decline_label | default: 'No, thank you' | escape }}</span>
-          </button>
+            <button type="button" class="tss-sb__choice" data-decline data-selected="false" aria-pressed="false">
+              <span class="tss-sb__plain">{{ b.decline_label | default: 'No, thank you' | escape }}</span>
+            </button>
+          </div>
         </div>
 
         {%- if b.footnote != blank -%}
@@ -2655,6 +2748,24 @@
             { "value": "single", "label": "Just one" }
           ],
           "default": "stepper"
+        },
+        {
+          "type": "select",
+          "id": "option_style",
+          "label": "Show variants as",
+          "options": [
+            { "value": "chips", "label": "Named buttons" },
+            { "value": "swatches", "label": "Colour swatches" }
+          ],
+          "default": "chips",
+          "visible_if": "{{ block.settings.mode == 'stepper' }}"
+        },
+        {
+          "type": "textarea",
+          "id": "swatch_colours",
+          "label": "Swatch colours",
+          "info": "One per line, as Name: #hex. Leave empty to use the colours saved on the product, then the variant image.",
+          "visible_if": "{{ block.settings.mode == 'stepper' and block.settings.option_style == 'swatches' }}"
         },
         {
           "type": "text",

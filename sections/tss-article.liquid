@@ -457,7 +457,8 @@
 
   <div class="tss-article__col">
     <div class="tss-article__body">
-      {{ article.content }}
+      {%- comment -%} Articles written with the unfilled email-list placeholder link to the newsletter form. {%- endcomment -%}
+      {{ article.content | replace: '#REPLACE_WITH_FOOTER_EMAIL_ID', '#newsletter' }}
     </div>
 
     {%- if s.show_author and article.author != blank -%}

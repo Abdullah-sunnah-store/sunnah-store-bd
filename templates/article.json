@@ -1,21 +1,89 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
       "type": "tss-article",
-      "settings": {}
+      "settings": {
+        "show_blog": true,
+        "show_date": true,
+        "show_read_time": true,
+        "read_time_label": "min read",
+        "show_excerpt": true,
+        "show_image": true,
+        "image_ratio": "landscape",
+        "image_width": 960,
+        "content_width": 680,
+        "title_size": 56,
+        "title_size_mobile": 40,
+        "body_size": 20,
+        "body_size_mobile": 19,
+        "heading_size": 32,
+        "heading_size_mobile": 26,
+        "show_author": false,
+        "show_tags": false,
+        "back_label": "",
+        "padding_top": 72,
+        "padding_bottom": 64,
+        "mobile_padding_top": 48,
+        "mobile_padding_bottom": 40
+      }
     },
     "products": {
       "type": "tss-article-products",
-      "settings": {}
+      "settings": {
+        "title": "The Piece in This Letter",
+        "title_many": "The Pieces in This Letter",
+        "use_linked": true,
+        "collection": "",
+        "limit": 4,
+        "button_label": "View this piece",
+        "from_label": "From",
+        "content_width": 680,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "mobile_padding_top": 56,
+        "mobile_padding_bottom": 56
+      }
     },
     "more": {
       "type": "tss-article-more",
-      "settings": {}
+      "settings": {
+        "title": "Keep Reading",
+        "limit": 3,
+        "read_label": "Read →",
+        "padding_top": 72,
+        "padding_bottom": 96,
+        "mobile_padding_top": 56,
+        "mobile_padding_bottom": 64
+      }
+    },
+    "tss_newsletter_kCi6LX": {
+      "type": "tss-newsletter",
+      "name": "TSS 10 · Newsletter",
+      "settings": {
+        "title": "Letters from our house",
+        "title_size": 30,
+        "lede": "A quiet note each month — the makers we found and the founder's latest letter. Nothing more.",
+        "placeholder": "Your email",
+        "button_label": "Receive the Letters",
+        "success_text": "Thank you — your first letter is on its way.",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
     }
   },
   "order": [
     "main",
     "products",
-    "more"
+    "more",
+    "tss_newsletter_kCi6LX"
   ]
 }

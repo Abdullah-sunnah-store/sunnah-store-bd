@@ -71,15 +71,25 @@
     outline: none;
   }
 
+  /* Messages take a full line of their own, never a share of the field's row. */
+  #tss-newsletter-{{ uid }} .tss-news__success,
+  #tss-newsletter-{{ uid }} .tss-news__error {
+    flex: 0 0 100%;
+    margin: 0;
+    text-align: center;
+  }
+
   #tss-newsletter-{{ uid }} .tss-news__success {
-    margin-top: 24px;
-    font-size: 14px;
+    font-family: var(--tss-serif);
+    font-size: 20px;
+    line-height: 1.4;
+    text-wrap: balance;
     color: var(--tss-gold-bright);
   }
 
   #tss-newsletter-{{ uid }} .tss-news__error {
-    margin-top: 16px;
     font-size: 13px;
+    line-height: 1.5;
     color: rgb(245 240 232 / 0.75);
   }
 
@@ -90,14 +100,16 @@
     }
 
     #tss-newsletter-{{ uid }} .tss-news__form {
-      flex-direction: row;
+      flex-flow: row wrap;
       align-items: flex-end;
       gap: 16px;
     }
 
     #tss-newsletter-{{ uid }} .tss-news__input {
       flex: 1;
-      text-align: left;
+      width: auto;
+      min-width: 12rem;
+      text-align: start;
     }
 
     #tss-newsletter-{{ uid }} .tss-news__form .tss-btn {
@@ -111,7 +123,8 @@
   class="tss-section"
   aria-labelledby="tss-news-heading-{{ uid }}"
 >
-  <div class="tss-news__inner">
+  {%- comment -%} A fixed anchor, so article copy can link to "#newsletter". {%- endcomment -%}
+  <div class="tss-news__inner" id="newsletter" style="scroll-margin-top: 96px;">
     <div class="tss-rise">
       {%- if s.title != blank -%}
         <h2 id="tss-news-heading-{{ uid }}" class="tss-news__title">{{ s.title | escape }}</h2>
@@ -125,28 +138,35 @@
       {%- form 'customer', class: 'tss-news__form' -%}
         <input type="hidden" name="contact[tags]" value="newsletter">
 
-        <label for="tss-news-email-{{ uid }}" class="tss-sr-only">
-          {{ s.placeholder | default: 'Email address' | escape }}
-        </label>
-        <input
-          id="tss-news-email-{{ uid }}"
-          class="tss-news__input"
-          type="email"
-          name="contact[email]"
-          value="{{ form.email }}"
-          autocomplete="email"
-          placeholder="{{ s.placeholder | default: 'Your email' | escape }}"
-          required
-        >
+        {%- comment -%} Once subscribed, the thank-you stands alone in place of the field. {%- endcomment -%}
+        {%- if form.posted_successfully? -%}
+          <p class="tss-news__success" role="status">{{ s.success_text | default: 'Thank you — your first letter is on its way.' | escape }}</p>
+        {%- else -%}
+          <label for="tss-news-email-{{ uid }}" class="tss-sr-only">
+            {{ s.placeholder | default: 'Email address' | escape }}
+          </label>
+          <input
+            id="tss-news-email-{{ uid }}"
+            class="tss-news__input"
+            type="email"
+            name="contact[email]"
+            value="{{ form.email }}"
+            autocomplete="email"
+            placeholder="{{ s.placeholder | default: 'Your email' | escape }}"
+            required
+            {% if form.errors %}
+              aria-invalid="true"
+              aria-describedby="tss-news-error-{{ uid }}"
+            {% endif %}
+          >
 
-        <button type="submit" class="tss-btn tss-btn--gold">
-          {{ s.button_label | default: 'Receive the Letters' | escape }}
-        </button>
+          <button type="submit" class="tss-btn tss-btn--gold">
+            {{ s.button_label | default: 'Receive the Letters' | escape }}
+          </button>
 
-        {%- if form.errors -%}
-          <p class="tss-news__error">{{ form.errors.translated_fields.email }} {{ form.errors.messages.email }}</p>
-        {%- elsif form.posted_successfully? -%}
-          <p class="tss-news__success">{{ s.success_text | default: 'Thank you — your first letter is on its way.' | escape }}</p>
+          {%- if form.errors -%}
+            <p class="tss-news__error" id="tss-news-error-{{ uid }}" role="alert">{{ form.errors.translated_fields.email }} {{ form.errors.messages.email }}</p>
+          {%- endif -%}
         {%- endif -%}
       {%- endform -%}
     </div>

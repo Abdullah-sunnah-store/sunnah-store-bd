@@ -191,11 +191,12 @@
           "settings": {
             "label": "To hold it.",
             "question": "Magnetic pins, and no holes?",
-            "product": "",
+            "product": "hijab-magnet",
             "name": "Magnetic hijab pins",
             "copy": "Holds the fabric without a pin through it. No snags, and no holes in the hijab.",
             "small_note": "",
             "mode": "stepper",
+            "option_style": "swatches",
             "decline_label": "No pins",
             "show_tab": "Pashmina, Cherry",
             "footnote": "Extras are priced as shown. They are not part of Buy Two, Receive Four and do not count toward your set."
@@ -206,11 +207,13 @@
           "settings": {
             "label": "To shape it.",
             "question": "A scrunchie beneath?",
-            "product": "",
+            "product": "soft-textured-scrunchie",
             "name": "The scrunchie",
             "copy": "Worn beneath the hijab to give it shape. Keeps everything in place through the day.",
             "small_note": "",
             "mode": "stepper",
+            "option_style": "swatches",
+            "swatch_colours": "Grey: #8a8a8c\nGray: #8a8a8c\nNavy Blue: #1b2440\nDark Purple: #46204f\nPastel Yellow: #f1ec9b\nTaupe Brown: #8a6a54\nBurgundy: #6e1f2e\nWine Red: #6e1f2e\nChampagne: #efe6d3\nIvory: #efe6d3\nDusty Rose: #cf8f9b\nDark Chocolate Brown: #3f2a20\nBlack: #1f1f1f",
             "decline_label": "No scrunchie",
             "show_tab": "Pashmina, Cherry",
             "footnote": "Extras are priced as shown. They are not part of Buy Two, Receive Four and do not count toward your set."
