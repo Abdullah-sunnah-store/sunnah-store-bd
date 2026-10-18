@@ -1148,8 +1148,46 @@
 <div id="tss-sb-{{ uid }}" class="tss-section" data-tss-set-builder>
   <div class="tss-sb__page">
     <div class="tss-sb__top">
-    {%- if slide_blocks.size > 0 -%}
+    {%- liquid
+      # A tab's own image replaces the slide gallery while that tab is open.
+      assign has_tab_images = false
+      for block in group_blocks
+        if block.settings.image != blank
+          assign has_tab_images = true
+        endif
+      endfor
+      assign first_group = group_blocks | first
+      assign first_tab_image = first_group.settings.image
+    -%}
+    {%- if slide_blocks.size > 0 or has_tab_images -%}
       <div class="tss-sb__gallery-wrap">
+        {%- for block in group_blocks -%}
+          {%- if block.settings.image != blank -%}
+            <div class="tss-sb__slide" data-tab-image="{{ block.id }}" {% unless forloop.first %}hidden{% endunless %}>
+              {%- if forloop.first -%}
+                {% render 'tss-image',
+                  image: block.settings.image,
+                  class: 'tss-sb__slide-img',
+                  widths: '480,720,960',
+                  sizes: '(min-width: 64rem) 720px, 100vw',
+                  alt: block.settings.image_alt,
+                  priority: true
+                %}
+              {%- else -%}
+                {% render 'tss-image',
+                  image: block.settings.image,
+                  class: 'tss-sb__slide-img',
+                  widths: '480,720,960',
+                  sizes: '(min-width: 64rem) 720px, 100vw',
+                  alt: block.settings.image_alt
+                %}
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if slide_blocks.size > 0 -%}
+        <div data-slides {% if first_tab_image != blank %}hidden{% endif %}>
         <div
           class="tss-sb__gallery"
           data-gallery
@@ -1159,7 +1197,7 @@
         >
           {%- for block in slide_blocks -%}
             <div class="tss-sb__slide" {{ block.shopify_attributes }}>
-              {%- if forloop.first -%}
+              {%- if forloop.first and first_tab_image == blank -%}
                 {% render 'tss-image',
                   image: block.settings.image,
                   class: 'tss-sb__slide-img',
@@ -1186,6 +1224,8 @@
           <div class="tss-sb__gallery-bar" aria-hidden="true">
             <span data-gallery-bar style="width: calc(100% / {{ slide_blocks.size }});"></span>
           </div>
+        {%- endif -%}
+        </div>
         {%- endif -%}
       </div>
     {%- endif -%}
@@ -1634,8 +1674,15 @@
                 <span data-match-text data-template="{{ b.match_text | escape }}"></span>
                 <span class="tss-sb__gold" data-step-price>{{ extra_first.price | money }}</span>
               </p>
-              <button type="button" class="tss-sb__pick" data-pick aria-pressed="false">
-                {{- b.accept_label | default: 'Add this' | escape -}}
+              <button
+                type="button"
+                class="tss-sb__pick"
+                data-pick
+                data-accept-label="{{ b.accept_label | default: 'Add this' | escape }}"
+                data-accepted-label="{{ b.accepted_label | default: 'Added' | escape }}"
+                aria-pressed="false"
+              >
+                <span data-pick-label>{{ b.accept_label | default: 'Add this' | escape }}</span>
                 <span class="tss-sr-only">: {{ extra_name | escape }}</span>
               </button>
 
@@ -2171,6 +2218,10 @@
         } else {
           var pick = step.el.querySelector('[data-pick]');
           pick.setAttribute('aria-pressed', step.picked ? 'true' : 'false');
+          var pickLabel = pick.querySelector('[data-pick-label]');
+          if (pickLabel) {
+            pickLabel.textContent = pick.getAttribute(step.picked ? 'data-accepted-label' : 'data-accept-label');
+          }
           var matchCount = step.mode === 'match' ? countInTab(step.matchTab) : 1;
           var matchText = step.el.querySelector('[data-match-text]');
           if (matchText) matchText.textContent = fill(matchText.getAttribute('data-template'), { count: matchCount });
@@ -2271,6 +2322,27 @@
       each(root.querySelectorAll('[data-panel]'), function (panel) {
         panel.hidden = panel.getAttribute('data-panel') !== id;
       });
+      var tabImage = null;
+      each(root.querySelectorAll('[data-tab-image]'), function (image) {
+        var on = image.getAttribute('data-tab-image') === id;
+        image.hidden = !on;
+        if (on) tabImage = image;
+      });
+      var slides = root.querySelector('[data-slides]');
+      if (slides) slides.hidden = !!tabImage;
+
+      // Without its own image, a tab shows the gallery slide in the same position.
+      var gallery = root.querySelector('[data-gallery]');
+      if (tabImage || !gallery || !gallery.clientWidth) return;
+      var tabIds = Array.prototype.map.call(root.querySelectorAll('[data-tab]'), function (tab) {
+        return tab.getAttribute('data-tab');
+      });
+      var index = tabIds.indexOf(id);
+      var slideCount = gallery.querySelectorAll('.tss-sb__slide').length;
+      if (index === -1 || index >= slideCount) return;
+      var rtl = getComputedStyle(gallery).direction === 'rtl';
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      gallery.scrollTo({ left: (rtl ? -index : index) * gallery.clientWidth, behavior: reduce ? 'auto' : 'smooth' });
     }
 
     if (els.tabs) {
@@ -2660,6 +2732,18 @@
         { "type": "text", "id": "label", "label": "Tab label", "default": "Mugs" },
         { "type": "collection", "id": "collection", "label": "Collection" },
         {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Shown at the top while this tab is open. Leave empty to show the gallery images."
+        },
+        {
+          "type": "text",
+          "id": "image_alt",
+          "label": "Image description",
+          "info": "Read out by screen readers."
+        },
+        {
           "type": "select",
           "id": "style",
           "label": "Layout",
@@ -2786,6 +2870,13 @@
           "id": "accept_label",
           "label": "Yes button",
           "default": "Add this",
+          "visible_if": "{{ block.settings.mode != 'stepper' }}"
+        },
+        {
+          "type": "text",
+          "id": "accepted_label",
+          "label": "Yes button once added",
+          "default": "Added",
           "visible_if": "{{ block.settings.mode != 'stepper' }}"
         },
         { "type": "text", "id": "decline_label", "label": "No option", "default": "No, thank you" },

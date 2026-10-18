@@ -30,7 +30,7 @@
     "tss_rail": {
       "type": "tss-collection-rail",
       "settings": {
-        "menu": "main-menu-2",
+        "menu": "main-menu-2-horizon",
         "show_all": true,
         "all_label": "All",
         "all_link": "",

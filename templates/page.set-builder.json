@@ -24,9 +24,13 @@
           "settings": {
             "label": "Mugs",
             "collection": "mugs",
+            "image": "shopify://shop_images/DSC02030_ProductBeautifier.jpg",
+            "image_alt": "",
             "style": "cards",
             "note": "Half price from four pieces.",
-            "limit": 36
+            "limit": 36,
+            "exclude": "",
+            "swatch_colours": ""
           }
         },
         "tab_pashmina": {
@@ -34,6 +38,8 @@
           "settings": {
             "label": "Pashmina",
             "collection": "pashmina-hijab",
+            "image": "shopify://shop_images/Pashmina_Hijab_Canon_pink_PCP_2.jpg",
+            "image_alt": "",
             "style": "swatches",
             "note": "Half price from four pieces.",
             "limit": 36,
@@ -46,6 +52,8 @@
           "settings": {
             "label": "Cherry",
             "collection": "cherry-hijab",
+            "image": "shopify://shop_images/Cherry_Hijab_Bottle_Green_CBG_5.jpg",
+            "image_alt": "",
             "style": "swatches",
             "note": "Half price from four pieces.",
             "limit": 36,
@@ -139,14 +147,17 @@
           "settings": {
             "label": "To go with it.",
             "question": "A lid for each mug?",
-            "product": "lid-harf-harmony",
+            "product": "lid-start-with-bismillah",
             "name": "",
             "copy": "Bismillah before the first sip. A lid that keeps the reminder on the mug, and the tea warm beneath it.",
             "small_note": "",
             "mode": "match",
+            "option_style": "chips",
+            "swatch_colours": "",
             "match_tab": "Mugs",
             "match_text": "One for each of your [count] mugs",
             "accept_label": "Add the lids",
+            "accepted_label": "Added",
             "decline_label": "Just the mugs",
             "show_tab": "Mugs",
             "ask_message": false,
@@ -166,24 +177,19 @@
             "copy": "A place for each mug to rest, and a table kept clean.",
             "small_note": "",
             "mode": "stepper",
+            "option_style": "chips",
+            "swatch_colours": "",
+            "match_tab": "",
+            "match_text": "One for each of your [count] mugs",
+            "accept_label": "Add this",
+            "accepted_label": "Added",
             "decline_label": "No coasters",
             "show_tab": "Mugs",
+            "ask_message": false,
+            "message_placeholder": "What would you like it to say?",
+            "message_max": 120,
+            "free_at": 0,
             "footnote": "Extras are priced as shown. They are not part of Buy Two, Receive Four and do not count toward your set."
-          }
-        },
-        "step_package": {
-          "type": "step",
-          "settings": {
-            "label": "A gift, complete.",
-            "question": "Or just your own choices?",
-            "product": "pray-moment-budget-friendly-premium-gift-box",
-            "name": "The Pray Moment gift box",
-            "copy": "A Qur'an, a set of dua cards and one hijab.",
-            "small_note": "",
-            "mode": "stepper",
-            "decline_label": "No gift package",
-            "show_tab": "Pashmina, Cherry",
-            "footnote": ""
           }
         },
         "step_pins": {
@@ -197,8 +203,17 @@
             "small_note": "",
             "mode": "stepper",
             "option_style": "swatches",
+            "swatch_colours": "",
+            "match_tab": "",
+            "match_text": "One for each of your [count] mugs",
+            "accept_label": "Add this",
+            "accepted_label": "Added",
             "decline_label": "No pins",
             "show_tab": "Pashmina, Cherry",
+            "ask_message": false,
+            "message_placeholder": "What would you like it to say?",
+            "message_max": 120,
+            "free_at": 0,
             "footnote": "Extras are priced as shown. They are not part of Buy Two, Receive Four and do not count toward your set."
           }
         },
@@ -214,8 +229,16 @@
             "mode": "stepper",
             "option_style": "swatches",
             "swatch_colours": "Grey: #8a8a8c\nGray: #8a8a8c\nNavy Blue: #1b2440\nDark Purple: #46204f\nPastel Yellow: #f1ec9b\nTaupe Brown: #8a6a54\nBurgundy: #6e1f2e\nWine Red: #6e1f2e\nChampagne: #efe6d3\nIvory: #efe6d3\nDusty Rose: #cf8f9b\nDark Chocolate Brown: #3f2a20\nBlack: #1f1f1f",
+            "match_tab": "",
+            "match_text": "One for each of your [count] mugs",
+            "accept_label": "Add this",
+            "accepted_label": "Added",
             "decline_label": "No scrunchie",
             "show_tab": "Pashmina, Cherry",
+            "ask_message": false,
+            "message_placeholder": "What would you like it to say?",
+            "message_max": 120,
+            "free_at": 0,
             "footnote": "Extras are priced as shown. They are not part of Buy Two, Receive Four and do not count toward your set."
           }
         },
@@ -229,7 +252,12 @@
             "copy": "Your message, written by hand on a card and placed with your order.",
             "small_note": "",
             "mode": "single",
+            "option_style": "chips",
+            "swatch_colours": "",
+            "match_tab": "",
+            "match_text": "One for each of your [count] mugs",
             "accept_label": "Add the card",
+            "accepted_label": "Added",
             "decline_label": "It's for our own home",
             "show_tab": "",
             "ask_message": true,
@@ -253,7 +281,6 @@
         "offer_mother",
         "step_lid",
         "step_coasters",
-        "step_package",
         "step_pins",
         "step_scrunchie",
         "step_gift"
