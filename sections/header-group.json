@@ -55,7 +55,17 @@
         "search_popular": "",
         "show_desktop_nav": true,
         "show_utility": true,
-        "notice_seconds": 5
+        "notice_seconds": 5,
+        "show_promo": true,
+        "promo_text": "Create Your Own Gift Box",
+        "promo_link": "shopify://pages/custom-gift-box",
+        "promo_icon": "🎁",
+        "promo_bg": "#fafafa",
+        "promo_bg_hover": "#edf5e8",
+        "show_offer": true,
+        "offer_link": "shopify://pages/set-builder",
+        "offer_badge": "50% OFF",
+        "offer_label": "Buy two, receive four"
       }
     }
   },

@@ -116,14 +116,26 @@
         {%- assign b = block.settings -%}
         <article {{ block.shopify_attributes }}>
           <div class="tss-clip">
-            <div>
+            {%- comment -%}
+              The image repeats the Discover link for pointer users; it stays out of
+              the tab order so each card is one stop for keyboards and screen readers.
+            {%- endcomment -%}
+            {%- if b.link != blank -%}
+              <a href="{{ b.link }}" tabindex="-1" aria-hidden="true">
+            {%- else -%}
+              <div>
+            {%- endif -%}
               {% render 'tss-image',
                 image: b.image,
                 asset: b.image_asset,
                 sizes: '(min-width: 64rem) 24vw, (min-width: 40rem) 46vw, 78vw',
                 alt: b.name
               %}
-            </div>
+            {%- if b.link != blank -%}
+              </a>
+            {%- else -%}
+              </div>
+            {%- endif -%}
           </div>
 
           <div class="tss-rise">

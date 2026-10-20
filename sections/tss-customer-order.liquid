@@ -42,7 +42,13 @@
                 <td>
                   <div class="tss-acct__item">
                     {%- if line_item.image -%}
-                      {{ line_item.image | image_url: width: 120 | image_tag: loading: 'lazy', alt: line_item.title }}
+                      {%- if line_item.url != blank -%}
+                        <a href="{{ line_item.url }}" tabindex="-1" aria-hidden="true">
+                          {{- line_item.image | image_url: width: 120 | image_tag: loading: 'lazy', alt: line_item.title -}}
+                        </a>
+                      {%- else -%}
+                        {{ line_item.image | image_url: width: 120 | image_tag: loading: 'lazy', alt: line_item.title }}
+                      {%- endif -%}
                     {%- endif -%}
                     <div>
                       {%- if line_item.url != blank -%}

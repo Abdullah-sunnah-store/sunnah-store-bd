@@ -1,0 +1,1559 @@
+{% comment %}
+  TSS — Gift builder
+  A one-page, answer-as-you-go purchase flow for a small collection, after the
+  reference build at kindred-three-kohl.vercel.app:
+
+    gallery of the chosen design + gold scroll bar · eyebrow, serif title, "From" price
+    1. Design — one card per product in the collection
+    2+. Steps (blocks) — two answers each, unlocked one at a time; an answer
+        can carry a paid add-on product and ask for a message, a time or a date
+    summary — reads the order back with a running total and Add to Bag
+    fixed total bar once a design is chosen
+
+  Every answer travels as a line-item property on the design. A paid answer
+  also adds its add-on product to the cart as its own line, tagged with the
+  design it belongs to. Answers without a product cost nothing here; shipping
+  is still charged at checkout.
+
+  Without JavaScript the form still posts the chosen design and its answers to
+  the cart; only the add-on lines need the script.
+
+  @example
+  <!-- templates/page.kiswah.json with Collection set to The Kiswah Edition;
+       on a collection template the Collection setting can stay empty -->
+{% endcomment %}
+
+{% render 'tss-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign max_designs = s.max_designs | default: 12
+  # The picked collection wins; on a collection template the page's own is used.
+  assign source = s.collection | default: collection
+  assign design_count = source.products.size
+
+  assign title = s.title | default: source.title | default: page.title
+  assign lede = s.lede
+  if lede == blank
+    assign lede = source.description | strip_html | strip
+  endif
+
+  assign from_price = nil
+  for product in source.products limit: max_designs
+    if forloop.first or product.price_min < from_price
+      assign from_price = product.price_min
+    endif
+  endfor
+
+  assign img_ratio = s.image_ratio | default: '1 / 1'
+-%}
+
+<style>
+  #tss-gb-{{ uid }} {
+    background: var(--tss-ivory);
+    padding-block-end: {{ s.padding_bottom | default: 0 }}px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__layout {
+    margin-inline: auto;
+    max-width: 1152px;
+  }
+
+  /* ---------- media ---------- */
+  #tss-gb-{{ uid }} .tss-gb__media {
+    min-width: 0;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__rail {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__slide {
+    flex: none;
+    width: 100%;
+    aspect-ratio: {{ img_ratio }};
+    scroll-snap-align: start;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Wide pieces would lose their ends in the box, so they are shown whole. */
+  #tss-gb-{{ uid }} .tss-gb__slide img.tss-gb__img--contain {
+    object-fit: contain;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__bar {
+    position: relative;
+    height: 2px;
+    margin: 12px var(--tss-gutter) 0;
+    background: rgb(26 74 58 / 0.15);
+    overflow: hidden;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__bar span {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 100%;
+    background: var(--tss-gold);
+    transform-origin: left center;
+    transform: scaleX(var(--tss-gb-progress, 0.15));
+    transition: transform 0.2s linear;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__bar span:dir(rtl) {
+    transform-origin: right center;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__intro {
+    padding: 32px var(--tss-gutter) 0;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__title {
+    margin-top: 12px;
+    font-family: var(--tss-serif);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__lede {
+    margin-top: 16px;
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.5;
+    color: rgb(28 28 26 / 0.7);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__from {
+    margin-top: 16px;
+    font-size: 16px;
+    color: var(--tss-gold);
+  }
+
+  /* ---------- steps ---------- */
+  #tss-gb-{{ uid }} .tss-gb__steps {
+    min-width: 0;
+    padding-block-end: 160px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__step {
+    min-width: 0;
+    margin: 0;
+    padding: 56px var(--tss-gutter) 0;
+    border: 0;
+    scroll-margin-top: calc(var(--header-height, 0px) + 16px);
+    transition: opacity 0.5s var(--tss-ease);
+  }
+
+  /* Stacked under the intro on phones, so it only needs a short lead-in. */
+  #tss-gb-{{ uid }} .tss-gb__step:first-child {
+    padding-top: 32px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__step[data-locked='true'] {
+    opacity: 0.4;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__legend {
+    float: left;
+    width: 100%;
+    padding: 0;
+    font-family: var(--tss-serif);
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--tss-ink);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__legend span {
+    opacity: 0.45;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__options {
+    clear: both;
+    display: grid;
+    gap: 12px;
+    padding-top: 28px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__choice {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 64px;
+    padding: 20px;
+    border: 1px solid rgb(26 74 58 / 0.2);
+    border-radius: 2px;
+    background: var(--tss-ivory);
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__choice--design {
+    align-items: center;
+    padding: 12px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__choice:has(input:checked) {
+    border-color: var(--tss-green-mid);
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__choice:has(input:focus-visible) {
+    outline: 2px solid var(--tss-green-mid);
+    outline-offset: 2px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__choice:has(input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__choice input,
+  #tss-gb-{{ uid }} .tss-gb__slot input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__tick {
+    position: absolute;
+    inset-block-start: 8px;
+    inset-inline-end: 12px;
+    font-size: 16px;
+    color: var(--tss-green-mid);
+    opacity: 0;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__choice:has(input:checked) .tss-gb__tick {
+    opacity: 1;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__thumb {
+    flex: none;
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__thumb.tss-gb__img--contain {
+    object-fit: contain;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__name {
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__detail {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 1.45;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__choice--design .tss-gb__detail {
+    margin-top: 0;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__badge {
+    display: block;
+    margin-top: 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--tss-gold);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__points {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 1.5;
+    color: rgb(28 28 26 / 0.65);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__price {
+    flex: none;
+    max-width: 45%;
+    padding-inline-end: 12px;
+    font-size: 14px;
+    text-align: end;
+    color: var(--tss-gold);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__choice--design .tss-gb__price {
+    align-self: flex-start;
+    padding-top: 8px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__note {
+    margin-top: 16px;
+    font-size: 12px;
+    font-weight: 300;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  /* ---------- extras: message, times, date ---------- */
+  #tss-gb-{{ uid }} .tss-gb__extra {
+    display: grid;
+    gap: 12px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__extra[hidden] {
+    display: none;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__field {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 16px;
+    border: 1px solid rgb(26 74 58 / 0.35);
+    border-radius: 2px;
+    background: var(--tss-ivory);
+    font: inherit;
+    font-size: 14px;
+    color: var(--tss-ink);
+  }
+
+  #tss-gb-{{ uid }} textarea.tss-gb__field {
+    min-height: 112px;
+    resize: none;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__field:focus-visible {
+    outline: 2px solid var(--tss-green-mid);
+    outline-offset: 2px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__count {
+    margin-top: -8px;
+    font-size: 11px;
+    text-align: end;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__slots {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__slot {
+    position: relative;
+    display: grid;
+    flex: 1;
+    min-width: 0;
+    min-height: 48px;
+    padding: 4px;
+    place-items: center;
+    border: 1px solid rgb(26 74 58 / 0.2);
+    border-radius: 2px;
+    background: var(--tss-ivory);
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__slot:has(input:checked) {
+    border-color: var(--tss-green-mid);
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__slot:has(input:focus-visible) {
+    outline: 2px solid var(--tss-green-mid);
+    outline-offset: 2px;
+  }
+
+  /* ---------- summary ---------- */
+  #tss-gb-{{ uid }} .tss-gb__summary {
+    margin-top: 64px;
+    padding: 64px var(--tss-gutter);
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__summary-title {
+    font-family: var(--tss-serif);
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__summary-title span {
+    display: block;
+    opacity: 0.45;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__rows {
+    margin-top: 32px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 12px;
+    border-bottom: 1px solid rgb(28 28 26 / 0.18);
+    font-size: 14px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__row dt {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__row dd {
+    margin: 0;
+    flex: none;
+    max-width: 50%;
+    text-align: end;
+    color: var(--tss-gold);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 20px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__total-label {
+    font-family: var(--tss-serif);
+    font-size: 22px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__total-value {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--tss-gold);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__hint {
+    min-height: 1.5em;
+    margin-bottom: 12px;
+    font-size: 12px;
+    text-align: center;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__hint[data-error='true'] {
+    color: #a3341f;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__submit {
+    width: 100%;
+    height: 56px;
+    border: 0;
+    border-radius: 2px;
+    background: var(--tss-ink);
+    color: var(--tss-ivory);
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__submit[aria-disabled='true'] {
+    opacity: 0.4;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__submit:focus-visible {
+    outline: 2px solid var(--tss-green-mid);
+    outline-offset: 3px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__trust {
+    margin-top: 16px;
+    font-size: 11px;
+    text-align: center;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  /* ---------- fixed total bar ---------- */
+  #tss-gb-{{ uid }} .tss-gb__dock {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 10;
+    padding: 12px var(--tss-gutter) max(12px, env(safe-area-inset-bottom));
+    border-top: 1px solid rgb(26 74 58 / 0.15);
+    background: var(--tss-ivory);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__dock[hidden] {
+    display: none;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__dock-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-inline: auto;
+    max-width: 1152px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__dock-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__dock-total {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--tss-gold);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__dock-toggle {
+    min-height: 48px;
+    padding-inline: 12px;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 12px;
+    color: var(--tss-ink);
+    cursor: pointer;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__dock-toggle span {
+    display: inline-block;
+    transition: transform 0.2s;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__dock-toggle[aria-expanded='true'] span {
+    transform: rotate(180deg);
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__dock-detail {
+    margin-inline: auto;
+    max-width: 1152px;
+    padding-top: 12px;
+    border-top: 1px solid rgb(28 28 26 / 0.18);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__empty {
+    padding: 64px var(--tss-gutter);
+    text-align: center;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  @media (min-width: 768px) {
+    #tss-gb-{{ uid }} .tss-gb__layout {
+      display: grid;
+      grid-template-columns: 55% 45%;
+      align-items: start;
+    }
+
+    #tss-gb-{{ uid }} .tss-gb__intro {
+      padding-bottom: 48px;
+    }
+
+    #tss-gb-{{ uid }} .tss-gb__step:first-child {
+      padding-top: 56px;
+    }
+
+    #tss-gb-{{ uid }} .tss-gb__media {
+      position: sticky;
+      top: var(--header-height, 0px);
+      max-height: calc(100vh - var(--header-height, 0px));
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #tss-gb-{{ uid }} .tss-gb__step,
+    #tss-gb-{{ uid }} .tss-gb__bar span,
+    #tss-gb-{{ uid }} .tss-gb__choice {
+      transition: none;
+    }
+  }
+</style>
+
+<section
+  id="tss-gb-{{ uid }}"
+  class="tss-section tss-gb"
+  aria-label="{{ title | escape }}"
+  data-tss-gift-builder
+>
+  {%- if design_count == 0 -%}
+    <p class="tss-gb__empty">{{ s.empty_text | escape }}</p>
+  {%- else -%}
+    <form
+      class="tss-gb__layout"
+      action="{{ routes.cart_add_url }}"
+      method="post"
+      data-form
+    >
+      <input type="hidden" name="quantity" value="1">
+
+      <div class="tss-gb__media">
+        {%- for product in source.products limit: max_designs -%}
+          {%- assign gallery_index = forloop.index0 -%}
+          <div
+            class="tss-gb__gallery"
+            data-gallery="{{ gallery_index }}"
+            {% unless forloop.first %}
+              hidden
+            {% endunless %}
+          >
+            <div
+              class="tss-gb__rail"
+              tabindex="0"
+              role="region"
+              aria-label="{{ product.title | escape }}"
+              data-rail
+            >
+              {%- for media in product.media limit: 8 -%}
+                {%- liquid
+                  assign img = media.preview_image
+                  assign img_class = ''
+                  if img.aspect_ratio > 1
+                    assign img_class = 'tss-gb__img--contain'
+                  endif
+                  assign loading = 'lazy'
+                  if gallery_index == 0 and forloop.first
+                    assign loading = 'eager'
+                  endif
+                -%}
+                <div class="tss-gb__slide">
+                  {{
+                    img
+                    | image_url: width: 2000
+                    | image_tag:
+                      class: img_class,
+                      widths: '480,720,960,1280,1600,2000',
+                      sizes: '(min-width: 768px) 55vw, 100vw',
+                      loading: loading,
+                      alt: media.alt | default: product.title
+                  }}
+                </div>
+              {%- else -%}
+                <div class="tss-gb__slide">
+                  {{ 'product-1' | placeholder_svg_tag }}
+                </div>
+              {%- endfor -%}
+            </div>
+            {%- if product.media.size > 1 -%}
+              <div class="tss-gb__bar" aria-hidden="true"><span data-progress></span></div>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+
+        <div class="tss-gb__intro">
+          {%- if s.eyebrow != blank -%}
+            <p class="tss-eyebrow">{{ s.eyebrow | escape }}</p>
+          {%- endif -%}
+          <h1 class="tss-gb__title">{{ title | escape }}</h1>
+          {%- if lede != blank -%}
+            <p class="tss-gb__lede">{{ lede | escape }}</p>
+          {%- endif -%}
+          {%- if s.show_from and from_price -%}
+            <p class="tss-gb__from">
+              {{- s.from_label | escape }}
+              {{ from_price | money -}}
+            </p>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="tss-gb__steps">
+        {%- comment -%} Step 1 — the design. Its radio is the cart line's variant id. {%- endcomment -%}
+        <fieldset class="tss-gb__step" data-step="design" data-label="{{ s.design_label | escape }}">
+          <legend class="tss-gb__legend">
+            {{- s.design_label | escape }}. <span>{{ s.design_question | escape }}</span>
+          </legend>
+          <div class="tss-gb__options">
+            {%- for product in source.products limit: max_designs -%}
+              {%- liquid
+                assign v = product.selected_or_first_available_variant
+                assign size = blank
+                if s.size_metafield != blank
+                  assign size_parts = s.size_metafield | split: '.'
+                  if size_parts.size == 2
+                    assign size = product.metafields[size_parts[0]][size_parts[1]].value
+                  endif
+                endif
+                assign thumb = product.featured_media.preview_image
+                assign thumb_class = 'tss-gb__thumb'
+                if thumb.aspect_ratio > 1
+                  assign thumb_class = 'tss-gb__thumb tss-gb__img--contain'
+                endif
+              -%}
+              <label class="tss-gb__choice tss-gb__choice--design">
+                <input
+                  type="radio"
+                  name="id"
+                  value="{{ v.id }}"
+                  data-design="{{ forloop.index0 }}"
+                  data-title="{{ product.title | escape }}"
+                  data-price="{{ v.price }}"
+                  required
+                  {% unless product.available %}
+                    disabled
+                  {% endunless %}
+                >
+                {%- if thumb -%}
+                  {{
+                    thumb
+                    | image_url: width: 160
+                    | image_tag: class: thumb_class, width: 64, height: 64, loading: 'lazy', alt: ''
+                  }}
+                {%- else -%}
+                  <span class="tss-gb__thumb" aria-hidden="true"></span>
+                {%- endif -%}
+                <span class="tss-gb__body">
+                  <span class="tss-gb__name">{{ product.title | escape }}</span>
+                  {%- if product.available == false -%}
+                    <span class="tss-gb__detail">{{ s.sold_out_label | escape }}</span>
+                  {%- elsif size != blank -%}
+                    <span class="tss-gb__detail">{{ size | escape }}</span>
+                  {%- endif -%}
+                </span>
+                <span class="tss-gb__price">{{ v.price | money }}</span>
+                <span class="tss-gb__tick" aria-hidden="true">✓</span>
+              </label>
+            {%- endfor -%}
+          </div>
+          {%- if s.design_note != blank -%}
+            <p class="tss-gb__note">{{ s.design_note | escape }}</p>
+          {%- endif -%}
+        </fieldset>
+
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign b = block.settings
+            assign prop = b.property | default: b.label | strip
+            assign extra = b.extra | default: 'none'
+            assign min_days = b.min_days | default: 0
+            assign slot_lines = b.slots | newline_to_br | split: '<br />'
+          -%}
+          <fieldset
+            class="tss-gb__step"
+            data-step="{{ forloop.index }}"
+            data-label="{{ b.label | escape }}"
+            {{ block.shopify_attributes }}
+          >
+            <legend class="tss-gb__legend">
+              {{- b.label | escape }}. <span>{{ b.question | escape }}</span>
+            </legend>
+            <div class="tss-gb__options">
+              {%- for key in (1..3) -%}
+                {%- liquid
+                  # Answers are stored as a_*, b_*, c_* settings; the third is optional.
+                  assign k = 'abc' | slice: forloop.index0
+                  assign o_key = k | append: '_name'
+                  assign o_name = b[o_key]
+                  assign o_key = k | append: '_detail'
+                  assign o_detail = b[o_key]
+                  assign o_key = k | append: '_badge'
+                  assign o_badge = b[o_key]
+                  assign o_key = k | append: '_points'
+                  assign o_points = b[o_key]
+                  assign o_key = k | append: '_product'
+                  assign o_product = b[o_key]
+                  assign o_key = k | append: '_price_label'
+                  assign o_label = b[o_key]
+                  # Paid at checkout (shipping), so it only counts toward the total shown here.
+                  assign o_key = k | append: '_checkout_price'
+                  assign o_later = b[o_key] | default: 0 | times: 100 | round
+                  assign o_extra = false
+                  if b.extra_on == k
+                    assign o_extra = true
+                  endif
+                  if extra == 'none'
+                    assign o_extra = false
+                  endif
+
+                  assign o_variant = o_product.selected_or_first_available_variant
+                  assign o_price = 0
+                  assign o_text = o_label
+                  if o_product != blank and o_product.available
+                    assign o_price = o_variant.price
+                    if o_text == blank
+                      assign o_text = o_variant.price | money
+                    endif
+                  endif
+                  if o_text == blank and o_later > 0
+                    assign o_text = o_later | money
+                  endif
+                  assign o_summary = o_text
+                  if o_text == blank
+                    assign o_summary = 0 | money
+                  endif
+                -%}
+                {%- if o_name != blank -%}
+                  <label class="tss-gb__choice">
+                    <input
+                      type="radio"
+                      name="properties[{{ prop | escape }}]"
+                      value="{{ o_name | escape }}"
+                      data-price="{{ o_price }}"
+                      data-later="{{ o_later }}"
+                      data-summary="{{ o_summary | escape }}"
+                      {% if o_price > 0 %}
+                        data-addon="{{ o_variant.id }}"
+                      {% endif %}
+                      {% if o_extra %}
+                        data-has-extra
+                      {% endif %}
+                      required
+                    >
+                    <span class="tss-gb__body">
+                      <span class="tss-gb__name">{{ o_name | escape }}</span>
+                      {%- if o_badge != blank -%}
+                        <span class="tss-gb__badge">{{ o_badge | escape }}</span>
+                      {%- endif -%}
+                      {%- if o_detail != blank -%}
+                        <span class="tss-gb__detail">{{ o_detail | escape }}</span>
+                      {%- endif -%}
+                      {%- if o_points != blank -%}
+                        <span class="tss-gb__points">
+                          {{- o_points | strip | escape | newline_to_br -}}
+                        </span>
+                      {%- endif -%}
+                    </span>
+                    {%- if o_text != blank -%}
+                      <span class="tss-gb__price">{{ o_text | escape }}</span>
+                    {%- endif -%}
+                    <span class="tss-gb__tick" aria-hidden="true">✓</span>
+                  </label>
+
+                  {%- if o_extra -%}
+                    {%- comment -%}
+                      Sits right under the answer that asks for it. Its fields stay
+                      disabled — and so out of the cart — until that answer is chosen.
+                    {%- endcomment -%}
+                    <div class="tss-gb__extra" data-extra hidden>
+                      {%- if extra == 'message' -%}
+                        {%- assign message_max = b.message_max | default: 120 -%}
+                        <label class="visually-hidden" for="tss-gb-{{ block.id }}-message">
+                          {{- b.message_property | escape -}}
+                        </label>
+                        <textarea
+                          id="tss-gb-{{ block.id }}-message"
+                          class="tss-gb__field"
+                          name="properties[{{ b.message_property | escape }}]"
+                          maxlength="{{ message_max }}"
+                          placeholder="{{ b.message_placeholder | escape }}"
+                          aria-describedby="tss-gb-{{ block.id }}-count"
+                          data-required
+                          disabled
+                        ></textarea>
+                        <p class="tss-gb__count" id="tss-gb-{{ block.id }}-count" data-count>
+                          0/{{ message_max }}
+                        </p>
+                      {%- endif -%}
+
+                      {%- if extra == 'date_slots' -%}
+                        <label class="visually-hidden" for="tss-gb-{{ block.id }}-date">
+                          {{- b.date_property | escape -}}
+                        </label>
+                        <input
+                          id="tss-gb-{{ block.id }}-date"
+                          class="tss-gb__field"
+                          type="date"
+                          name="properties[{{ b.date_property | escape }}]"
+                          data-min-days="{{ min_days }}"
+                          data-required
+                          disabled
+                        >
+                      {%- endif -%}
+
+                      {%- if extra == 'slots' or extra == 'date_slots' -%}
+                        <fieldset class="tss-gb__slots" data-slots>
+                          <legend class="visually-hidden">{{ b.slot_property | escape }}</legend>
+                          {%- for slot in slot_lines -%}
+                            {%- assign slot = slot | strip -%}
+                            {%- if slot != blank -%}
+                              <label class="tss-gb__slot">
+                                <input
+                                  type="radio"
+                                  name="properties[{{ b.slot_property | escape }}]"
+                                  value="{{ slot | escape }}"
+                                  disabled
+                                >
+                                {{- slot | escape -}}
+                              </label>
+                            {%- endif -%}
+                          {%- endfor -%}
+                        </fieldset>
+                      {%- endif -%}
+                    </div>
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+            {%- if b.note != blank -%}
+              <p class="tss-gb__note">{{ b.note | escape }}</p>
+            {%- endif -%}
+          </fieldset>
+        {%- endfor -%}
+
+        <div class="tss-gb__summary">
+          <h2 class="tss-gb__summary-title">
+            {{- s.summary_title | escape -}}
+            {%- if s.summary_subtitle != blank -%}
+              <span>{{ s.summary_subtitle | escape }}</span>
+            {%- endif -%}
+          </h2>
+
+          <dl class="tss-gb__rows">
+            <div class="tss-gb__row">
+              <dt data-row-label="design">{{ s.design_label | escape }}</dt>
+              <dd data-row="design">—</dd>
+            </div>
+            {%- for block in section.blocks -%}
+              <div class="tss-gb__row">
+                <dt>{{ block.settings.label | escape }}</dt>
+                <dd data-row="{{ forloop.index }}">—</dd>
+              </div>
+            {%- endfor -%}
+          </dl>
+
+          <div class="tss-gb__total">
+            <span class="tss-gb__total-label">{{ s.total_label | escape }}</span>
+            <span class="tss-gb__total-value" data-total>{{ 0 | money }}</span>
+          </div>
+
+          <p class="tss-gb__hint" role="status" data-hint>{{ s.incomplete_text | escape }}</p>
+          <button type="submit" class="tss-gb__submit" data-submit>{{ s.button_label | escape }}</button>
+
+          {%- if s.trust_line != blank -%}
+            <p class="tss-gb__trust">{{ s.trust_line | escape }}</p>
+          {%- endif -%}
+        </div>
+      </div>
+    </form>
+
+    <div class="tss-gb__dock" data-dock hidden>
+      <div class="tss-gb__dock-inner">
+        <div>
+          <p class="tss-gb__dock-label">{{ s.total_label | escape }}</p>
+          <p class="tss-gb__dock-total" data-dock-total>{{ 0 | money }}</p>
+        </div>
+        <button
+          type="button"
+          class="tss-gb__dock-toggle"
+          aria-expanded="false"
+          aria-controls="tss-gb-{{ uid }}-dock-detail"
+          data-dock-toggle
+        >
+          {{ s.view_label | escape }} <span aria-hidden="true">⌄</span>
+        </button>
+      </div>
+      <p class="tss-gb__dock-detail" id="tss-gb-{{ uid }}-dock-detail" data-dock-detail hidden></p>
+    </div>
+  {%- endif -%}
+</section>
+
+{%- if design_count > 0 -%}
+  <script>
+    (function () {
+      var root = document.getElementById('tss-gb-{{ uid }}');
+      if (!root || root.hasAttribute('data-ready')) return;
+      root.setAttribute('data-ready', '');
+
+      var ADD_URL = {{ routes.cart_add_url | append: '.js' | json }};
+      var CART_URL = {{ routes.cart_url | json }};
+      var AFTER_ADD = {{ s.after_add | default: 'checkout' | json }};
+      var MONEY_FORMAT = {{ shop.money_format | strip_html | json }};
+      var LINK_PROPERTY = {{ s.link_property | default: 'For' | json }};
+      var T = {
+        incomplete: {{ s.incomplete_text | json }},
+        ready: {{ s.ready_text | json }},
+        adding: {{ s.adding_label | json }},
+        error: {{ s.error_text | json }}
+      };
+
+      var form = root.querySelector('[data-form]');
+      var steps = Array.prototype.slice.call(root.querySelectorAll('[data-step]'));
+      var submit = root.querySelector('[data-submit]');
+      var hint = root.querySelector('[data-hint]');
+      var totalEl = root.querySelector('[data-total]');
+      var dock = root.querySelector('[data-dock]');
+      var dockTotal = root.querySelector('[data-dock-total]');
+      var dockToggle = root.querySelector('[data-dock-toggle]');
+      var dockDetail = root.querySelector('[data-dock-detail]');
+      var submitLabel = submit.textContent;
+      var busy = false;
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      // The script walks the shopper to the first unanswered step itself;
+      // native required-field popups would point into locked steps.
+      form.noValidate = true;
+
+      // Shopify's money_format is a Liquid fragment, not a number format.
+      function money(cents) {
+        var value = (cents || 0) / 100;
+        function withCommas(n) {
+          var parts = n.split('.');
+          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          return parts.join('.');
+        }
+        return String(MONEY_FORMAT).replace(/\{\{\s*(\w+)\s*\}\}/, function (_, token) {
+          switch (token) {
+            case 'amount_no_decimals':
+              return withCommas(String(Math.round(value)));
+            case 'amount_with_comma_separator':
+              return withCommas(value.toFixed(2)).replace(/,/g, ' ').replace('.', ',');
+            case 'amount_no_decimals_with_comma_separator':
+              return withCommas(String(Math.round(value))).replace(/,/g, '.');
+            case 'amount_no_decimals_with_space_separator':
+              return withCommas(String(Math.round(value))).replace(/,/g, ' ');
+            default:
+              return withCommas(value.toFixed(2));
+          }
+        });
+      }
+
+      function chosen(step) {
+        return step.querySelector('.tss-gb__options > .tss-gb__choice input:checked');
+      }
+
+      function extraFor(input) {
+        var next = input.closest('.tss-gb__choice').nextElementSibling;
+        return next && next.hasAttribute('data-extra') ? next : null;
+      }
+
+      // An answer is complete once it is chosen and anything it asks for is filled in.
+      function complete(step) {
+        var input = chosen(step);
+        if (!input) return false;
+        var extra = extraFor(input);
+        if (!extra) return true;
+        var fields = extra.querySelectorAll('[data-required]');
+        for (var i = 0; i < fields.length; i++) {
+          if (!fields[i].value.trim()) return false;
+        }
+        var slots = extra.querySelector('[data-slots]');
+        return !slots || !!slots.querySelector('input:checked');
+      }
+
+      /* ---------- render ---------- */
+      function render() {
+        var total = 0;
+        var open = true;
+        var detail = [];
+
+        steps.forEach(function (step) {
+          var locked = !open;
+          step.setAttribute('data-locked', locked ? 'true' : 'false');
+          step.inert = locked;
+
+          var input = chosen(step);
+          var key = step.getAttribute('data-step');
+          var row = root.querySelector('[data-row="' + key + '"]');
+
+          // Show only the extra under the chosen answer, and only post its fields then.
+          step.querySelectorAll('[data-extra]').forEach(function (extra) {
+            var on = !!input && extraFor(input) === extra;
+            extra.hidden = !on;
+            extra.querySelectorAll('input, textarea').forEach(function (field) {
+              field.disabled = !on;
+            });
+          });
+
+          if (input) {
+            var price = parseInt(input.getAttribute('data-price'), 10) || 0;
+            price += parseInt(input.getAttribute('data-later'), 10) || 0;
+            total += price;
+            if (key === 'design') {
+              root.querySelector('[data-row-label="design"]').textContent = input.getAttribute('data-title');
+              row.textContent = money(price);
+              detail.push(step.getAttribute('data-label') + ' · ' + money(price));
+            } else {
+              row.textContent = input.getAttribute('data-summary');
+              if (price > 0) detail.push(step.getAttribute('data-label') + ' · ' + money(price));
+            }
+          } else if (row) {
+            row.textContent = '—';
+          }
+
+          if (!complete(step)) open = false;
+        });
+
+        var text = money(total);
+        totalEl.textContent = text;
+        dockTotal.textContent = text;
+        dockDetail.textContent = detail.join('  ·  ');
+        dock.hidden = !chosen(steps[0]);
+
+        submit.setAttribute('aria-disabled', open && !busy ? 'false' : 'true');
+        var status = open ? T.ready : T.incomplete;
+        if (!hint.hasAttribute('data-error') && hint.textContent !== status) hint.textContent = status;
+      }
+
+      function nextPending() {
+        for (var i = 0; i < steps.length; i++) {
+          if (!complete(steps[i])) return steps[i];
+        }
+        return null;
+      }
+
+      function scrollToStep(step) {
+        if (!step) return;
+        setTimeout(function () {
+          step.scrollIntoView({ behavior: reduce.matches ? 'auto' : 'smooth', block: 'start' });
+        }, 60);
+      }
+
+      /* ---------- gallery ---------- */
+      function showGallery(index) {
+        root.querySelectorAll('[data-gallery]').forEach(function (gallery) {
+          var on = gallery.getAttribute('data-gallery') === String(index);
+          gallery.hidden = !on;
+          if (on) {
+            var rail = gallery.querySelector('[data-rail]');
+            if (rail) rail.scrollLeft = 0;
+            gallery.querySelectorAll('img[loading="lazy"]').forEach(function (img) {
+              img.loading = 'eager';
+            });
+          }
+        });
+      }
+
+      root.querySelectorAll('[data-rail]').forEach(function (rail) {
+        var bar = rail.parentNode.querySelector('[data-progress]');
+        if (!bar) return;
+        function sync() {
+          var span = rail.scrollWidth - rail.clientWidth;
+          var progress = span > 0 ? Math.abs(rail.scrollLeft) / span : 0;
+          bar.style.setProperty('--tss-gb-progress', Math.max(0.15, progress));
+        }
+        rail.addEventListener('scroll', sync, { passive: true });
+        sync();
+      });
+
+      /* ---------- answers ---------- */
+      root.addEventListener('change', function (e) {
+        var input = e.target;
+        hint.removeAttribute('data-error');
+
+        if (input.hasAttribute('data-design')) showGallery(input.getAttribute('data-design'));
+
+        var step = input.closest('[data-step]');
+        var wasAnswer = input.parentNode.classList.contains('tss-gb__choice');
+        render();
+
+        // Move on once a step is done; stay put while its extra still needs filling in.
+        if (step && complete(step)) {
+          var pending = nextPending();
+          if (pending && pending !== step) scrollToStep(pending);
+        } else if (wasAnswer && input.checked) {
+          var extra = extraFor(input);
+          var first = extra && extra.querySelector('textarea, input[type="date"]');
+          if (first) first.focus({ preventScroll: true });
+        }
+      });
+
+      root.addEventListener('input', function (e) {
+        var field = e.target;
+        if (field.tagName === 'TEXTAREA') {
+          var count = field.parentNode.querySelector('[data-count]');
+          if (count) count.textContent = field.value.length + '/' + field.maxLength;
+        }
+        render();
+      });
+
+      // Dates open a few days out, counted in the shopper's own calendar.
+      root.querySelectorAll('[data-min-days]').forEach(function (field) {
+        var day = new Date();
+        day.setDate(day.getDate() + (parseInt(field.getAttribute('data-min-days'), 10) || 0));
+        var pad = function (n) {
+          return String(n).padStart(2, '0');
+        };
+        field.min = day.getFullYear() + '-' + pad(day.getMonth() + 1) + '-' + pad(day.getDate());
+      });
+
+      /* ---------- dock ---------- */
+      dockToggle.addEventListener('click', function () {
+        var open = dockToggle.getAttribute('aria-expanded') !== 'true';
+        dockToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        dockDetail.hidden = !open;
+      });
+
+      /* ---------- add to bag ---------- */
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (busy) return;
+
+        var pending = nextPending();
+        if (pending) {
+          pending.setAttribute('tabindex', '-1');
+          scrollToStep(pending);
+          pending.focus({ preventScroll: true });
+          return;
+        }
+
+        var design = chosen(steps[0]);
+        var line = { id: parseInt(design.value, 10), quantity: 1, properties: {} };
+        var items = [line];
+
+        // Every enabled property field rides on the design's own line.
+        form.querySelectorAll('[name^="properties["]').forEach(function (field) {
+          if (field.disabled || !field.value.trim()) return;
+          if (field.type === 'radio' && !field.checked) return;
+          line.properties[field.name.slice(11, -1)] = field.value.trim();
+        });
+
+        // Paid answers become their own lines, pointing back at the design.
+        steps.slice(1).forEach(function (step) {
+          var input = chosen(step);
+          var addon = input && input.getAttribute('data-addon');
+          if (!addon) return;
+          var props = {};
+          props[LINK_PROPERTY] = design.getAttribute('data-title');
+          items.push({ id: parseInt(addon, 10), quantity: 1, properties: props });
+        });
+
+        busy = true;
+        submit.textContent = T.adding;
+        render();
+
+        fetch(ADD_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ items: items })
+        })
+          .then(function (response) {
+            return response.json().then(function (body) {
+              if (!response.ok) throw new Error(body.description || body.message || T.error);
+              return body;
+            });
+          })
+          .then(function () {
+            window.location.href = AFTER_ADD === 'checkout' ? '/checkout' : CART_URL;
+          })
+          .catch(function (error) {
+            busy = false;
+            submit.textContent = submitLabel;
+            hint.setAttribute('data-error', 'true');
+            hint.textContent = (error && error.message) || T.error;
+            render();
+          });
+      });
+
+      // Returning with the back button restores the page from cache mid-submit.
+      window.addEventListener('pageshow', function (event) {
+        if (!event.persisted) return;
+        busy = false;
+        submit.textContent = submitLabel;
+        render();
+      });
+
+      // Answers the browser restored on reload still need their gallery.
+      var restored = chosen(steps[0]);
+      if (restored) showGallery(restored.getAttribute('data-design'));
+      render();
+    })();
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "TSS — Gift builder",
+  "tag": "div",
+  "class": "tss-gift-builder-section",
+  "settings": [
+    { "type": "header", "content": "Introduction" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Kiswatul Kaaba" },
+    { "type": "text", "id": "title", "label": "Title", "info": "Leave empty to use the collection title." },
+    {
+      "type": "textarea",
+      "id": "lede",
+      "label": "Introduction",
+      "info": "Leave empty to use the collection description."
+    },
+    { "type": "checkbox", "id": "show_from", "label": "Show the lowest price", "default": true },
+    { "type": "text", "id": "from_label", "label": "Lowest price prefix", "default": "From", "visible_if": "{{ section.settings.show_from }}" },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image shape",
+      "options": [
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 5", "label": "Portrait" }
+      ],
+      "default": "1 / 1"
+    },
+
+    { "type": "header", "content": "Design step" },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Each product in it is one design. Leave empty on a collection template to use that collection."
+    },
+    { "type": "text", "id": "design_label", "label": "Heading", "default": "Design" },
+    { "type": "text", "id": "design_question", "label": "Question", "default": "Which one will they treasure?" },
+    {
+      "type": "text",
+      "id": "size_metafield",
+      "label": "Size metafield",
+      "info": "namespace.key of a product metafield shown under each design, e.g. custom.size. Leave empty to hide."
+    },
+    { "type": "text", "id": "design_note", "label": "Note", "default": "Each is embroidered by hand, so no two are quite identical." },
+    { "type": "text", "id": "sold_out_label", "label": "Sold out label", "default": "Sold out" },
+    {
+      "type": "range",
+      "id": "max_designs",
+      "label": "Most designs to show",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "default": 12
+    },
+
+    { "type": "header", "content": "Summary" },
+    { "type": "text", "id": "summary_title", "label": "Heading", "default": "Your frame," },
+    { "type": "text", "id": "summary_subtitle", "label": "Heading, second line", "default": "ready to give." },
+    { "type": "text", "id": "total_label", "label": "Total label", "default": "Total" },
+    { "type": "text", "id": "incomplete_text", "label": "Unfinished message", "default": "Answer each step to continue." },
+    { "type": "text", "id": "ready_text", "label": "Finished message", "default": "Includes delivery, paid at checkout." },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Add to Bag" },
+    { "type": "text", "id": "adding_label", "label": "Button label while adding", "default": "Adding…" },
+    { "type": "text", "id": "error_text", "label": "Error message", "default": "Sorry, that could not be added. Please try again." },
+    { "type": "text", "id": "trust_line", "label": "Line under the button", "default": "Cash on Delivery · bKash · 14-day returns" },
+    { "type": "text", "id": "view_label", "label": "Total bar toggle", "default": "View" },
+    {
+      "type": "select",
+      "id": "after_add",
+      "label": "After Add to Bag",
+      "options": [
+        { "value": "checkout", "label": "Go to checkout" },
+        { "value": "cart", "label": "Go to the cart" }
+      ],
+      "default": "checkout"
+    },
+    {
+      "type": "text",
+      "id": "link_property",
+      "label": "Add-on link property",
+      "info": "Shown on each add-on line in the cart with the design it belongs to.",
+      "default": "For"
+    },
+    { "type": "text", "id": "empty_text", "label": "Empty collection message", "default": "Nothing here yet." },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Heading", "default": "Wrapping" },
+        { "type": "text", "id": "question", "label": "Question", "default": "Included with every frame." },
+        {
+          "type": "text",
+          "id": "property",
+          "label": "Cart property name",
+          "info": "The answer is saved on the order under this name. Leave empty to use the heading."
+        },
+        { "type": "text", "id": "note", "label": "Note under the answers" },
+
+        { "type": "header", "content": "First answer" },
+        { "type": "text", "id": "a_name", "label": "Name", "default": "Yes" },
+        { "type": "text", "id": "a_badge", "label": "Badge" },
+        { "type": "text", "id": "a_detail", "label": "Description" },
+        { "type": "textarea", "id": "a_points", "label": "Details", "info": "One per line." },
+        {
+          "type": "product",
+          "id": "a_product",
+          "label": "Add-on product",
+          "info": "Charged for this answer and added to the cart as its own line. Leave empty for no charge."
+        },
+        { "type": "text", "id": "a_price_label", "label": "Price text", "info": "Leave empty to show the add-on's price." },
+        {
+          "type": "number",
+          "id": "a_checkout_price",
+          "label": "Charged at checkout",
+          "info": "For costs Shopify adds at checkout, like delivery. Counted in the total here, not added to the cart."
+        },
+
+        { "type": "header", "content": "Second answer" },
+        { "type": "text", "id": "b_name", "label": "Name", "default": "No" },
+        { "type": "text", "id": "b_badge", "label": "Badge" },
+        { "type": "text", "id": "b_detail", "label": "Description" },
+        { "type": "textarea", "id": "b_points", "label": "Details", "info": "One per line." },
+        {
+          "type": "product",
+          "id": "b_product",
+          "label": "Add-on product",
+          "info": "Charged for this answer and added to the cart as its own line. Leave empty for no charge."
+        },
+        { "type": "text", "id": "b_price_label", "label": "Price text", "info": "Leave empty to show the add-on's price." },
+        {
+          "type": "number",
+          "id": "b_checkout_price",
+          "label": "Charged at checkout",
+          "info": "For costs Shopify adds at checkout, like delivery. Counted in the total here, not added to the cart."
+        },
+
+        { "type": "header", "content": "Third answer (optional)" },
+        { "type": "text", "id": "c_name", "label": "Name", "info": "Leave empty for a two-answer step." },
+        { "type": "text", "id": "c_badge", "label": "Badge" },
+        { "type": "text", "id": "c_detail", "label": "Description" },
+        { "type": "textarea", "id": "c_points", "label": "Details", "info": "One per line." },
+        {
+          "type": "product",
+          "id": "c_product",
+          "label": "Add-on product",
+          "info": "Charged for this answer and added to the cart as its own line. Leave empty for no charge."
+        },
+        { "type": "text", "id": "c_price_label", "label": "Price text", "info": "Leave empty to show the add-on's price." },
+        {
+          "type": "number",
+          "id": "c_checkout_price",
+          "label": "Charged at checkout",
+          "info": "For costs Shopify adds at checkout, like delivery. Counted in the total here, not added to the cart."
+        },
+
+        { "type": "header", "content": "Follow-up question" },
+        {
+          "type": "select",
+          "id": "extra",
+          "label": "Ask for",
+          "options": [
+            { "value": "none", "label": "Nothing" },
+            { "value": "message", "label": "A message" },
+            { "value": "slots", "label": "A time of day" },
+            { "value": "date_slots", "label": "A date and time of day" }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "select",
+          "id": "extra_on",
+          "label": "After",
+          "options": [
+            { "value": "a", "label": "First answer" },
+            { "value": "b", "label": "Second answer" },
+            { "value": "c", "label": "Third answer" }
+          ],
+          "default": "a",
+          "visible_if": "{{ block.settings.extra != 'none' }}"
+        },
+        {
+          "type": "text",
+          "id": "message_property",
+          "label": "Message property name",
+          "default": "Message",
+          "visible_if": "{{ block.settings.extra == 'message' }}"
+        },
+        {
+          "type": "text",
+          "id": "message_placeholder",
+          "label": "Message placeholder",
+          "default": "What would you like it to say?",
+          "visible_if": "{{ block.settings.extra == 'message' }}"
+        },
+        {
+          "type": "range",
+          "id": "message_max",
+          "label": "Message length limit",
+          "min": 40,
+          "max": 300,
+          "step": 10,
+          "default": 120,
+          "visible_if": "{{ block.settings.extra == 'message' }}"
+        },
+        {
+          "type": "text",
+          "id": "date_property",
+          "label": "Date property name",
+          "default": "Date",
+          "visible_if": "{{ block.settings.extra == 'date_slots' }}"
+        },
+        {
+          "type": "range",
+          "id": "min_days",
+          "label": "Earliest date, days from today",
+          "min": 0,
+          "max": 14,
+          "step": 1,
+          "default": 2,
+          "visible_if": "{{ block.settings.extra == 'date_slots' }}"
+        },
+        {
+          "type": "text",
+          "id": "slot_property",
+          "label": "Time property name",
+          "default": "Time",
+          "visible_if": "{{ block.settings.extra == 'slots' or block.settings.extra == 'date_slots' }}"
+        },
+        {
+          "type": "textarea",
+          "id": "slots",
+          "label": "Times of day",
+          "info": "One per line.",
+          "default": "Morning\nAfternoon\nEvening",
+          "visible_if": "{{ block.settings.extra == 'slots' or block.settings.extra == 'date_slots' }}"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TSS — Gift builder",
+      "blocks": [
+        {
+          "type": "step",
+          "settings": {
+            "label": "Wrapping",
+            "question": "Included with every frame.",
+            "note": "Our gift to you, and to them.",
+            "a_name": "Wrapped by hand",
+            "a_detail": "Ivory paper, twine and a wax seal",
+            "a_price_label": "Included",
+            "b_name": "No wrapping",
+            "b_detail": "Sent in protective packaging only"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

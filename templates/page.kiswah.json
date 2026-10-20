@@ -1,0 +1,84 @@
+{
+  "sections": {
+    "builder": {
+      "type": "tss-gift-builder",
+      "blocks": {
+        "wrapping": {
+          "type": "step",
+          "settings": {
+            "label": "Wrapping",
+            "question": "Included with every frame.",
+            "property": "Wrapping",
+            "note": "Our gift to you, and to them.",
+            "a_name": "Wrapped by hand",
+            "a_detail": "Ivory paper, twine and a wax seal",
+            "a_price_label": "Included",
+            "b_name": "No wrapping",
+            "b_detail": "Sent in protective packaging only",
+            "extra": "none"
+          }
+        },
+        "message": {
+          "type": "step",
+          "settings": {
+            "label": "A message",
+            "question": "A few words, written by hand.",
+            "property": "Card",
+            "note": "Written in English or Bangla — tell us which in your message.",
+            "a_name": "Hand-calligraphed card",
+            "a_detail": "Your message, written by our calligrapher on heavy cotton card",
+            "b_name": "No message",
+            "extra": "message",
+            "extra_on": "a",
+            "message_property": "Card message",
+            "message_placeholder": "What would you like it to say?",
+            "message_max": 120
+          }
+        },
+        "hanging": {
+          "type": "step",
+          "settings": {
+            "label": "Hanging",
+            "question": "Shall we hang it for you?",
+            "property": "Hanging",
+            "note": "Hanging fee is non-refundable once installed.",
+            "a_name": "Hung & cared for",
+            "a_badge": "Dhaka city only",
+            "a_points": "We come to you and hang it, level and secure\nFor a full year, we'll replace cracked glass or re-hang it\nChoose a visit time that suits your household",
+            "b_name": "I'll hang it myself",
+            "extra": "slots",
+            "extra_on": "a",
+            "slot_property": "Hanging visit",
+            "slots": "Morning\nAfternoon\nEvening",
+            "a_product": "hanging-service"
+          }
+        }
+      },
+      "block_order": [
+        "wrapping",
+        "message",
+        "hanging"
+      ],
+      "settings": {
+        "collection": "the-kiswah-edition",
+        "eyebrow": "Kiswatul Kaaba",
+        "title": "The Kiswah Frame",
+        "lede": "Embroidered by hand on velvet, after the cloth that covers the Kaaba. Made in Bangladesh.",
+        "show_from": true,
+        "from_label": "From",
+        "image_ratio": "1 / 1",
+        "design_label": "Design",
+        "design_question": "Which one will they treasure?",
+        "design_note": "Each is embroidered by hand, so no two are quite identical.",
+        "summary_title": "Your frame,",
+        "summary_subtitle": "ready to give.",
+        "ready_text": "Delivery is chosen and paid at checkout.",
+        "trust_line": "Cash on Delivery · bKash · 14-day returns",
+        "after_add": "checkout"
+      }
+    }
+  },
+  "order": [
+    "builder"
+  ]
+}

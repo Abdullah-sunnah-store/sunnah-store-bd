@@ -29,6 +29,13 @@
     assign crumb = heading
   endif
 
+  # A picked image wins; otherwise each collection shows its own image from
+  # admin, and the theme asset only covers collections without one.
+  assign bg_image = s.image
+  if bg_image == blank and collection.image != blank
+    assign bg_image = collection.image
+  endif
+
   assign lede = s.lede
   if lede == blank
     assign lede = collection.description | strip_html | strip
@@ -201,9 +208,9 @@
 </style>
 
 <section id="tss-cheader-{{ uid }}" class="tss-section" {{ section.shopify_attributes }}>
-  {%- if s.image != blank or s.image_asset != blank -%}
+  {%- if bg_image != blank or s.image_asset != blank -%}
     {% render 'tss-image',
-      image: s.image,
+      image: bg_image,
       asset: s.image_asset,
       class: 'tss-cheader__img',
       width: 1600,
@@ -314,7 +321,7 @@
       "type": "image_picker",
       "id": "image",
       "label": "Image",
-      "info": "Optional. The band is an emerald gradient when nothing is set."
+      "info": "Optional. Leave empty to use each collection's own image; the band is an emerald gradient when there is none."
     },
     {
       "type": "text",

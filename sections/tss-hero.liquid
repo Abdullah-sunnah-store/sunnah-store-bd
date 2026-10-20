@@ -99,6 +99,21 @@
     }
   }
 
+  /* The whole photo follows the button. The copy above it lets clicks fall
+     through to that link, except on its own links. */
+  #tss-hero-{{ uid }} .tss-hero__hit {
+    position: absolute;
+    inset: 0;
+  }
+
+  #tss-hero-{{ uid }} .tss-hero__content {
+    pointer-events: none;
+  }
+
+  #tss-hero-{{ uid }} .tss-hero__content a {
+    pointer-events: auto;
+  }
+
   #tss-hero-{{ uid }} .tss-hero__scrim {
     position: absolute;
     inset: 0;
@@ -224,6 +239,10 @@
     </picture>
 
     <div class="tss-hero__scrim" aria-hidden="true"></div>
+
+    {%- if s.button_link != blank -%}
+      <a class="tss-hero__hit" href="{{ s.button_link }}" tabindex="-1" aria-hidden="true"></a>
+    {%- endif -%}
 
     <div class="tss-hero__content">
       {%- if s.eyebrow != blank -%}

@@ -26,6 +26,21 @@
     object-fit: cover;
   }
 
+  /* The whole photo follows the button. The copy above it lets clicks fall
+     through to that link, except on its own links. */
+  #tss-shop-all-{{ uid }} .tss-shopall__hit {
+    position: absolute;
+    inset: 0;
+  }
+
+  #tss-shop-all-{{ uid }} .tss-shopall__content {
+    pointer-events: none;
+  }
+
+  #tss-shop-all-{{ uid }} .tss-shopall__content a {
+    pointer-events: auto;
+  }
+
   #tss-shop-all-{{ uid }} .tss-shopall__scrim {
     position: absolute;
     inset: 0;
@@ -81,6 +96,10 @@
     %}
 
     <div class="tss-shopall__scrim" aria-hidden="true"></div>
+
+    {%- if s.button_link != blank -%}
+      <a class="tss-shopall__hit" href="{{ s.button_link }}" tabindex="-1" aria-hidden="true"></a>
+    {%- endif -%}
 
     <div class="tss-shopall__content">
       {%- if s.title != blank -%}

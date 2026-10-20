@@ -165,10 +165,12 @@
     inset: 0;
   }
 
+  /* Whole photo, never cropped: square and wide shots sit centred in the
+     portrait box rather than losing their edges. */
   #tss-cgrid-{{ uid }} .tss-cgrid__img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     transition: clip-path 1.2s var(--tss-ease), transform 1.2s var(--tss-ease);
   }
 
@@ -641,17 +643,25 @@
               <div class="tss-cgrid__break">
                 {%- if s.break_image != blank or s.break_asset != blank -%}
                   <div class="tss-cgrid__break-media tss-clip">
-                    {% render 'tss-image',
-                      image: s.break_image,
-                      asset: s.break_asset,
-                      class: 'tss-cgrid__break-img',
-                      asset_width: 1600,
-                      asset_height: 900,
-                      width: 1600,
-                      widths: '480,720,960,1280,1600',
-                      sizes: '100vw',
-                      alt: s.break_text
-                    %}
+                    {%- capture break_media -%}
+                      {% render 'tss-image',
+                        image: s.break_image,
+                        asset: s.break_asset,
+                        class: 'tss-cgrid__break-img',
+                        asset_width: 1600,
+                        asset_height: 900,
+                        width: 1600,
+                        widths: '480,720,960,1280,1600',
+                        sizes: '100vw',
+                        alt: s.break_text
+                      %}
+                    {%- endcapture -%}
+                    {%- comment -%} Repeats the break link for pointer users only. {%- endcomment -%}
+                    {%- if s.break_link_url != blank -%}
+                      <a href="{{ s.break_link_url }}" tabindex="-1" aria-hidden="true">{{ break_media }}</a>
+                    {%- else -%}
+                      {{ break_media }}
+                    {%- endif -%}
                   </div>
                 {%- endif -%}
 

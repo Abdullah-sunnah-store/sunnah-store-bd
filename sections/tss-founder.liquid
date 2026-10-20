@@ -224,7 +224,7 @@
       <div class="tss-rise">
         <div class="tss-founder__pick">
           <div class="tss-founder__pick-media tss-clip">
-            <div>
+            {%- capture pick_media -%}
               {% render 'tss-image',
                 image: pick_image,
                 asset: s.pick_image_asset,
@@ -233,7 +233,13 @@
                 sizes: '34vw',
                 alt: pick_title
               %}
-            </div>
+            {%- endcapture -%}
+            {%- comment -%} Repeats the title link for pointer users only. {%- endcomment -%}
+            {%- if pick_url != blank -%}
+              <a href="{{ pick_url }}" tabindex="-1" aria-hidden="true">{{ pick_media }}</a>
+            {%- else -%}
+              <div>{{ pick_media }}</div>
+            {%- endif -%}
           </div>
 
           <div>

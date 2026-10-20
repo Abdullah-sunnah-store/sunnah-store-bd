@@ -1,7 +1,8 @@
 {% comment %}
   TSS — Header
-  Fixed stack: emerald utility bar (region toggle + rotating notice) above an
-  ivory bar holding the menu trigger, serif wordmark, search and bag.
+  Fixed stack: emerald utility bar (region toggle + rotating notice), an
+  optional gift-box link bar, then an ivory bar holding the menu trigger,
+  serif wordmark, search and bag.
   Hides on scroll down, returns on scroll up.
 {% endcomment %}
 
@@ -11,6 +12,18 @@
   assign s = section.settings
   assign uid = section.id
   assign menu = linklists[s.menu]
+
+  # The gift-box bar adds its height to the fixed stack, so the spacer and
+  # --header-height grow with it.
+  assign show_offer = false
+  if s.show_offer and s.offer_link != blank
+    assign show_offer = true
+  endif
+
+  assign promo_h = 0
+  if s.show_promo and s.promo_text != blank
+    assign promo_h = 36
+  endif
 
   assign show_nav = false
   if s.show_desktop_nav and menu.links.size > 0
@@ -141,10 +154,136 @@
     display: none;
   }
 
+  /* ---------- gift-box bar ---------- */
+  #tss-header-{{ uid }} .tss-head__promo {
+    position: relative;
+    display: flex;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    overflow: hidden;
+    border-bottom: 1px solid rgb(8 41 30 / 0.12);
+    background: {{ s.promo_bg | default: '#fafafa' }};
+    padding-inline: var(--tss-gutter);
+    font-family: var(--tss-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--tss-ink);
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+  }
+
+  #tss-header-{{ uid }} .tss-head__promo:hover {
+    background: {{ s.promo_bg_hover | default: '#edf5e8' }};
+  }
+
+  #tss-header-{{ uid }} .tss-head__promo:focus-visible {
+    outline: 2px solid var(--tss-green-mid);
+    outline-offset: -3px;
+  }
+
+  #tss-header-{{ uid }} .tss-head__promo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgb(255 255 255 / 0) 50%, rgb(255 255 255 / 0.4) 70%, rgb(255 255 255 / 0) 80%);
+    transform: translateX(-100%);
+    pointer-events: none;
+  }
+
+  #tss-header-{{ uid }} .tss-head__promo:hover::before {
+    animation: tss-head-shine 2s ease-in-out infinite;
+  }
+
+  #tss-header-{{ uid }} .tss-head__promo-text {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  #tss-header-{{ uid }} .tss-head__promo-arrow {
+    display: grid;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--tss-ink);
+    color: #fff;
+    font-size: 12px;
+  }
+
+  #tss-header-{{ uid }} .tss-head__promo-arrow:dir(rtl) {
+    transform: scaleX(-1);
+  }
+
+  /* ---------- offer badge (menu + drawer) ---------- */
+  .tss-head__badge {
+    display: inline-block;
+    border-radius: 999px;
+    background: {{ s.offer_bg | default: '#b8860b' }};
+    padding: 4px 9px;
+    font-family: var(--tss-sans);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.06em;
+    color: {{ s.offer_color | default: '#ffffff' }};
+    white-space: nowrap;
+    animation: tss-head-bounce 1.2s ease-in-out infinite;
+  }
+
+  .tss-head__badge-img {
+    display: block;
+    height: 22px;
+    width: auto;
+    animation: tss-head-bounce 1.2s ease-in-out infinite;
+  }
+
+  /* Hops up and back with a gold glow at the top of each hop. */
+  @keyframes tss-head-bounce {
+    0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 0 rgb(212 168 48 / 0)); }
+    50% { transform: translateY(-5px); filter: drop-shadow(0 4px 6px rgb(212 168 48 / 0.7)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tss-head__badge,
+    .tss-head__badge-img {
+      animation: none;
+    }
+  }
+
+  /* Two classes, so it wins over the drawer link's display: block further down. */
+  #tss-drawer-{{ uid }} .tss-drawer__link.tss-drawer__offer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  @keyframes tss-head-shine {
+    0% { transform: translateX(-100%); }
+    50%, 100% { transform: translateX(100%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #tss-header-{{ uid }} .tss-head__promo:hover::before {
+      animation: none;
+    }
+  }
+
   /* Spacer so page content clears the fixed stack */
   .tss-head__spacer-{{ uid }} {
-    height: 88px;
+    height: {{ 88 | plus: promo_h }}px;
   }
+
+  {%- if promo_h > 0 -%}
+    body {
+      --header-height: {{ 88 | plus: promo_h }}px;
+    }
+  {%- endif -%}
 
   @media (min-width: 64rem) {
     /* Equal outer columns, so the menu sits on the centre of the bar rather
@@ -332,12 +471,12 @@
 
     {%- if show_nav -%}
       .tss-head__spacer-{{ uid }} {
-        height: 96px;
+        height: {{ 96 | plus: promo_h }}px;
       }
 
       /* base.css reads this for its own sticky offsets. */
       body {
-        --header-height: 96px;
+        --header-height: {{ 96 | plus: promo_h }}px;
       }
     {%- endif -%}
   }
@@ -791,6 +930,16 @@
     </div>
   {%- endif -%}
 
+  {%- if promo_h > 0 -%}
+    <a class="tss-head__promo" href="{{ s.promo_link | default: routes.root_url }}">
+      {%- if s.promo_icon != blank -%}
+        <span aria-hidden="true">{{ s.promo_icon | escape }}</span>
+      {%- endif -%}
+      <span class="tss-head__promo-text">{{ s.promo_text | escape }}</span>
+      <span class="tss-head__promo-arrow" aria-hidden="true">➔</span>
+    </a>
+  {%- endif -%}
+
   <header class="tss-head__bar">
     <button
       type="button"
@@ -856,6 +1005,17 @@
               {%- endif -%}
             </li>
           {%- endfor -%}
+          {%- if show_offer -%}
+            <li class="tss-head__item">
+              <a href="{{ s.offer_link }}" class="tss-head__link" aria-label="{{ s.offer_label | default: s.offer_badge | escape }}">
+                {%- if s.offer_image != blank -%}
+                  {{ s.offer_image | image_url: height: 66 | image_tag: class: 'tss-head__badge-img', height: 22, alt: '' }}
+                {%- else -%}
+                  <span class="tss-head__badge">{{ s.offer_badge | escape }}</span>
+                {%- endif -%}
+              </a>
+            </li>
+          {%- endif -%}
         </ul>
       </nav>
     {%- endif -%}
@@ -901,6 +1061,16 @@
           <a href="{{ link.url }}" class="tss-drawer__link">{{ link.title | escape }}</a>
         {%- endif -%}
       {%- endfor -%}
+      {%- if show_offer -%}
+        <a href="{{ s.offer_link }}" class="tss-drawer__link tss-drawer__offer">
+          <span>{{ s.offer_label | default: s.offer_badge | escape }}</span>
+          {%- if s.offer_image != blank -%}
+            {{ s.offer_image | image_url: height: 66 | image_tag: class: 'tss-head__badge-img', height: 22, alt: '' }}
+          {%- else -%}
+            <span class="tss-head__badge" aria-hidden="true">{{ s.offer_badge | escape }}</span>
+          {%- endif -%}
+        </a>
+      {%- endif -%}
     </nav>
   </div>
 </div>
@@ -1258,6 +1428,76 @@
       "step": 1,
       "unit": "s",
       "default": 5
+    },
+    { "type": "header", "content": "Offer badge" },
+    {
+      "type": "checkbox",
+      "id": "show_offer",
+      "label": "Show offer badge in the menu",
+      "info": "Added after the last menu item, and at the end of the phone menu.",
+      "default": false
+    },
+    { "type": "url", "id": "offer_link", "label": "Link", "visible_if": "{{ section.settings.show_offer }}" },
+    {
+      "type": "text",
+      "id": "offer_badge",
+      "label": "Badge text",
+      "default": "50% OFF",
+      "visible_if": "{{ section.settings.show_offer }}"
+    },
+    {
+      "type": "text",
+      "id": "offer_label",
+      "label": "Offer name",
+      "info": "Read out to screen readers and shown beside the badge in the phone menu.",
+      "default": "Buy two, receive four",
+      "visible_if": "{{ section.settings.show_offer }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "offer_image",
+      "label": "Badge image",
+      "info": "Optional. Replaces the text badge, like the old 60% OFF graphic.",
+      "visible_if": "{{ section.settings.show_offer }}"
+    },
+    {
+      "type": "color",
+      "id": "offer_bg",
+      "label": "Badge background",
+      "default": "#b8860b",
+      "visible_if": "{{ section.settings.show_offer }}"
+    },
+    {
+      "type": "color",
+      "id": "offer_color",
+      "label": "Badge text colour",
+      "default": "#ffffff",
+      "visible_if": "{{ section.settings.show_offer }}"
+    },
+    { "type": "header", "content": "Gift box bar" },
+    { "type": "checkbox", "id": "show_promo", "label": "Show gift box bar", "default": false },
+    {
+      "type": "text",
+      "id": "promo_text",
+      "label": "Text",
+      "default": "Create Your Own Gift Box",
+      "visible_if": "{{ section.settings.show_promo }}"
+    },
+    { "type": "url", "id": "promo_link", "label": "Link", "visible_if": "{{ section.settings.show_promo }}" },
+    { "type": "text", "id": "promo_icon", "label": "Icon", "default": "🎁", "visible_if": "{{ section.settings.show_promo }}" },
+    {
+      "type": "color",
+      "id": "promo_bg",
+      "label": "Background",
+      "default": "#fafafa",
+      "visible_if": "{{ section.settings.show_promo }}"
+    },
+    {
+      "type": "color",
+      "id": "promo_bg_hover",
+      "label": "Background on hover",
+      "default": "#edf5e8",
+      "visible_if": "{{ section.settings.show_promo }}"
     }
   ],
   "blocks": [

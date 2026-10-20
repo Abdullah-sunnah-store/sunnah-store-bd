@@ -211,7 +211,11 @@
         <div class="tss-rise">
           <div class="tss-mg__row{% cycle 'sides': '', ' tss-mg__row--flip' %}">
             <div class="tss-mg__media tss-clip">
-              <div>
+              {%- comment -%}
+                The image links to the piece as well as the title; it is hidden from
+                keyboard and screen readers so each piece is announced once.
+              {%- endcomment -%}
+              {%- capture mg_image -%}
                 {% render 'tss-image',
                   image: i_image,
                   asset: b.image_asset,
@@ -221,7 +225,12 @@
                   alt: i_title,
                   placeholder: 'product-2'
                 %}
-              </div>
+              {%- endcapture -%}
+              {%- if i_url != blank -%}
+                <a href="{{ i_url }}" tabindex="-1" aria-hidden="true">{{ mg_image }}</a>
+              {%- else -%}
+                <div>{{ mg_image }}</div>
+              {%- endif -%}
             </div>
 
             <div class="tss-mg__body">
