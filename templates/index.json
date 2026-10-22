@@ -428,7 +428,7 @@
         "article_limit": 4,
         "read_label": "Read →",
         "button_label": "Read the Journal",
-        "button_link": "shopify://blogs/news",
+        "button_link": "shopify://blogs/from-the-journal",
         "rail_label": "Stories from the Journal",
         "padding_top": 80,
         "padding_bottom": 80,

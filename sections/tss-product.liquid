@@ -265,6 +265,7 @@
   }
 
   #tss-product-{{ uid }} .tss-pd__chip {
+    position: relative;
     display: block;
     height: 56px;
     border: 1px solid rgb(8 41 30 / 0.14);
@@ -290,17 +291,39 @@
     outline-offset: 2px;
   }
 
-  #tss-product-{{ uid }} .tss-pd__swatch[data-sold='true'] {
-    opacity: 0.42;
+  /* Fading the whole swatch turned a black chip into grey, so sold out now
+     shows as a slash over a full-strength colour and a struck-through name.
+     The slash is an ivory core with dark edging so it reads on any chip. */
+  #tss-product-{{ uid }} .tss-pd__swatch[data-sold='true'] .tss-pd__chip::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top right,
+      transparent calc(50% - 2px),
+      rgb(28 28 26 / 0.3) calc(50% - 2px),
+      rgb(28 28 26 / 0.3) calc(50% - 1px),
+      rgb(245 240 232 / 0.92) calc(50% - 1px),
+      rgb(245 240 232 / 0.92) calc(50% + 1px),
+      rgb(28 28 26 / 0.3) calc(50% + 1px),
+      rgb(28 28 26 / 0.3) calc(50% + 2px),
+      transparent calc(50% + 2px)
+    );
+  }
+
+  #tss-product-{{ uid }} .tss-pd__swatch[data-sold='true'] .tss-pd__chip-label {
+    text-decoration: line-through;
+    color: rgb(28 28 26 / 0.45);
   }
 
   #tss-product-{{ uid }} .tss-pd__chip-label {
     display: block;
     margin-top: 10px;
-    font-size: 10px;
+    font-size: 13px;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: rgb(28 28 26 / 0.6);
+    letter-spacing: 0.1em;
+    color: rgb(28 28 26 / 0.85);
   }
 
   #tss-product-{{ uid }} .tss-pd__pills {
@@ -930,11 +953,15 @@
                     case key
                       when 'walnut'
                         assign chip = 'background-color:#6b4a32;'
+                      when 'brown', 'tan', 'chestnut'
+                        assign chip = 'background-color:#824432;'
+                      when 'purple', 'violet', 'aubergine'
+                        assign chip = 'background-color:#5d6191;'
                       when 'oak', 'natural oak'
                         assign chip = 'background-color:#c9a97a;'
                       when 'matte black', 'black'
-                        assign chip = 'background-color:#1c1c1a;'
-                      when 'antique gold', 'gold'
+                        assign chip = 'background-color:#121211;'
+                      when 'antique gold', 'gold', 'golden'
                         assign chip = 'background-color:#c9a227;'
                       when 'ivory', 'cream', 'off white', 'off-white'
                         assign chip = 'background-color:#f5f0e8;'
@@ -1827,9 +1854,7 @@
     {
       "name": "TSS · Product",
       "blocks": [
-        { "type": "trust", "settings": { "icon": "hand-coins", "label": "Cash on Delivery" } },
-        { "type": "trust", "settings": { "icon": "gift", "label": "Gift-wrapped by hand" } },
-        { "type": "trust", "settings": { "icon": "undo-2", "label": "14-day returns" } },
+        { "type": "trust", "settings": { "icon": "undo-2", "label": "14 days return, replace, refund available." } },
         { "type": "accordion", "settings": { "title": "Description", "source": "description" } },
         { "type": "accordion", "settings": { "title": "Details & Specifications", "source": "metafield", "metafield": "tss.details" } },
         { "type": "accordion", "settings": { "title": "Shipping & Returns", "source": "custom" } },

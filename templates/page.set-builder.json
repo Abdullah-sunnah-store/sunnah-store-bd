@@ -24,12 +24,13 @@
           "settings": {
             "label": "Mugs",
             "collection": "mugs",
-            "image": "shopify://shop_images/DSC02030_ProductBeautifier.jpg",
+            "image": "shopify://shop_images/Mug_Landing_Page_PC.jpg",
+            "image_mobile": "shopify://shop_images/Mug_Landing_page.jpg",
             "image_alt": "",
             "style": "cards",
             "note": "Half price from four pieces.",
             "limit": 36,
-            "exclude": "",
+            "exclude": "Lid",
             "swatch_colours": ""
           }
         },
@@ -38,7 +39,8 @@
           "settings": {
             "label": "Pashmina",
             "collection": "pashmina-hijab",
-            "image": "shopify://shop_images/Pashmina_Hijab_Canon_pink_PCP_2.jpg",
+            "image": "shopify://shop_images/Hijab_Landing_Page_PC.jpg",
+            "image_mobile": "shopify://shop_images/Hijab_Landing_Page_Phone.jpg",
             "image_alt": "",
             "style": "swatches",
             "note": "Half price from four pieces.",
@@ -52,7 +54,8 @@
           "settings": {
             "label": "Cherry",
             "collection": "cherry-hijab",
-            "image": "shopify://shop_images/Cherry_Hijab_Bottle_Green_CBG_5.jpg",
+            "image": "shopify://shop_images/Hijab_Landing_Page_PC.jpg",
+            "image_mobile": "shopify://shop_images/Hijab_Landing_Page_Phone.jpg",
             "image_alt": "",
             "style": "swatches",
             "note": "Half price from four pieces.",
@@ -176,12 +179,12 @@
             "name": "Coasters",
             "copy": "A place for each mug to rest, and a table kept clean.",
             "small_note": "",
-            "mode": "stepper",
+            "mode": "single",
             "option_style": "chips",
             "swatch_colours": "",
             "match_tab": "",
-            "match_text": "One for each of your [count] mugs",
-            "accept_label": "Add this",
+            "match_text": "4 Pcs set",
+            "accept_label": "Add the coaster set",
             "accepted_label": "Added",
             "decline_label": "No coasters",
             "show_tab": "Mugs",
@@ -189,7 +192,8 @@
             "message_placeholder": "What would you like it to say?",
             "message_max": 120,
             "free_at": 0,
-            "footnote": "Extras are priced as shown. They are not part of Buy Two, Receive Four and do not count toward your set."
+            "footnote": "Extras are priced as shown. They are not part of Buy Two, Receive Four and do not count toward your set.",
+            "set_pieces": 4
           }
         },
         "step_pins": {
@@ -255,7 +259,7 @@
             "option_style": "chips",
             "swatch_colours": "",
             "match_tab": "",
-            "match_text": "One for each of your [count] mugs",
+            "match_text": "",
             "accept_label": "Add the card",
             "accepted_label": "Added",
             "decline_label": "It's for our own home",

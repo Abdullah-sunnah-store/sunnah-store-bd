@@ -43,33 +43,15 @@
     --tss-sb-ease: cubic-bezier(0.16, 1, 0.3, 1);
 
     background: var(--tss-ivory);
-    padding-bottom: 200px;
+    padding-bottom: 48px;
   }
 
   /* This page carries its own fixed bar: the mobile quick-nav would sit under
-     it and the WhatsApp launcher on top of it. */
-  [id^='tss-sticky-'] {
-    display: none !important;
-  }
-
-  /* body-prefixed: tss-base.css is linked again by later sections, so an
-     equal-weight rule here loses to its own 68px offset. */
-  body .whatsapp-float {
-    bottom: calc(200px + env(safe-area-inset-bottom)) !important;
-  }
-
+     it and the WhatsApp launcher would cover the pieces, so both stay off. */
+  [id^='tss-sticky-'],
+  body .whatsapp-float,
   body .whatsapp-popup {
-    bottom: calc(270px + env(safe-area-inset-bottom)) !important;
-  }
-
-  @media screen and (min-width: 64rem) {
-    body .whatsapp-float {
-      bottom: calc(124px + env(safe-area-inset-bottom)) !important;
-    }
-
-    body .whatsapp-popup {
-      bottom: calc(194px + env(safe-area-inset-bottom)) !important;
-    }
+    display: none !important;
   }
 
   #tss-sb-{{ uid }} .tss-sb__page {
@@ -120,6 +102,12 @@
     height: auto;
     aspect-ratio: {{ s.gallery_ratio | default: '4 / 5' }};
     object-fit: cover;
+  }
+
+  /* A tab's own photograph is shown whole, at the shape it was uploaded in,
+     so desktop and mobile crops each come through as picked. */
+  #tss-sb-{{ uid }} .tss-sb__slide[data-tab-image] img {
+    aspect-ratio: auto;
   }
 
   #tss-sb-{{ uid }} .tss-sb__gallery-bar {
@@ -209,6 +197,48 @@
   }
 
   /* ---------- tray ---------- */
+  /* Stays in view while the pieces below it scroll. The header hides on
+     scroll down and returns on scroll up, so the tray follows its edge. */
+  #tss-sb-{{ uid }} .tss-sb__tray {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    margin-inline: calc(-1 * var(--tss-gutter));
+    padding: 12px var(--tss-gutter);
+    background: var(--tss-ivory);
+    transition: top 0.4s ease-out;
+  }
+
+  body:has([id^='tss-header-'][data-hidden='false']) #tss-sb-{{ uid }} :is(.tss-sb__tray, .tss-sb__tray-bar) {
+    top: var(--header-height, 88px);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__tray .tss-sb__h {
+    margin-bottom: 12px;
+  }
+
+  /* Small screens keep only the count and slots in view; the heading
+     scrolls away with the page so the tray stays short. */
+  @media screen and (max-width: 749px) {
+    #tss-sb-{{ uid }} .tss-sb__tray {
+      display: contents;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__tray-bar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      margin-inline: calc(-1 * var(--tss-gutter));
+      padding: 10px var(--tss-gutter);
+      background: var(--tss-ivory);
+      transition: top 0.4s ease-out;
+    }
+
+    #tss-sb-{{ uid }} .tss-sb__tray-bar .tss-sb__slots {
+      margin-top: 8px;
+    }
+  }
+
   #tss-sb-{{ uid }} .tss-sb__tray-label {
     font-size: 11px;
     letter-spacing: 0.18em;
@@ -368,6 +398,21 @@
 
   #tss-sb-{{ uid }} .tss-sb__set .tss-sb__gold {
     color: var(--tss-gold);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__set-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__set-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--tss-ivory-2) center / cover no-repeat;
+    box-shadow: inset 0 0 0 1px rgb(28 28 26 / 0.08);
   }
 
   #tss-sb-{{ uid }} .tss-sb__text-btn {
@@ -624,6 +669,19 @@
     color: rgb(28 28 26 / 0.7);
   }
 
+  #tss-sb-{{ uid }} .tss-sb__choice-row [data-step-price] {
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* "One for each of your 4 mugs" — the quantity is the point, so it reads first. */
+  #tss-sb-{{ uid }} .tss-sb__choice-row [data-match-text] {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--tss-ink);
+  }
+
   #tss-sb-{{ uid }} .tss-sb__choice-row .tss-sb__stepper {
     margin-top: 0;
   }
@@ -874,6 +932,15 @@
     color: rgb(28 28 26 / 0.45);
   }
 
+  /* The same action again where the steps end, so the page closes on it. */
+  #tss-sb-{{ uid }} .tss-sb__end {
+    padding: 0 var(--tss-gutter);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__end .tss-sb__submit {
+    max-width: 720px;
+  }
+
   #tss-sb-{{ uid }} .tss-sb__foot {
     min-height: 17px;
     padding-top: 6px;
@@ -985,10 +1052,6 @@
   }
 
   @media screen and (min-width: 64rem) {
-    #tss-sb-{{ uid }} {
-      padding-bottom: 140px;
-    }
-
     #tss-sb-{{ uid }} .tss-sb__top {
       display: grid;
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
@@ -1150,23 +1213,42 @@
     <div class="tss-sb__top">
     {%- liquid
       # A tab's own image replaces the slide gallery while that tab is open.
+      # A mobile image alone stands in for the desktop one too.
       assign has_tab_images = false
       for block in group_blocks
-        if block.settings.image != blank
+        if block.settings.image != blank or block.settings.image_mobile != blank
           assign has_tab_images = true
         endif
       endfor
       assign first_group = group_blocks | first
-      assign first_tab_image = first_group.settings.image
+      assign first_tab_image = first_group.settings.image | default: first_group.settings.image_mobile
+      assign mobile_widths = '480,720,960,1200,1440' | split: ','
     -%}
     {%- if slide_blocks.size > 0 or has_tab_images -%}
       <div class="tss-sb__gallery-wrap">
         {%- for block in group_blocks -%}
-          {%- if block.settings.image != blank -%}
+          {%- liquid
+            assign tab_image = block.settings.image | default: block.settings.image_mobile
+            assign tab_image_mobile = block.settings.image_mobile
+            if block.settings.image == blank
+              assign tab_image_mobile = blank
+            endif
+          -%}
+          {%- if tab_image != blank -%}
             <div class="tss-sb__slide" data-tab-image="{{ block.id }}" {% unless forloop.first %}hidden{% endunless %}>
+              {%- if tab_image_mobile != blank -%}
+                <picture>
+                  <source
+                    media="(max-width: 749px)"
+                    srcset="{% for w in mobile_widths %}{{ tab_image_mobile | image_url: width: w }} {{ w }}w{% unless forloop.last %}, {% endunless %}{% endfor %}"
+                    sizes="100vw"
+                    width="{{ tab_image_mobile.width }}"
+                    height="{{ tab_image_mobile.height }}"
+                  >
+              {%- endif -%}
               {%- if forloop.first -%}
                 {% render 'tss-image',
-                  image: block.settings.image,
+                  image: tab_image,
                   class: 'tss-sb__slide-img',
                   widths: '480,720,960',
                   sizes: '(min-width: 64rem) 720px, 100vw',
@@ -1175,12 +1257,15 @@
                 %}
               {%- else -%}
                 {% render 'tss-image',
-                  image: block.settings.image,
+                  image: tab_image,
                   class: 'tss-sb__slide-img',
                   widths: '480,720,960',
                   sizes: '(min-width: 64rem) 720px, 100vw',
                   alt: block.settings.image_alt
                 %}
+              {%- endif -%}
+              {%- if tab_image_mobile != blank -%}
+                </picture>
               {%- endif -%}
             </div>
           {%- endif -%}
@@ -1248,13 +1333,17 @@
     </div>
 
     <section class="tss-sb__block" aria-labelledby="tss-sb-pieces-{{ uid }}">
-      <h2 class="tss-sb__h" id="tss-sb-pieces-{{ uid }}">
-        {{ s.pieces_label | default: 'The pieces.' | escape }}
-        <span>{{ s.pieces_question | default: 'Start with a set, or choose your own.' | escape }}</span>
-      </h2>
+      <div class="tss-sb__tray">
+        <h2 class="tss-sb__h" id="tss-sb-pieces-{{ uid }}">
+          {{ s.pieces_label | default: 'The pieces.' | escape }}
+          <span>{{ s.pieces_question | default: 'Start with a set, or choose your own.' | escape }}</span>
+        </h2>
 
-      <p class="tss-sb__tray-label" data-tray-label aria-live="polite"></p>
-      <div class="tss-sb__slots" data-slots></div>
+        <div class="tss-sb__tray-bar">
+          <p class="tss-sb__tray-label" data-tray-label aria-live="polite"></p>
+          <div class="tss-sb__slots" data-slots></div>
+        </div>
+      </div>
 
       {%- if group_blocks.size > 0 -%}
         <div class="tss-sb__tabs" role="tablist" data-tabs aria-label="{{ s.pieces_label | default: 'The pieces' | escape }}">
@@ -1324,6 +1413,43 @@
                   <div>
                     <h3>{{ sb.name | default: 'Set' | escape }}</h3>
                     <p>{{ set_names | escape }}</p>
+                    {%- if g.style == 'swatches' -%}
+                      {%- comment -%} The names above carry the meaning; the dots only show it. {%- endcomment -%}
+                      <div class="tss-sb__set-swatches" aria-hidden="true">
+                        {%- for item in sb.products -%}
+                          {%- liquid
+                            assign iv = item.selected_or_first_available_variant
+                            assign set_piece = item.title
+                            unless item.has_only_default_variant
+                              assign set_piece = item.title | append: ' ' | append: iv.title
+                            endunless
+                            assign set_piece = set_piece | downcase
+                            assign set_colour = ''
+                            assign best_size = 0
+                            for line in swatch_lines
+                              assign pair = line | split: ':'
+                              if pair.size < 2
+                                continue
+                              endif
+                              assign colour_name = pair[0] | strip | downcase
+                              if colour_name != blank and colour_name.size > best_size and set_piece contains colour_name
+                                assign best_size = colour_name.size
+                                assign set_colour = pair[1] | strip | remove: ';' | remove: '"'
+                              endif
+                            endfor
+                            assign set_image = iv.featured_image | default: item.featured_image
+                          -%}
+                          <span
+                            class="tss-sb__set-swatch"
+                            {% if set_colour != blank %}
+                              style="background-color: {{ set_colour | escape }};"
+                            {% elsif set_image %}
+                              style="background-image: url('{{ set_image | image_url: width: 80, height: 80, crop: 'center' }}');"
+                            {% endif %}
+                          ></span>
+                        {%- endfor -%}
+                      </div>
+                    {%- endif -%}
                   </div>
                   <button type="button" class="tss-sb__text-btn" data-add-set="{{ set_ids }}">
                     {{- s.add_set_label | default: 'Add this set' | escape -}}
@@ -1555,6 +1681,7 @@
         data-show-tab="{{ b.show_tab | escape }}"
         data-match-tab="{{ b.match_tab | escape }}"
         data-free-at="{{ b.free_at | default: 0 }}"
+        data-pieces="{{ b.set_pieces | default: 1 }}"
         data-locked="true"
         hidden
         aria-labelledby="tss-sb-step-{{ block.id }}"
@@ -1671,7 +1798,7 @@
 
             {%- else -%}
               <p class="tss-sb__choice-row" data-option="{{ extra_first.id }}" data-name="" data-price="{{ extra_first.price }}">
-                <span data-match-text data-template="{{ b.match_text | escape }}"></span>
+                <span data-match-text data-template="{% if b.mode != 'stepper' %}{{ b.match_text | escape }}{% endif %}"></span>
                 <span class="tss-sb__gold" data-step-price>{{ extra_first.price | money }}</span>
               </p>
               <button
@@ -1712,6 +1839,12 @@
         {%- endif -%}
       </section>
     {%- endfor -%}
+
+    <div class="tss-sb__end">
+      <button type="button" class="tss-sb__submit" data-submit-end disabled hidden>
+        {{- s.submit_label | default: 'Add to Bag' | escape -}}
+      </button>
+    </div>
   </div>
 
   <div class="tss-sb__bar">
@@ -1920,6 +2053,7 @@
         showTab: el.getAttribute('data-show-tab'),
         matchTab: el.getAttribute('data-match-tab'),
         freeAt: parseInt(el.getAttribute('data-free-at'), 10) || 0,
+        pieces: parseInt(el.getAttribute('data-pieces'), 10) || 1,
         options: options,
         active: options.length ? options[0].id : null,
         qty: {},
@@ -2031,6 +2165,7 @@
       hint: root.querySelector('[data-hint]'),
       view: root.querySelector('[data-view]'),
       submit: root.querySelector('[data-submit]'),
+      submitEnd: root.querySelector('[data-submit-end]'),
       foot: root.querySelector('[data-foot]'),
       sheet: root.querySelector('[data-sheet]'),
       lines: root.querySelector('[data-lines]'),
@@ -2227,7 +2362,15 @@
           if (matchText) matchText.textContent = fill(matchText.getAttribute('data-template'), { count: matchCount });
           var priceEl = step.el.querySelector('[data-step-price]');
           var free = step.freeAt > 0 && count >= step.freeAt;
-          priceEl.textContent = free ? T.included : money(step.options[0].price * Math.max(1, matchCount));
+          var total = step.options[0].price * Math.max(1, matchCount);
+          // A product sold as a set of N reads per piece too: "4 × ৳120 = ৳480".
+          var qty = step.mode === 'match' ? Math.max(1, matchCount) : step.pieces;
+          // "4 × ৳299 = ৳1,196" when there is more than one; a single price otherwise.
+          priceEl.textContent = free
+            ? T.included
+            : qty > 1
+              ? qty + ' × ' + money(Math.round(total / qty)) + ' = ' + money(total)
+              : money(total);
           var messageWrap = step.el.querySelector('[data-message-wrap]');
           if (messageWrap) messageWrap.hidden = !step.picked;
         }
@@ -2269,6 +2412,9 @@
       // it leads to the next one instead of sitting greyed out off-screen.
       els.submit.disabled = !enough || state.busy;
       if (!state.busy) els.submit.textContent = enough && !ready ? T.next : submitLabel;
+      syncSubmitEnd();
+      // It appears only once every step is answered; until then the bar leads on.
+      if (els.submitEnd) els.submitEnd.hidden = !ready;
       if (!state.busy && els.foot.getAttribute('data-error') !== 'true') {
         els.foot.textContent = ready
           ? ''
@@ -2330,6 +2476,13 @@
       });
       var slides = root.querySelector('[data-slides]');
       if (slides) slides.hidden = !!tabImage;
+
+      // Keep ?start= in the address bar so each tab has its own shareable link.
+      if (groupLabels[id]) {
+        var url = new URL(window.location.href);
+        url.searchParams.set('start', groupLabels[id].toLowerCase());
+        history.replaceState(history.state, '', url);
+      }
 
       // Without its own image, a tab shows the gallery slide in the same position.
       var gallery = root.querySelector('[data-gallery]');
@@ -2418,7 +2571,7 @@
       if (!stepEl) {
         if (target.closest('[data-view]')) return els.sheet.showModal();
         if (target.closest('[data-sheet-close]') || target === els.sheet) return els.sheet.close();
-        if (target.closest('[data-submit]')) return submit();
+        if (target.closest('[data-submit], [data-submit-end]')) return submit();
         return;
       }
 
@@ -2492,6 +2645,13 @@
     }
 
     /* ---------- add to bag ---------- */
+    // The button after the steps follows the bar's button in state and label.
+    function syncSubmitEnd() {
+      if (!els.submitEnd) return;
+      els.submitEnd.disabled = els.submit.disabled;
+      els.submitEnd.textContent = els.submit.textContent;
+    }
+
     function submit() {
       if (state.busy || els.submit.disabled) return;
       if (REQUIRE_ANSWERS && state.pending) {
@@ -2527,6 +2687,7 @@
       state.busy = true;
       els.submit.disabled = true;
       els.submit.textContent = T.adding;
+      syncSubmitEnd();
       els.foot.removeAttribute('data-error');
       els.foot.textContent = '';
 
@@ -2738,6 +2899,12 @@
           "info": "Shown at the top while this tab is open. Leave empty to show the gallery images."
         },
         {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Mobile image",
+          "info": "Shown instead on phones. Leave empty to use the image above."
+        },
+        {
           "type": "text",
           "id": "image_alt",
           "label": "Image description",
@@ -2859,11 +3026,19 @@
           "visible_if": "{{ block.settings.mode == 'match' }}"
         },
         {
+          "type": "number",
+          "id": "set_pieces",
+          "label": "Pieces in the set",
+          "info": "For a product sold as a set, e.g. 4 coasters. The price then reads 4 × piece price = set price.",
+          "visible_if": "{{ block.settings.mode == 'single' }}"
+        },
+        {
           "type": "text",
           "id": "match_text",
           "label": "Line beside the price",
+          "info": "[count] becomes the number of matching pieces. With Just one, write the line as it should read, e.g. 4 Pcs set.",
           "default": "One for each of your [count] mugs",
-          "visible_if": "{{ block.settings.mode == 'match' }}"
+          "visible_if": "{{ block.settings.mode != 'stepper' }}"
         },
         {
           "type": "text",

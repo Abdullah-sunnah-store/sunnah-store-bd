@@ -62,7 +62,7 @@
 
   #tss-mpieces-{{ uid }} .tss-mpieces__grid {
     display: grid;
-    grid-template-columns: repeat({{ s.mobile_columns | default: 1 }}, minmax(0, 1fr));
+    grid-template-columns: repeat({{ s.mobile_columns | default: 2 }}, minmax(0, 1fr));
     gap: 32px 12px;
     margin-top: 32px;
   }
@@ -80,10 +80,11 @@
     background: var(--tss-ivory-2);
   }
 
+  /* Whole photo, never cropped, as on the collection grid. */
   #tss-mpieces-{{ uid }} .tss-mpieces__img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     transition: transform 1.2s var(--tss-ease);
   }
 
@@ -147,7 +148,7 @@
 
   @media (min-width: 40rem) {
     #tss-mpieces-{{ uid }} .tss-mpieces__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat({{ s.desktop_columns | default: 4 | at_most: 3 }}, minmax(0, 1fr));
     }
   }
 
@@ -161,7 +162,7 @@
     }
 
     #tss-mpieces-{{ uid }} .tss-mpieces__grid {
-      grid-template-columns: repeat({{ s.desktop_columns | default: 2 }}, minmax(0, 1fr));
+      grid-template-columns: repeat({{ s.desktop_columns | default: 4 }}, minmax(0, 1fr));
       gap: 48px 16px;
       margin-top: 40px;
     }
@@ -199,7 +200,7 @@
                     | image_tag:
                       class: 'tss-mpieces__img',
                       widths: '360,540,720,960,1200,1400,2000,2800',
-                      sizes: '(min-width: 64rem) 50vw, (min-width: 40rem) 50vw, 100vw',
+                      sizes: '(min-width: 64rem) 25vw, (min-width: 40rem) 33vw, 50vw',
                       loading: 'lazy',
                       alt: product.featured_media.alt | default: product.title
                   }}
@@ -274,7 +275,7 @@
       "min": 2,
       "max": 4,
       "step": 1,
-      "default": 2
+      "default": 4
     },
     {
       "type": "select",
@@ -284,7 +285,7 @@
         { "value": "1", "label": "1" },
         { "value": "2", "label": "2" }
       ],
-      "default": "1"
+      "default": "2"
     },
     {
       "type": "range",

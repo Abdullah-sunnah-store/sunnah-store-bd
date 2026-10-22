@@ -12,25 +12,11 @@
     "main": {
       "type": "tss-product",
       "blocks": {
-        "trust_cod": {
-          "type": "trust",
-          "settings": {
-            "icon": "hand-coins",
-            "label": "Cash on Delivery"
-          }
-        },
-        "trust_wrap": {
-          "type": "trust",
-          "settings": {
-            "icon": "gift",
-            "label": "Gift-wrapped by hand"
-          }
-        },
         "trust_returns": {
           "type": "trust",
           "settings": {
             "icon": "undo-2",
-            "label": "14-day returns"
+            "label": "14 days return, replace, refund available."
           }
         },
         "acc_description": {
@@ -75,8 +61,6 @@
         }
       },
       "block_order": [
-        "trust_cod",
-        "trust_wrap",
         "trust_returns",
         "acc_description",
         "acc_details",
