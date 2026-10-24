@@ -1,0 +1,1301 @@
+{% comment %}
+  Section contract.
+  TSS — Cart page. The bag as one quiet column on a phone, with the checkout
+  button pinned to the bottom of the screen; on a desktop the summary and the
+  button move into a side column beside the items.
+
+  Everything works as a plain cart form: quantities post as updates[], Remove
+  and the pairing offer are links, and Continue to checkout submits the form.
+  The inline script upgrades those to /cart/change.js and /cart/add.js calls and
+  re-renders this section from the response.
+
+  Gift choices are saved as cart attributes under the keys set in the section,
+  never the product page's gift_order key, which blocks Cash on Delivery.
+  @example
+  <!-- templates/cart.json: { "type": "tss-cart" } -->
+{% endcomment %}
+
+{% render 'tss-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+
+  assign gift_key = s.gift_attribute | default: 'Gift' | strip
+  assign message_key = s.message_attribute | default: 'Gift Message' | strip
+  assign gift_value = s.gift_value | default: 'Yes'
+  assign gift_on = false
+  if cart.attributes[gift_key] != blank
+    assign gift_on = true
+  endif
+
+  # Free delivery follows the shop-wide free-shipping threshold (in cents).
+  assign threshold = 0
+  if settings.free_shipping_bar_enabled and settings.free_shipping_threshold > 0
+    assign threshold = settings.free_shipping_threshold
+  endif
+  assign free_delivery = false
+  if threshold > 0 and cart.total_price >= threshold
+    assign free_delivery = true
+  endif
+
+  assign delivery = 0
+  if s.show_delivery and free_delivery == false
+    assign delivery = s.delivery_fee | default: 0 | times: 100
+  endif
+  assign grand_total = cart.total_price | plus: delivery
+
+  assign progress = 100
+  assign remaining = 0
+  if threshold > 0
+    assign progress = cart.total_price | times: 100 | divided_by: threshold
+    if progress > 100
+      assign progress = 100
+    endif
+    assign remaining = threshold | minus: cart.total_price
+  endif
+
+  # The pairing offer stands aside once its product is already in the bag.
+  assign pair = s.pair_product
+  assign show_pair = false
+  if pair != blank and pair.available and cart.item_count > 0
+    assign show_pair = true
+    for item in cart.items
+      if item.product_id == pair.id
+        assign show_pair = false
+        break
+      endif
+    endfor
+  endif
+
+  if cart.item_count == 1
+    assign count_label = s.count_one | default: '[count] item' | replace: '[count]', cart.item_count
+  else
+    assign count_label = s.count_other | default: '[count] items' | replace: '[count]', cart.item_count
+  endif
+-%}
+
+<style>
+  #tss-cart-{{ uid }} {
+    background: var(--tss-ivory);
+  }
+
+  /* App widgets that inject after the cart form (Essential Upsell's strip)
+     sit on the same measure as the bag and the header. */
+  #tss-cart-{{ uid }} [data-cart-body] > :not(form):not(.tss-cart__empty) {
+    box-sizing: border-box;
+    max-width: calc(var(--tss-max) + (var(--tss-gutter) * 2));
+    margin-inline: auto;
+    padding-inline: var(--tss-gutter);
+  }
+
+  /* Horizon sections below the bag (e.g. You may also like) take the TSS
+     measure, so their edges line up with the header and the bag. */
+  #shopify-section-{{ section.id }} ~ .shopify-section {
+    --page-margin: var(--tss-gutter);
+    --page-content-width: var(--tss-max);
+    --page-width: calc(var(--tss-max) + (var(--tss-gutter) * 2));
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'main' 'summary' 'bar';
+    max-width: calc(var(--tss-max) + (var(--tss-gutter) * 2));
+    margin-inline: auto;
+    padding: 28px var(--tss-gutter) 0;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__main {
+    grid-area: main;
+    min-width: 0;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding-bottom: 8px;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__title {
+    font-family: var(--tss-serif);
+    font-size: 34px;
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--tss-ink);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__title:focus {
+    outline: none;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__count,
+  #tss-cart-{{ uid }} .tss-cart__detail,
+  #tss-cart-{{ uid }} .tss-cart__muted {
+    font-size: 13px;
+    color: rgb(28 28 26 / 0.6);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__count {
+    font-size: 14px;
+  }
+
+  /* ---------- lines ---------- */
+  #tss-cart-{{ uid }} .tss-cart__line {
+    display: flex;
+    gap: 14px;
+    padding-block: 18px;
+    border-bottom: 1px solid rgb(26 74 58 / 0.14);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__thumb {
+    flex-shrink: 0;
+    display: block;
+    width: 88px;
+    height: 104px;
+    overflow: hidden;
+    border-radius: 2px;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__thumb img,
+  #tss-cart-{{ uid }} .tss-cart__thumb svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__name-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__name {
+    min-width: 0;
+    font-family: var(--tss-serif);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+    color: var(--tss-ink);
+    text-decoration: none;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__name:hover {
+    color: var(--tss-green-mid);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__price {
+    font-size: 15px;
+    white-space: nowrap;
+    text-align: end;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__was {
+    display: block;
+    font-size: 12px;
+    color: rgb(28 28 26 / 0.45);
+    text-decoration: line-through;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__qty {
+    display: inline-flex;
+    align-items: center;
+    height: 40px;
+    border: 1px solid rgb(26 74 58 / 0.25);
+    border-radius: 2px;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__qty button {
+    width: 40px;
+    height: 100%;
+    border: 0;
+    background: none;
+    font-size: 18px;
+    line-height: 1;
+    color: var(--tss-ink);
+    cursor: pointer;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__qty button:disabled {
+    color: rgb(28 28 26 / 0.3);
+    cursor: default;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__qty input {
+    width: 32px;
+    height: 100%;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 14px;
+    text-align: center;
+    color: var(--tss-ink);
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__qty input::-webkit-outer-spin-button,
+  #tss-cart-{{ uid }} .tss-cart__qty input::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 2px;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 13px;
+    color: rgb(28 28 26 / 0.6);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__link:hover {
+    color: var(--tss-ink);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__error {
+    font-size: 13px;
+    color: #9b2c2c;
+  }
+
+  #tss-cart-{{ uid }} [data-busy='true'] .tss-cart__lines {
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+  }
+
+  /* ---------- cards: pairing offer and gift ---------- */
+  #tss-cart-{{ uid }} .tss-cart__card {
+    margin-top: 24px;
+    padding: 18px;
+    border: 1px solid rgb(26 74 58 / 0.14);
+    border-radius: 3px;
+    background: #fffdf8;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__pair {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 18px;
+    padding: 14px;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__pair-img {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    overflow: hidden;
+    border-radius: 2px;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__pair-img img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__pair-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgb(28 28 26 / 0.6);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__pair-name {
+    font-size: 14px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__pair-add {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 12px;
+    border: 1px solid var(--tss-ink);
+    border-radius: 2px;
+    font-size: 14px;
+    white-space: nowrap;
+    color: var(--tss-ink);
+    text-decoration: none;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__pair-add:hover {
+    background: var(--tss-ink);
+    color: var(--tss-ivory);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__gift-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__gift-title {
+    display: block;
+    font-family: var(--tss-serif);
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  /* The switch is a real checkbox, so it submits with the form and reads as
+     a switch to assistive tech through role="switch". */
+  #tss-cart-{{ uid }} .tss-cart__switch {
+    position: relative;
+    flex-shrink: 0;
+    width: 48px;
+    height: 28px;
+    margin: 0;
+    border-radius: 14px;
+    background: #c9c0ad;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: background-color 0.3s ease;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__switch::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 3px;
+    inset-inline-start: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fffdf8;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+    transition: transform 0.3s var(--tss-ease);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__switch:checked {
+    background: var(--tss-green-mid);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__switch:checked::after {
+    transform: translateX(20px);
+  }
+
+  [dir='rtl'] #tss-cart-{{ uid }} .tss-cart__switch:checked::after {
+    transform: translateX(-20px);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__switch:focus-visible {
+    outline: 2px solid var(--tss-green-mid);
+    outline-offset: 2px;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__gift-panel {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__gift:has(.tss-cart__switch:checked) .tss-cart__gift-panel {
+    display: flex;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__gift-panel label {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__gift-panel textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgb(26 74 58 / 0.25);
+    border-radius: 2px;
+    background: var(--tss-ivory);
+    font: inherit;
+    font-size: 15px;
+    color: var(--tss-ink);
+    resize: vertical;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__gift-panel textarea:focus-visible {
+    outline: 2px solid var(--tss-green-mid);
+    outline-offset: 1px;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__tip {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 2px;
+    background: var(--tss-ivory-2);
+    font-size: 13px;
+    color: rgb(28 28 26 / 0.8);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__tip svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ---------- summary ---------- */
+  #tss-cart-{{ uid }} .tss-cart__summary {
+    grid-area: summary;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    margin-top: 24px;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+    color: rgb(28 28 26 / 0.75);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__rule {
+    height: 1px;
+    margin-block: 4px;
+    background: rgb(26 74 58 / 0.14);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-weight: 500;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__total-value {
+    font-family: var(--tss-serif);
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__meter {
+    height: 3px;
+    margin-top: 4px;
+    overflow: hidden;
+    border-radius: 2px;
+    background: rgb(26 74 58 / 0.14);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__meter span {
+    display: block;
+    width: var(--tss-cart-progress, 0%);
+    height: 100%;
+    background: var(--tss-green-mid);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__promises {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 18px;
+    padding-top: 20px;
+    border-top: 1px solid rgb(26 74 58 / 0.14);
+    font-size: 12px;
+    text-align: center;
+    color: rgb(28 28 26 / 0.75);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__promise {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  /* A single promise reads as one line, icon beside the text. */
+  #tss-cart-{{ uid }} .tss-cart__promise:only-child {
+    flex-direction: row;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__promise:only-child svg {
+    flex-shrink: 0;
+  }
+
+  /* ---------- checkout bar: pinned to the bottom of a phone screen ---------- */
+  #tss-cart-{{ uid }} .tss-cart__bar {
+    grid-area: bar;
+    position: sticky;
+    inset-block-end: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 28px;
+    margin-inline: calc(var(--tss-gutter) * -1);
+    padding: 14px var(--tss-gutter) 20px;
+    border-top: 1px solid rgb(26 74 58 / 0.14);
+    background: var(--tss-ivory);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__checkout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    min-height: 54px;
+    padding-inline: 20px;
+    border: 0;
+    border-radius: 2px;
+    background: var(--tss-green-mid);
+    font-family: var(--tss-sans);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--tss-ivory);
+    cursor: pointer;
+    transition: background-color 0.4s ease;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__checkout:hover {
+    background: var(--tss-green);
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__checkout:focus-visible,
+  #tss-cart-{{ uid }} .tss-cart__qty button:focus-visible,
+  #tss-cart-{{ uid }} .tss-cart__link:focus-visible,
+  #tss-cart-{{ uid }} .tss-cart__pair-add:focus-visible {
+    outline: 2px solid var(--tss-green-mid);
+    outline-offset: 2px;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__pay {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-align: center;
+    color: rgb(28 28 26 / 0.6);
+  }
+
+  /* ---------- empty ---------- */
+  #tss-cart-{{ uid }} .tss-cart__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    max-width: 30rem;
+    margin-inline: auto;
+    padding: 72px var(--tss-gutter) 96px;
+    text-align: center;
+  }
+
+  #tss-cart-{{ uid }} .tss-cart__empty a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    margin-top: 8px;
+    padding-inline: 28px;
+    border-radius: 2px;
+    background: var(--tss-green-mid);
+    color: var(--tss-ivory);
+    text-decoration: none;
+  }
+
+  @media (min-width: 64rem) {
+    #tss-cart-{{ uid }} .tss-cart__layout {
+      grid-template-columns: minmax(0, 1fr) 380px;
+      grid-template-rows: auto auto 1fr;
+      grid-template-areas: 'main summary' 'main bar' 'main .';
+      column-gap: 64px;
+      padding-top: 48px;
+      padding-bottom: 72px;
+    }
+
+    #tss-cart-{{ uid }} .tss-cart__summary {
+      margin-top: 52px;
+      padding: 24px;
+      border: 1px solid rgb(26 74 58 / 0.14);
+      border-radius: 3px;
+      background: #fffdf8;
+    }
+
+    #tss-cart-{{ uid }} .tss-cart__bar {
+      position: static;
+      margin: 16px 0 0;
+      padding: 0;
+      border-top: 0;
+      background: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #tss-cart-{{ uid }} .tss-cart__switch,
+    #tss-cart-{{ uid }} .tss-cart__switch::after {
+      transition: none;
+    }
+  }
+</style>
+
+<section id="tss-cart-{{ uid }}" class="tss-section tss-cart" aria-labelledby="tss-cart-title-{{ uid }}">
+  <p class="tss-sr-only" role="status" aria-live="polite" data-cart-status></p>
+
+  <div data-cart-body data-item-count="{{ cart.item_count }}">
+    {%- if cart.item_count == 0 -%}
+      <div class="tss-cart__empty">
+        <h1 class="tss-cart__title" id="tss-cart-title-{{ uid }}" tabindex="-1" data-cart-title>
+          {{- s.empty_heading | default: 'Your bag is empty' | escape -}}
+        </h1>
+        {%- if s.empty_text != blank -%}
+          <p class="tss-cart__muted">{{ s.empty_text | escape }}</p>
+        {%- endif -%}
+        <a href="{{ s.empty_link | default: routes.all_products_collection_url }}">
+          {{- s.empty_link_label | default: 'Continue browsing' | escape -}}
+        </a>
+      </div>
+    {%- else -%}
+      <form action="{{ routes.cart_url }}" method="post" id="tss-cart-form-{{ uid }}" class="tss-cart__layout" novalidate>
+        <div class="tss-cart__main">
+          <div class="tss-cart__head">
+            <h1 class="tss-cart__title" id="tss-cart-title-{{ uid }}" tabindex="-1" data-cart-title>
+              {{- s.heading | default: 'Your bag' | escape -}}
+            </h1>
+            <span class="tss-cart__count">{{ count_label | escape }}</span>
+          </div>
+
+          <ul class="tss-cart__lines" role="list">
+            {%- for item in cart.items -%}
+              <li class="tss-cart__line" data-line="{{ item.key }}">
+                <a class="tss-cart__thumb" href="{{ item.url }}" tabindex="-1" aria-hidden="true">
+                  {%- if item.image != blank -%}
+                    {%- liquid
+                      if forloop.index <= 2
+                        assign line_loading = 'eager'
+                      else
+                        assign line_loading = 'lazy'
+                      endif
+                    -%}
+                    {{
+                      item.image
+                      | image_url: width: 264
+                      | image_tag: widths: '176,264', sizes: '88px', loading: line_loading, alt: ''
+                    }}
+                  {%- else -%}
+                    {{ 'product-1' | placeholder_svg_tag }}
+                  {%- endif -%}
+                </a>
+
+                <div class="tss-cart__info">
+                  <div class="tss-cart__name-row">
+                    <a class="tss-cart__name" href="{{ item.url }}">{{ item.product.title | escape }}</a>
+                    <span class="tss-cart__price">
+                      {%- if item.original_line_price > item.final_line_price -%}
+                        <s class="tss-cart__was">{{ item.original_line_price | money }}</s>
+                      {%- endif -%}
+                      {{ item.final_line_price | money }}
+                    </span>
+                  </div>
+
+                  {%- liquid
+                    assign details = ''
+                    unless item.product.has_only_default_variant
+                      assign details = item.variant.title
+                    endunless
+                    if item.selling_plan_allocation
+                      assign details = details | append: ' · ' | append: item.selling_plan_allocation.selling_plan.name
+                    endif
+                  -%}
+                  {%- if details != blank -%}
+                    <span class="tss-cart__detail">{{ details | remove_first: ' · ' | escape }}</span>
+                  {%- endif -%}
+                  {%- for property in item.properties -%}
+                    {%- assign first_char = property.first | slice: 0 -%}
+                    {%- if property.last != blank and first_char != '_' -%}
+                      <span class="tss-cart__detail">{{ property.first | escape }}: {{ property.last | escape }}</span>
+                    {%- endif -%}
+                  {%- endfor -%}
+                  {%- for discount in item.line_level_discount_allocations -%}
+                    <span class="tss-cart__detail">{{ discount.discount_application.title | escape }} (−{{ discount.amount | money }})</span>
+                  {%- endfor -%}
+
+                  <div class="tss-cart__controls">
+                    <div class="tss-cart__qty">
+                      <button
+                        type="button"
+                        data-qty-step="-1"
+                        data-focus="dec-{{ item.key }}"
+                        aria-label="{{ 'accessibility.decrease_quantity' | t }}, {{ item.product.title | escape }}"
+                        hidden
+                      >
+                        −
+                      </button>
+                      <label class="tss-sr-only" for="tss-cart-qty-{{ uid }}-{{ forloop.index }}">
+                        {{- 'accessibility.quantity' | t }}, {{ item.product.title | escape -}}
+                      </label>
+                      <input
+                        id="tss-cart-qty-{{ uid }}-{{ forloop.index }}"
+                        type="number"
+                        name="updates[]"
+                        value="{{ item.quantity }}"
+                        min="0"
+                        inputmode="numeric"
+                        data-qty-input
+                        data-focus="qty-{{ item.key }}"
+                      >
+                      <button
+                        type="button"
+                        data-qty-step="1"
+                        data-focus="inc-{{ item.key }}"
+                        aria-label="{{ 'accessibility.increase_quantity' | t }}, {{ item.product.title | escape }}"
+                        hidden
+                      >
+                        +
+                      </button>
+                    </div>
+                    <a
+                      class="tss-cart__link"
+                      href="{{ item.url_to_remove }}"
+                      data-remove
+                      aria-label="{{ 'accessibility.remove_item' | t: title: item.product.title }}"
+                    >
+                      {{- 'actions.remove' | t -}}
+                    </a>
+                  </div>
+                  <p class="tss-cart__error" data-line-error hidden></p>
+                </div>
+              </li>
+            {%- endfor -%}
+          </ul>
+
+          <noscript>
+            <button type="submit" name="update" class="tss-cart__link">{{ s.update_label | default: 'Update bag' | escape }}</button>
+          </noscript>
+
+          {%- if show_pair -%}
+            {%- liquid
+              assign pair_variant = pair.selected_or_first_available_variant
+              assign first_title = cart.items.first.product.title
+              assign pair_eyebrow = s.pair_eyebrow | replace: '[item]', first_title
+              assign pair_name = s.pair_name | default: pair.title
+              assign pair_price = pair_variant.price | money_without_trailing_zeros | strip_html
+            -%}
+            <div class="tss-cart__card tss-cart__pair">
+              {%- if pair.featured_image != blank -%}
+                <div class="tss-cart__pair-img">
+                  {{
+                    pair.featured_image
+                    | image_url: width: 168
+                    | image_tag: widths: '112,168', sizes: '56px', loading: 'lazy', alt: ''
+                  }}
+                </div>
+              {%- endif -%}
+              <div class="tss-cart__pair-text">
+                {%- if pair_eyebrow != blank -%}
+                  <p class="tss-cart__eyebrow">{{ pair_eyebrow | escape }}</p>
+                {%- endif -%}
+                <p class="tss-cart__pair-name">{{ pair_name | escape }}</p>
+              </div>
+              <a
+                class="tss-cart__pair-add"
+                href="{{ routes.cart_add_url }}?id={{ pair_variant.id }}&amp;quantity=1"
+                data-pair-add="{{ pair_variant.id }}"
+                data-focus="pair"
+                aria-label="{{ s.pair_add_label | default: 'Add' | escape }} {{ pair_name | escape }}, {{ pair_price }}"
+              >
+                + {{ pair_price -}}
+              </a>
+            </div>
+          {%- endif -%}
+
+          {%- if s.show_gift -%}
+            <div class="tss-cart__card tss-cart__gift">
+              <label class="tss-cart__gift-row" for="tss-cart-gift-{{ uid }}">
+                <span>
+                  <span class="tss-cart__gift-title">{{ s.gift_heading | default: 'Is this a gift?' | escape }}</span>
+                  {%- if s.gift_text != blank -%}
+                    <span class="tss-cart__muted">{{ s.gift_text | escape }}</span>
+                  {%- endif -%}
+                </span>
+                {%- comment -%} The empty hidden value clears the attribute when the switch is off. {%- endcomment -%}
+                <input type="hidden" name="attributes[{{ gift_key | escape }}]" value="">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  class="tss-cart__switch"
+                  id="tss-cart-gift-{{ uid }}"
+                  name="attributes[{{ gift_key | escape }}]"
+                  value="{{ gift_value | escape }}"
+                  data-gift-toggle
+                  data-focus="gift"
+                  {% if gift_on %}
+                    checked
+                  {% endif %}
+                >
+              </label>
+
+              <div class="tss-cart__gift-panel">
+                <label for="tss-cart-message-{{ uid }}">{{ s.message_label | default: 'Your message, handwritten on our card' | escape }}</label>
+                <textarea
+                  id="tss-cart-message-{{ uid }}"
+                  name="attributes[{{ message_key | escape }}]"
+                  rows="3"
+                  maxlength="{{ s.message_max | default: 300 }}"
+                  placeholder="{{ s.message_placeholder | escape }}"
+                  data-gift-message
+                >{{ cart.attributes[message_key] | escape }}</textarea>
+                {%- if s.gift_tip != blank -%}
+                  <p class="tss-cart__tip">
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+                    <span>{{ s.gift_tip | escape }}</span>
+                  </p>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endif -%}
+        </div>
+
+        <div class="tss-cart__summary" aria-label="{{ s.summary_label | default: 'Order summary' | escape }}" role="group">
+          <div class="tss-cart__row">
+            <span>{{ 'content.cart_subtotal' | t }}</span>
+            <span>{{ cart.items_subtotal_price | money }}</span>
+          </div>
+          {%- for discount in cart.cart_level_discount_applications -%}
+            <div class="tss-cart__row">
+              <span>{{ discount.title | escape }}</span>
+              <span>−{{ discount.total_allocated_amount | money }}</span>
+            </div>
+          {%- endfor -%}
+          {%- if s.show_delivery -%}
+            <div class="tss-cart__row">
+              <span>{{ s.delivery_label | default: 'Delivery' | escape }}</span>
+              <span>
+                {%- if free_delivery -%}
+                  {{ s.free_label | default: 'Free' | escape }}
+                {%- else -%}
+                  {{ delivery | money }}
+                {%- endif -%}
+              </span>
+            </div>
+          {%- endif -%}
+          <div class="tss-cart__rule"></div>
+          <div class="tss-cart__total">
+            <span>{{ s.total_label | default: 'Total' | escape }}</span>
+            <span class="tss-cart__total-value">{{ grand_total | money }}</span>
+          </div>
+
+          {%- if threshold > 0 -%}
+            <div class="tss-cart__meter" style="--tss-cart-progress: {{ progress }}%;" aria-hidden="true"><span></span></div>
+            <p class="tss-cart__muted">
+              {%- if free_delivery -%}
+                {{ s.free_reached_text | default: 'Your delivery is on us.' | escape }}
+              {%- else -%}
+                {%- assign remaining_money = remaining | money | strip_html -%}
+                {{ s.free_away_text | default: '[amount] away from free delivery' | escape | replace: '[amount]', remaining_money }}
+              {%- endif -%}
+            </p>
+          {%- endif -%}
+
+          {%- if s.promise_1 != blank or s.promise_2 != blank or s.promise_3 != blank -%}
+            <ul class="tss-cart__promises" role="list">
+              {%- if s.promise_1 != blank -%}
+                <li class="tss-cart__promise">
+                  <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 8h18v13H3z"/><path d="M12 8v13"/><path d="M12 8S10 3 7 4s0 4 5 4c5 0 8-3 5-4s-5 4-5 4"/></svg>
+                  {{ s.promise_1 | escape }}
+                </li>
+              {%- endif -%}
+              {%- if s.promise_2 != blank -%}
+                <li class="tss-cart__promise">
+                  <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 7h12v9H2z"/><path d="M14 10h4l3 3v3h-7"/><circle cx="6" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
+                  {{ s.promise_2 | escape }}
+                </li>
+              {%- endif -%}
+              {%- if s.promise_3 != blank -%}
+                <li class="tss-cart__promise">
+                  <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 4v4h4"/></svg>
+                  {{ s.promise_3 | escape }}
+                </li>
+              {%- endif -%}
+            </ul>
+          {%- endif -%}
+        </div>
+
+        <div class="tss-cart__bar">
+          <button type="submit" name="checkout" class="tss-cart__checkout">
+            <span>{{ s.checkout_label | default: 'Continue to checkout' | escape }}</span>
+            <span>{{ grand_total | money }}</span>
+          </button>
+          {%- if s.payment_line != blank -%}
+            <p class="tss-cart__pay">{{ s.payment_line | escape }}</p>
+          {%- endif -%}
+        </div>
+      </form>
+    {%- endif -%}
+  </div>
+</section>
+
+<script>
+  (function () {
+    var root = document.getElementById('tss-cart-{{ uid }}');
+    if (!root || root.__tssCart) return;
+    root.__tssCart = true;
+
+    var SECTION_ID = {{ section.id | json }};
+    var CHANGE_URL = {{ routes.cart_change_url | append: '.js' | json }};
+    var ADD_URL = {{ routes.cart_add_url | append: '.js' | json }};
+    var UPDATE_URL = {{ routes.cart_update_url | append: '.js' | json }};
+    var GIFT_KEY = {{ gift_key | json }};
+    var MESSAGE_KEY = {{ message_key | json }};
+    var T = {
+      updated: {{ s.updated_text | default: 'Your bag has been updated.' | json }},
+      error: {{ s.error_text | default: 'Something went wrong. Please try again.' | json }}
+    };
+
+    var status = root.querySelector('[data-cart-status]');
+    var queue = Promise.resolve();
+    var latest = 0;
+    var attrTimer = 0;
+    var attrsDirty = false;
+
+    function announce(message) {
+      if (!status) return;
+      status.textContent = '';
+      window.setTimeout(function () {
+        status.textContent = message;
+      }, 50);
+    }
+
+    async function post(url, body) {
+      var response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(body)
+      });
+      var data = await response.json().catch(function () {
+        return {};
+      });
+      if (!response.ok) {
+        var error = new Error(data.description || data.message || T.error);
+        error.data = data;
+        throw error;
+      }
+      return data;
+    }
+
+    function setBusy(busy) {
+      var body = root.querySelector('[data-cart-body]');
+      if (body) body.setAttribute('data-busy', busy ? 'true' : 'false');
+    }
+
+    // Swap in the fresh body, then put focus back on the same control, or on
+    // the heading when that control's line has gone.
+    function render(html) {
+      if (!html) return;
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var next = doc.querySelector('[data-cart-body]');
+      var current = root.querySelector('[data-cart-body]');
+      if (!next || !current) return;
+
+      var active = document.activeElement;
+      var focusKey = active && root.contains(active) ? active.getAttribute('data-focus') : null;
+
+      // Keep anything an app injected into the body (e.g. an upsell strip).
+      var fresh = document.importNode(next, true);
+      Array.prototype.slice.call(current.children).forEach(function (child) {
+        if (!child.matches('form, .tss-cart__empty')) fresh.appendChild(child);
+      });
+      current.replaceWith(fresh);
+      enhance();
+
+      if (focusKey) {
+        var target =
+          root.querySelector('[data-focus="' + CSS.escape(focusKey) + '"]') || root.querySelector('[data-cart-title]');
+        if (target) target.focus();
+      }
+
+      var count = Number(root.querySelector('[data-cart-body]').getAttribute('data-item-count')) || 0;
+      var event = new Event('cart:update', { bubbles: true });
+      event.detail = { resource: {}, sourceId: root.id, data: { source: 'tss-cart', itemCount: count } };
+      document.dispatchEvent(event);
+    }
+
+    async function refresh() {
+      var url = new URL(window.location.href);
+      url.searchParams.set('section_id', SECTION_ID);
+      var response = await fetch(url.toString(), { cache: 'no-store' });
+      if (response.ok) render(await response.text());
+    }
+
+    function readAttributes() {
+      var toggle = root.querySelector('[data-gift-toggle]');
+      var message = root.querySelector('[data-gift-message]');
+      if (!toggle) return null;
+      var attributes = {};
+      attributes[GIFT_KEY] = toggle.checked ? toggle.value : '';
+      if (message) attributes[MESSAGE_KEY] = toggle.checked ? message.value : '';
+      return attributes;
+    }
+
+    async function saveAttributes() {
+      window.clearTimeout(attrTimer);
+      if (!attrsDirty) return;
+      attrsDirty = false;
+      var attributes = readAttributes();
+      if (attributes) await post(UPDATE_URL, { attributes: attributes });
+    }
+
+    // Requests run one after another so quantities land in the order they
+    // were asked for; only the newest response is drawn.
+    function enqueue(run) {
+      var ticket = ++latest;
+      setBusy(true);
+      queue = queue
+        .then(saveAttributes)
+        .then(run)
+        .then(function (data) {
+          if (ticket !== latest) return;
+          render(data && data.sections ? data.sections[SECTION_ID] : null);
+          announce(T.updated);
+        })
+        .catch(async function (error) {
+          if (ticket === latest) await refresh().catch(function () {});
+          var message = (error && error.message) || T.error;
+          announce(message);
+          var line = error && error.line && root.querySelector('[data-line="' + CSS.escape(error.line) + '"] [data-line-error]');
+          if (line) {
+            line.textContent = message;
+            line.hidden = false;
+          }
+        })
+        .finally(function () {
+          if (ticket === latest) setBusy(false);
+        });
+    }
+
+    function changeLine(key, quantity) {
+      enqueue(async function () {
+        try {
+          return await post(CHANGE_URL, {
+            id: key,
+            quantity: Math.max(0, quantity),
+            sections: [SECTION_ID],
+            sections_url: window.location.pathname
+          });
+        } catch (error) {
+          error.line = key;
+          throw error;
+        }
+      });
+    }
+
+    // The stepper buttons only appear once this script can drive them; the
+    // number input and the noscript Update button cover the rest.
+    function enhance() {
+      root.querySelectorAll('[data-qty-step]').forEach(function (button) {
+        button.hidden = false;
+      });
+    }
+
+    root.addEventListener('click', function (event) {
+      var target = event.target instanceof Element ? event.target : null;
+      if (!target) return;
+
+      var step = target.closest('[data-qty-step]');
+      if (step) {
+        var line = step.closest('[data-line]');
+        var input = line && line.querySelector('[data-qty-input]');
+        if (!input) return;
+        var next = Math.max(0, (parseInt(input.value, 10) || 0) + Number(step.getAttribute('data-qty-step')));
+        input.value = next;
+        changeLine(line.getAttribute('data-line'), next);
+        return;
+      }
+
+      var remove = target.closest('[data-remove]');
+      if (remove) {
+        event.preventDefault();
+        changeLine(remove.closest('[data-line]').getAttribute('data-line'), 0);
+        return;
+      }
+
+      var pair = target.closest('[data-pair-add]');
+      if (pair) {
+        event.preventDefault();
+        enqueue(function () {
+          return post(ADD_URL, {
+            items: [{ id: Number(pair.getAttribute('data-pair-add')), quantity: 1 }],
+            sections: [SECTION_ID],
+            sections_url: window.location.pathname
+          });
+        });
+      }
+    });
+
+    root.addEventListener('change', function (event) {
+      var target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+
+      if (target.matches('[data-qty-input]')) {
+        changeLine(target.closest('[data-line]').getAttribute('data-line'), parseInt(target.value, 10) || 0);
+      } else if (target.matches('[data-gift-toggle]')) {
+        attrsDirty = true;
+        saveAttributes().catch(function () {
+          announce(T.error);
+        });
+      }
+    });
+
+    root.addEventListener('input', function (event) {
+      if (!(event.target instanceof HTMLElement) || !event.target.matches('[data-gift-message]')) return;
+      attrsDirty = true;
+      window.clearTimeout(attrTimer);
+      attrTimer = window.setTimeout(function () {
+        saveAttributes().catch(function () {
+          announce(T.error);
+        });
+      }, 600);
+    });
+
+    // Checkout posts the form itself, gift fields included; a message left
+    // behind a switched-off toggle is cleared rather than sent.
+    root.addEventListener('submit', function () {
+      window.clearTimeout(attrTimer);
+      var toggle = root.querySelector('[data-gift-toggle]');
+      var message = root.querySelector('[data-gift-message]');
+      if (toggle && message && !toggle.checked) message.value = '';
+    });
+
+    enhance();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "TSS · Cart",
+  "tag": "div",
+  "enabled_on": { "templates": ["cart"] },
+  "settings": [
+    { "type": "header", "content": "Heading" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Your bag" },
+    { "type": "text", "id": "count_one", "label": "Count, one item", "default": "[count] item" },
+    { "type": "text", "id": "count_other", "label": "Count, several items", "default": "[count] items" },
+
+    { "type": "header", "content": "Pairing offer" },
+    {
+      "type": "product",
+      "id": "pair_product",
+      "label": "Product",
+      "info": "Offered beneath the items, and hidden once it is in the bag."
+    },
+    { "type": "text", "id": "pair_name", "label": "Name", "info": "Leave empty to use the product title." },
+    {
+      "type": "text",
+      "id": "pair_eyebrow",
+      "label": "Line above the name",
+      "info": "[item] becomes the first product in the bag.",
+      "default": "Pairs with the [item]"
+    },
+    { "type": "text", "id": "pair_add_label", "label": "Add button label for screen readers", "default": "Add" },
+
+    { "type": "header", "content": "Gift" },
+    { "type": "checkbox", "id": "show_gift", "label": "Show gift option", "default": true },
+    { "type": "text", "id": "gift_heading", "label": "Heading", "default": "Is this a gift?", "visible_if": "{{ section.settings.show_gift }}" },
+    { "type": "text", "id": "gift_text", "label": "Text", "default": "Every order is wrapped by hand, at no charge.", "visible_if": "{{ section.settings.show_gift }}" },
+    { "type": "text", "id": "message_label", "label": "Message label", "default": "Your message, handwritten on our card", "visible_if": "{{ section.settings.show_gift }}" },
+    { "type": "text", "id": "message_placeholder", "label": "Message placeholder", "default": "Abbu, for your morning tea. With love, Raashid", "visible_if": "{{ section.settings.show_gift }}" },
+    { "type": "number", "id": "message_max", "label": "Message length limit", "default": 300, "visible_if": "{{ section.settings.show_gift }}" },
+    {
+      "type": "textarea",
+      "id": "gift_tip",
+      "label": "Note under the message",
+      "default": "Sending it straight to them? Pay by bKash at checkout, so nothing is asked of them at the door.",
+      "visible_if": "{{ section.settings.show_gift }}"
+    },
+    {
+      "type": "text",
+      "id": "gift_attribute",
+      "label": "Order attribute for gifts",
+      "info": "Shown on the order in the admin. Avoid gift_order unless gift orders should lose Cash on Delivery.",
+      "default": "Gift",
+      "visible_if": "{{ section.settings.show_gift }}"
+    },
+    { "type": "text", "id": "gift_value", "label": "Gift attribute value", "default": "Yes", "visible_if": "{{ section.settings.show_gift }}" },
+    { "type": "text", "id": "message_attribute", "label": "Order attribute for the message", "default": "Gift Message", "visible_if": "{{ section.settings.show_gift }}" },
+
+    { "type": "header", "content": "Summary" },
+    { "type": "text", "id": "summary_label", "label": "Summary name for screen readers", "default": "Order summary" },
+    {
+      "type": "checkbox",
+      "id": "show_delivery",
+      "label": "Show delivery charge",
+      "info": "Added to the total shown here. The final charge is set at checkout.",
+      "default": true
+    },
+    { "type": "text", "id": "delivery_label", "label": "Delivery label", "default": "Delivery inside Dhaka", "visible_if": "{{ section.settings.show_delivery }}" },
+    { "type": "number", "id": "delivery_fee", "label": "Delivery charge (৳)", "default": 100, "visible_if": "{{ section.settings.show_delivery }}" },
+    { "type": "text", "id": "free_label", "label": "Free delivery label", "default": "Free" },
+    { "type": "text", "id": "total_label", "label": "Total label", "default": "Total" },
+    {
+      "type": "text",
+      "id": "free_away_text",
+      "label": "Free delivery progress",
+      "info": "Uses the free shipping threshold in Theme settings. [amount] becomes the amount still to spend.",
+      "default": "[amount] away from free delivery"
+    },
+    { "type": "text", "id": "free_reached_text", "label": "Free delivery reached", "default": "Your delivery is on us." },
+    { "type": "text", "id": "promise_1", "label": "Promise, gift icon", "default": "Wrapped by hand, free" },
+    { "type": "text", "id": "promise_2", "label": "Promise, delivery icon", "default": "Same-day dispatch in Dhaka" },
+    { "type": "text", "id": "promise_3", "label": "Promise, returns icon", "default": "14 days return, replace, refund available" },
+
+    { "type": "header", "content": "Checkout" },
+    { "type": "text", "id": "checkout_label", "label": "Button label", "default": "Continue to checkout" },
+    { "type": "text", "id": "payment_line", "label": "Payment methods", "default": "Cash on delivery · bKash · Visa · Mastercard" },
+    { "type": "text", "id": "update_label", "label": "Update button (without JavaScript)", "default": "Update bag" },
+    { "type": "text", "id": "updated_text", "label": "Update announcement for screen readers", "default": "Your bag has been updated." },
+    { "type": "text", "id": "error_text", "label": "Error message", "default": "Something went wrong. Please try again." },
+
+    { "type": "header", "content": "Empty bag" },
+    { "type": "text", "id": "empty_heading", "label": "Heading", "default": "Your bag is empty" },
+    { "type": "text", "id": "empty_text", "label": "Text", "default": "Every piece is wrapped by hand in our Dhaka studio." },
+    { "type": "text", "id": "empty_link_label", "label": "Link label", "default": "Continue browsing" },
+    { "type": "url", "id": "empty_link", "label": "Link" }
+  ],
+  "presets": [{ "name": "TSS · Cart" }]
+}
+{% endschema %}

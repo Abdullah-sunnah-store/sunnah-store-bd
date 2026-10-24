@@ -154,7 +154,7 @@
     width: 100%;
     aspect-ratio: 3 / 4;
     overflow: hidden;
-    background: var(--tss-ivory-2);
+    background: var(--tss-ivory);
   }
 
   /* The clip-reveal wrapper sits inside the frame rather than around it:
@@ -163,6 +163,8 @@
   #tss-cgrid-{{ uid }} .tss-cgrid__frame {
     position: absolute;
     inset: 0;
+    /* Page colour behind contained photos, over .tss-clip's ivory-2. */
+    background: var(--tss-ivory);
   }
 
   /* Whole photo, never cropped: square and wide shots sit centred in the

@@ -162,6 +162,13 @@
     color: rgb(28 28 26 / 0.55);
   }
 
+  #tss-sb-{{ uid }} .tss-sb__summary-total {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--tss-gold);
+  }
+
   /* ---------- sections ---------- */
   #tss-sb-{{ uid }} .tss-sb__block {
     padding: 40px var(--tss-gutter);
@@ -681,6 +688,7 @@
     font-weight: 600;
     color: var(--tss-ink);
   }
+
 
   #tss-sb-{{ uid }} .tss-sb__choice-row .tss-sb__stepper {
     margin-top: 0;
@@ -1795,6 +1803,7 @@
                   <button type="button" data-inc aria-label="{{ s.add_one_label | default: 'Add one' | escape }} {{ extra_name | escape }}">{{ icon_plus }}</button>
                 </div>
               </div>
+              <p class="tss-sb__small" data-option-summary hidden></p>
 
             {%- else -%}
               <p class="tss-sb__choice-row" data-option="{{ extra_first.id }}" data-name="" data-price="{{ extra_first.price }}">
@@ -1934,6 +1943,7 @@
       addAnother: {{ s.add_another_label | default: 'Add another piece' | json }},
       left: {{ s.left_label | default: 'left' | json }},
       included: {{ s.included_label | default: 'Included' | json }},
+      stepTotal: {{ s.step_total_label | default: 'Total' | json }},
       message: {{ s.message_property | default: 'Message' | json }},
       offerKey: {{ s.offer_property_key | default: 'Offer' | json }}
     };
@@ -2331,15 +2341,17 @@
           var activeQty = step.qty[step.active] || 0;
           renderStepper(step.el.querySelector('[data-step-stepper]'), activeQty, 99);
           var summary = [];
+          var summaryTotal = 0;
           step.options.forEach(function (option) {
             var quantity = step.qty[option.id] || 0;
+            summaryTotal += quantity * option.price;
             var badge = option.el.querySelector('[data-badge]');
             if (badge) {
               badge.hidden = quantity < 1;
               badge.textContent = quantity;
               option.el.setAttribute('aria-pressed', option.id === step.active ? 'true' : 'false');
             }
-            if (quantity > 0 && option.name) summary.push(option.name + ' × ' + quantity);
+            if (quantity > 0) summary.push((option.name || step.name) + ' × ' + quantity);
             if (option.id === step.active) {
               var nameEl = step.el.querySelector('[data-option-name]');
               if (nameEl) nameEl.textContent = option.name;
@@ -2348,7 +2360,13 @@
           var summaryEl = step.el.querySelector('[data-option-summary]');
           if (summaryEl) {
             summaryEl.hidden = summary.length === 0;
-            summaryEl.textContent = summary.join(' · ');
+            summaryEl.textContent = summary.length ? summary.join(' · ') + ' · ' : '';
+            if (summary.length) {
+              var totalEl = document.createElement('strong');
+              totalEl.className = 'tss-sb__summary-total';
+              totalEl.textContent = T.stepTotal + ' ' + money(summaryTotal);
+              summaryEl.appendChild(totalEl);
+            }
           }
         } else {
           var pick = step.el.querySelector('[data-pick]');
@@ -2875,7 +2893,8 @@
     { "type": "text", "id": "regular_label", "label": "Regular price", "default": "Regular price" },
     { "type": "text", "id": "total_label", "label": "Total", "default": "Total" },
     { "type": "text", "id": "summary_note", "label": "Summary note", "default": "Delivery is added at checkout." },
-    { "type": "text", "id": "included_label", "label": "Included", "default": "Included" }
+    { "type": "text", "id": "included_label", "label": "Included", "default": "Included" },
+    { "type": "text", "id": "step_total_label", "label": "Add-on total", "info": "Ends the list of chosen add-on options, e.g. Total ৳840.", "default": "Total" }
   ],
   "blocks": [
     {
