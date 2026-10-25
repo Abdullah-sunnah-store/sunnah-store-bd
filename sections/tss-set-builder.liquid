@@ -1675,6 +1675,13 @@
         endif
         assign extra_name = b.name | default: extra.title
         assign extra_variants = extra.variants | where: 'available', true
+        # Further products join the stepper as options of their own, e.g. lid designs.
+        # Other modes only use the first variant, which stays the main product's.
+        for more in b.more_products
+          assign more_variants = more.variants | where: 'available', true
+          assign extra_variants = extra_variants | concat: more_variants
+        endfor
+        assign first_label = ''
         if extra_variants.size == 0
           continue
         endif
@@ -1740,6 +1747,15 @@
               <div class="tss-sb__chips">
                 {%- for variant in extra_variants -%}
                   {%- liquid
+                    # A single-variant product is named by its title after the dash,
+                    # so "Lid - Harf Harmony" reads "Harf Harmony".
+                    assign option_label = variant.title
+                    assign option_image = variant.featured_image
+                    if variant.product.has_only_default_variant
+                      assign option_label = variant.product.title | split: ' – ' | last | split: ' - ' | last | strip
+                      assign option_image = variant.featured_image | default: variant.product.featured_image
+                    endif
+                    assign first_label = first_label | default: option_label
                     assign option_colour = ''
                     if b.option_style == 'swatches'
                       # The longest colour name found in the variant title wins.
@@ -1763,22 +1779,22 @@
                     class="tss-sb__chip{% if b.option_style == 'swatches' %} tss-sb__chip--swatch{% endif %}"
                     aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
                     {% if b.option_style == 'swatches' %}
-                      aria-label="{{ variant.title | escape }}"
+                      aria-label="{{ option_label | escape }}"
                       {% if option_colour != blank %}
                         style="background-color: {{ option_colour | escape }};"
-                      {% elsif variant.featured_image %}
-                        style="background-image: url('{{ variant.featured_image | image_url: width: 120, height: 120, crop: 'center' }}');"
+                      {% elsif option_image %}
+                        style="background-image: url('{{ option_image | image_url: width: 120, height: 120, crop: 'center' }}');"
                       {% endif %}
                     {% endif %}
                     data-option="{{ variant.id }}"
-                    data-name="{{ variant.title | escape }}"
+                    data-name="{{ option_label | escape }}"
                     data-price="{{ variant.price }}"
-                    {% if variant.featured_image %}
-                      data-image="{{ variant.featured_image | image_url: width: 720 }}"
+                    {% if option_image %}
+                      data-image="{{ option_image | image_url: width: 720 }}"
                     {% endif %}
                   >
                     {%- unless b.option_style == 'swatches' -%}
-                      {{- variant.title | escape -}}
+                      {{- option_label | escape -}}
                     {%- endunless -%}
                     <span class="tss-sb__badge" data-badge hidden></span>
                   </button>
@@ -1790,7 +1806,7 @@
                   <output aria-live="polite">0</output>
                   <button type="button" data-inc aria-label="{{ s.add_one_label | default: 'Add one' | escape }} {{ extra_name | escape }}">{{ icon_plus }}</button>
                 </div>
-                <span data-option-name>{{ extra_first.title | escape }}</span>
+                <span data-option-name>{{ first_label | escape }}</span>
               </div>
               <p class="tss-sb__small" data-option-summary hidden></p>
 
@@ -3004,6 +3020,13 @@
         { "type": "text", "id": "label", "label": "Heading", "default": "To go with it." },
         { "type": "text", "id": "question", "label": "Heading, second part", "default": "A lid for each mug?" },
         { "type": "product", "id": "product", "label": "Product" },
+        {
+          "type": "product_list",
+          "id": "more_products",
+          "label": "More products as options",
+          "limit": 10,
+          "info": "Shown as buttons beside the product's own variants. A product without variants is named by its title after the dash, e.g. Lid - Harf Harmony reads Harf Harmony. Used when customers choose how many."
+        },
         { "type": "text", "id": "name", "label": "Name", "info": "Leave empty to use the product title." },
         { "type": "image_picker", "id": "image", "label": "Image", "info": "Leave empty to use the product image." },
         { "type": "textarea", "id": "copy", "label": "Description" },
