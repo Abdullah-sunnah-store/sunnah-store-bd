@@ -9,7 +9,9 @@
     03 Card — the card that goes inside, sent as a line-item property
     04 Names on the card (optional)
     05 Complete the gift — perfume and miswak rows with Add toggles; with two
-       boxes both perfumes ride along free as properties instead of paid lines
+       boxes both perfumes ride along free as properties instead of paid lines;
+       a hijab row shows its price less the set discount, which a matching
+       automatic discount in Shopify admin must actually charge
     order summary with one line per item; fixed total bar on small screens
 
   Without JavaScript the form still posts the first box with its card; the
@@ -103,6 +105,34 @@
   assign name_property = s.name_label
   assign miswak_label_text = s.miswak_label | default: miswak.title
 
+  # Hijab add-on, offered at a percentage off while it rides with the box.
+  # The page shows the reduced price; an automatic discount must charge it.
+  # Colours come from a collection (one product per colour, as in the set
+  # builder) or from the variants of one product; swatches are painted from
+  # "Name: #hex" lines matched against each colour's name.
+  assign hijab = s.hijab_product
+  assign hijab_collection = s.hijab_collection
+  assign has_hijab = false
+  if hijab_collection != blank and hijab_collection.products_count > 0
+    assign has_hijab = true
+  elsif hijab != blank
+    assign has_hijab = true
+  endif
+  assign hijab_label_text = s.hijab_label | default: hijab_collection.title | default: hijab.title
+  assign hijab_keep = 100 | minus: s.hijab_discount
+  assign hijab_swatch_lines = s.hijab_swatch_colours | newline_to_br | split: '<br />'
+  assign hijab_exclude = s.hijab_exclude | strip | downcase
+
+  # A second fabric (Cherry) adds a switch under the hijab photo.
+  assign hijab_group_count = 0
+  if has_hijab
+    assign hijab_group_count = 1
+  endif
+  if s.hijab_collection_2 != blank and s.hijab_collection_2.products_count > 0
+    assign has_hijab = true
+    assign hijab_group_count = hijab_group_count | plus: 1
+  endif
+
   # "In every box" strip: one item per block with a name or an image.
   assign inside_blocks = section.blocks | where: 'type', 'inside'
   assign inside_count = 0
@@ -144,7 +174,7 @@
     assign step = step | plus: 1
     assign step_name = step
   endif
-  if has_perfume or miswak != blank
+  if has_perfume or miswak != blank or has_hijab
     assign step = step | plus: 1
     assign step_extras = step
   endif
@@ -610,6 +640,228 @@
 
   #tss-gbx-{{ uid }} .tss-gbx__extra-price {
     font-size: 13px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__extra-price s {
+    margin-inline-start: 4px;
+    color: rgb(28 28 26 / 0.45);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__extra-badge {
+    align-self: flex-start;
+    margin-top: 2px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    background: var(--tss-green);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--tss-ivory);
+  }
+
+  /* ---------- hijab: photo beside name, price, swatches and stepper ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__hijab {
+    display: grid;
+    grid-template-columns: 128px minmax(0, 1fr);
+    gap: 12px 16px;
+    align-items: stretch;
+    padding: 12px;
+    border: 1px solid rgb(28 28 26 / 0.15);
+    transition: border-color 0.3s var(--tss-ease), background-color 0.3s var(--tss-ease);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab[data-count]:not([data-count='0']) {
+    border-color: var(--tss-green);
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-price .tss-gbx__extra-badge {
+    align-self: center;
+    margin-top: 0;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-foot {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-foot .tss-gbx__stepper {
+    margin-top: 0;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-tabs {
+    display: flex;
+    gap: 6px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-tab {
+    min-width: 0;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid rgb(28 28 26 / 0.15);
+    border-radius: 2px;
+    background: transparent;
+    font-family: var(--tss-sans);
+    font-size: 12px;
+    color: var(--tss-ink);
+    cursor: pointer;
+    transition: border-color 0.3s var(--tss-ease), background-color 0.3s var(--tss-ease);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-tab[aria-pressed='true'] {
+    border-color: var(--tss-green);
+    background: var(--tss-green);
+    color: var(--tss-ivory);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-tab:focus-visible {
+    outline: 2px solid var(--tss-gold);
+    outline-offset: 2px;
+  }
+
+  /* The photo runs the full height of the name, price and swatches. */
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-media {
+    position: relative;
+    min-height: 128px;
+    overflow: hidden;
+    border: 1px solid rgb(28 28 26 / 0.1);
+    background: #fff;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-media img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-name {
+    font-family: var(--tss-serif);
+    font-size: 20px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hswatch {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--tss-ivory-2) center / cover no-repeat;
+    box-shadow: inset 0 0 0 1px rgb(28 28 26 / 0.08);
+    cursor: pointer;
+    transition: box-shadow 0.25s var(--tss-ease);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hswatch[aria-pressed='true'] {
+    box-shadow: 0 0 0 2px var(--tss-ivory), 0 0 0 3px var(--tss-gold);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hswatch[hidden] {
+    display: none;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hswatch:focus-visible {
+    outline: 2px solid var(--tss-green);
+    outline-offset: 4px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hswatch-badge {
+    position: absolute;
+    inset-block-start: -6px;
+    inset-inline-end: -6px;
+    display: grid;
+    place-items: center;
+    min-width: 16px;
+    height: 16px;
+    padding-inline: 3px;
+    border-radius: 8px;
+    background: var(--tss-gold);
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--tss-ivory);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hswatch-badge[hidden] {
+    display: none;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__stepper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 10px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__stepper button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid rgb(26 74 58 / 0.2);
+    border-radius: 2px;
+    background: transparent;
+    font-size: 18px;
+    color: var(--tss-ink);
+    cursor: pointer;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__stepper button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__stepper output {
+    width: 28px;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  @media (max-width: 480px) {
+    #tss-gbx-{{ uid }} .tss-gbx__hijab {
+      grid-template-columns: 96px minmax(0, 1fr);
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__hijab-media {
+      min-height: 96px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #tss-gbx-{{ uid }} .tss-gbx__hijab,
+    #tss-gbx-{{ uid }} .tss-gbx__hijab-tab,
+    #tss-gbx-{{ uid }} .tss-gbx__hswatch {
+      transition: none;
+    }
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__extra-free {
@@ -1393,7 +1645,7 @@
           </div>
         {%- endfor -%}
 
-        {%- if has_perfume or miswak != blank -%}
+        {%- if has_perfume or miswak != blank or has_hijab -%}
           <fieldset class="tss-gbx__step">
             <legend class="tss-gbx__legend">
               <span class="tss-gbx__num" aria-hidden="true">{{ step_extras | prepend: '0' }}</span>
@@ -1478,6 +1730,186 @@
                   </label>
                 </div>
               {%- endif -%}
+
+              {%- if has_hijab -%}
+                {%- comment -%}
+                  Hijab: photo with the fabric switch (Pashmina / Cherry) under
+                  it; beside it the chosen colour's name and price, small round
+                  swatches for the chosen fabric and a stepper. Each colour keeps
+                  its own count, shown as a badge on its swatch; every counted
+                  colour is its own line.
+                {%- endcomment -%}
+                <div class="tss-gbx__hijab" data-hijab>
+                  <div class="tss-gbx__hijab-media">
+                    <img alt="" width="600" height="600" loading="lazy" data-hijab-img hidden>
+                  </div>
+                  <div class="tss-gbx__hijab-body">
+                    <span class="tss-gbx__hijab-name" data-hijab-name>{{ hijab_label_text | escape }}</span>
+                    <div class="tss-gbx__hijab-price">
+                      <span class="tss-gbx__extra-price">
+                        <span data-hijab-sale></span>
+                        {%- if s.hijab_discount > 0 %} <s data-hijab-full></s>{% endif -%}
+                      </span>
+                      {%- if s.hijab_badge != blank and s.hijab_discount > 0 -%}
+                        <span class="tss-gbx__extra-badge">
+                          {{- s.hijab_badge | replace: '[percent]', s.hijab_discount | escape -}}
+                        </span>
+                      {%- endif -%}
+                    </div>
+
+                    <div class="tss-gbx__swatches" role="group" aria-label="{{ s.hijab_choice_label | escape }}">
+                      {%- assign first_open = true -%}
+                      {%- for g in (1..2) -%}
+                        {%- liquid
+                          # Group 1 is the first fabric (collection, or one product);
+                          # group 2 the second fabric's collection.
+                          assign group_from_collection = false
+                          assign group_items = nil
+                          if g == 1
+                            assign group_collection = hijab_collection
+                            assign group_lines = hijab_swatch_lines
+                            if hijab_collection != blank and hijab_collection.products_count > 0
+                              assign group_from_collection = true
+                              assign group_items = hijab_collection.products
+                            elsif hijab != blank
+                              assign group_items = hijab.handle | split: ','
+                            endif
+                          else
+                            assign group_collection = s.hijab_collection_2
+                            assign group_lines = s.hijab_swatch_colours_2 | newline_to_br | split: '<br />'
+                            if group_collection != blank and group_collection.products_count > 0
+                              assign group_from_collection = true
+                              assign group_items = group_collection.products
+                            endif
+                          endif
+                          if group_items == nil
+                            continue
+                          endif
+                        -%}
+                        {%- for entry in group_items limit: 50 -%}
+                          {%- liquid
+                            assign item = entry
+                            unless group_from_collection
+                              assign item = all_products[entry]
+                            endunless
+                            if hijab_exclude != blank
+                              assign item_title = item.title | downcase
+                              if item_title contains hijab_exclude
+                                continue
+                              endif
+                            endif
+                          -%}
+                          {%- for variant in item.variants -%}
+                            {%- liquid
+                              unless variant.available
+                                continue
+                              endunless
+                              assign piece_name = item.title
+                              unless item.has_only_default_variant
+                                if group_from_collection
+                                  assign piece_name = item.title | append: ' ' | append: variant.title
+                                else
+                                  assign piece_name = variant.title
+                                endif
+                              endunless
+                              assign piece_image = variant.featured_image | default: item.featured_image
+                              assign piece_max = 99
+                              if variant.inventory_management == 'shopify' and variant.inventory_policy == 'deny'
+                                assign piece_max = variant.inventory_quantity | at_least: 0
+                              endif
+                              assign piece_sale = variant.price | times: hijab_keep | divided_by: 100
+
+                              # The longest colour name found in the piece name wins, so
+                              # "Mint Green" is not painted as "Mint".
+                              assign piece_colour = ''
+                              assign best_size = 0
+                              assign piece_lower = piece_name | downcase
+                              for line in group_lines
+                                assign pair = line | split: ':'
+                                if pair.size < 2
+                                  continue
+                                endif
+                                assign colour_name = pair[0] | strip | downcase
+                                if colour_name != blank and colour_name.size > best_size and piece_lower contains colour_name
+                                  assign best_size = colour_name.size
+                                  assign piece_colour = pair[1] | strip | remove: ';' | remove: '"'
+                                endif
+                              endfor
+                              if piece_colour == blank
+                                for value in item.options_with_values.first.values
+                                  if value == variant.option1 and value.swatch.color
+                                    assign piece_colour = value.swatch.color
+                                  endif
+                                endfor
+                              endif
+                            -%}
+                            <button
+                              type="button"
+                              class="tss-gbx__hswatch"
+                              aria-pressed="{% if first_open %}true{% else %}false{% endif %}"
+                              aria-label="{{ piece_name | escape }}"
+                              {% if piece_colour != blank %}
+                                style="background-color: {{ piece_colour | escape }};"
+                              {% elsif piece_image %}
+                                style="background-image: url('{{ piece_image | image_url: width: 80, height: 80, crop: 'center' }}');"
+                              {% endif %}
+                              data-hijab-swatch
+                              data-hijab-group="{{ g }}"
+                              data-variant="{{ variant.id }}"
+                              data-name="{{ piece_name | escape }}"
+                              data-price="{{ piece_sale }}"
+                              data-full="{{ variant.price }}"
+                              data-max="{{ piece_max }}"
+                              {% if piece_image %}
+                                data-large="{{ piece_image | image_url: width: 600 }}"
+                              {% endif %}
+                              {% if g != 1 %}
+                                hidden
+                              {% endif %}
+                            >
+                              <span class="tss-gbx__hswatch-badge" data-badge hidden></span>
+                            </button>
+                            {%- assign first_open = false -%}
+                          {%- endfor -%}
+                        {%- endfor -%}
+                      {%- endfor -%}
+                    </div>
+                  </div>
+                  {%- comment -%} Fabric switch and stepper share one row under the card. {%- endcomment -%}
+                  <div class="tss-gbx__hijab-foot">
+                    {%- if hijab_group_count > 1 -%}
+                      <div class="tss-gbx__hijab-tabs" role="group" aria-label="{{ s.hijab_fabric_label | escape }}">
+                        {%- for g in (1..2) -%}
+                          {%- liquid
+                            if g == 1
+                              assign tab_label = s.hijab_tab_1 | default: hijab_collection.title
+                            else
+                              assign tab_label = s.hijab_tab_2 | default: s.hijab_collection_2.title
+                            endif
+                          -%}
+                          <button
+                            type="button"
+                            class="tss-gbx__hijab-tab"
+                            aria-pressed="{% if g == 1 %}true{% else %}false{% endif %}"
+                            data-hijab-tab="{{ g }}"
+                          >
+                            {{- tab_label | escape -}}
+                          </button>
+                        {%- endfor -%}
+                      </div>
+                    {%- endif -%}
+                    {%- if first_open -%}
+                      <span class="tss-gbx__extra-note">{{ s.sold_out_label | escape }}</span>
+                    {%- else -%}
+                      <div class="tss-gbx__stepper">
+                        <button type="button" aria-label="{{ s.remove_one_label | escape }}" data-hijab-dec>−</button>
+                        <output aria-live="polite" data-hijab-qty>0</output>
+                        <button type="button" aria-label="{{ s.add_one_label | escape }}" data-hijab-inc>+</button>
+                      </div>
+                    {%- endif -%}
+                  </div>
+                </div>
+              {%- endif -%}
             </div>
           </fieldset>
         {%- endif -%}
@@ -1539,8 +1971,11 @@
         two: {{ s.two_label | json }},
         twoNote: {{ s.two_note | json }},
         perfume: {{ perfume_label_text | json }},
-        miswak: {{ miswak_label_text | json }}
+        miswak: {{ miswak_label_text | json }},
+        hijab: {{ hijab_label_text | json }},
+        offer: {% if s.hijab_discount > 0 %}{{ s.hijab_badge | replace: '[percent]', s.hijab_discount | json }}{% else %}''{% endif %}
       };
+      var OFFER = {{ s.hijab_offer_property | default: 'Offer' | json }};
 
       var form = root.querySelector('[data-form]');
       var rail = root.querySelector('[data-rail]');
@@ -1555,6 +1990,19 @@
       var perfumeToggle = root.querySelector('[data-perfume-toggle]');
       var scents = root.querySelector('[data-perfume-scents]');
       var miswak = root.querySelector('[data-miswak]');
+      var hijabCard = root.querySelector('[data-hijab]');
+      var hijabSwatches = Array.prototype.slice.call(root.querySelectorAll('[data-hijab-swatch]'));
+      var hijabImg = root.querySelector('[data-hijab-img]');
+      var hijabName = root.querySelector('[data-hijab-name]');
+      var hijabSale = root.querySelector('[data-hijab-sale]');
+      var hijabFull = root.querySelector('[data-hijab-full]');
+      var hijabQtyOut = root.querySelector('[data-hijab-qty]');
+      var hijabDec = root.querySelector('[data-hijab-dec]');
+      var hijabInc = root.querySelector('[data-hijab-inc]');
+      var hijabTabs = Array.prototype.slice.call(root.querySelectorAll('[data-hijab-tab]'));
+      var hijabQty = {};
+      var hijabActive = hijabSwatches[0] || null;
+      var hijabGroup = hijabActive ? hijabActive.getAttribute('data-hijab-group') : '1';
       var labels = submits.map(function (b) { return b.textContent; });
       var active = 1;
       var busy = false;
@@ -1616,8 +2064,13 @@
         var second = two ? picked('[data-colours="2"]') : null;
         var scent = !two && perfumeToggle && perfumeToggle.checked ? picked('[data-perfume-scents]') : null;
         var addMiswak = !!(miswak && miswak.checked);
-        var total = cents(first) + cents(second) + cents(scent) + (addMiswak ? cents(miswak) : 0);
-        return { two: two, first: first, second: second, scent: scent, miswak: addMiswak, total: total };
+        // Every hijab colour with a count, in swatch order.
+        var hijabs = hijabSwatches
+          .map(function (el) { return { el: el, qty: hijabQty[el.getAttribute('data-variant')] || 0 }; })
+          .filter(function (h) { return h.qty > 0; });
+        var hijabTotal = hijabs.reduce(function (sum, h) { return sum + cents(h.el) * h.qty; }, 0);
+        var total = cents(first) + cents(second) + cents(scent) + (addMiswak ? cents(miswak) : 0) + hijabTotal;
+        return { two: two, first: first, second: second, scent: scent, miswak: addMiswak, hijabs: hijabs, total: total };
       }
 
       function addLine(label, value) {
@@ -1647,6 +2100,10 @@
           }
         }
         if (st.miswak) addLine(T.miswak, money(cents(miswak)));
+        st.hijabs.forEach(function (h) {
+          var label = hijabSwatches.length > 1 ? h.el.getAttribute('data-name') : T.hijab;
+          addLine(label + (h.qty > 1 ? ' × ' + h.qty : ''), money(cents(h.el) * h.qty));
+        });
       }
 
       function render() {
@@ -1691,6 +2148,37 @@
         });
         if (scents) {
           scents.hidden = st.two || !(perfumeToggle && perfumeToggle.checked) || scents.querySelectorAll('input').length < 2;
+        }
+
+        // The hijab card shows the active colour: photo, name, prices and its count.
+        if (hijabCard && hijabActive) {
+          var activeId = hijabActive.getAttribute('data-variant');
+          var activeQty = hijabQty[activeId] || 0;
+          var large = hijabActive.getAttribute('data-large');
+          if (hijabImg && large) {
+            if (hijabImg.getAttribute('src') !== large) hijabImg.src = large;
+            hijabImg.hidden = false;
+          }
+          if (hijabName) hijabName.textContent = hijabActive.getAttribute('data-name');
+          if (hijabSale) hijabSale.textContent = '+ ' + money(cents(hijabActive));
+          if (hijabFull) hijabFull.textContent = money(parseInt(hijabActive.getAttribute('data-full'), 10));
+          if (hijabQtyOut) hijabQtyOut.textContent = activeQty;
+          if (hijabDec) hijabDec.disabled = activeQty <= 0;
+          if (hijabInc) hijabInc.disabled = activeQty >= (parseInt(hijabActive.getAttribute('data-max'), 10) || 99);
+          hijabTabs.forEach(function (tab) {
+            tab.setAttribute('aria-pressed', tab.getAttribute('data-hijab-tab') === hijabGroup ? 'true' : 'false');
+          });
+          hijabSwatches.forEach(function (el) {
+            var qty = hijabQty[el.getAttribute('data-variant')] || 0;
+            var badge = el.querySelector('[data-badge]');
+            el.hidden = el.getAttribute('data-hijab-group') !== hijabGroup;
+            el.setAttribute('aria-pressed', el === hijabActive ? 'true' : 'false');
+            if (badge) {
+              badge.textContent = qty;
+              badge.hidden = qty === 0;
+            }
+          });
+          hijabCard.setAttribute('data-count', st.hijabs.reduce(function (sum, h) { return sum + h.qty; }, 0));
         }
 
         var text = money(st.total);
@@ -1740,6 +2228,42 @@
           selectTab(next, true);
         });
       });
+
+      /* ---------- hijab ---------- */
+      hijabSwatches.forEach(function (el) {
+        el.addEventListener('click', function () {
+          hijabActive = el;
+          render();
+        });
+      });
+
+      // Switching fabric shows its swatches and picks its first colour.
+      hijabTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var group = tab.getAttribute('data-hijab-tab');
+          if (group === hijabGroup) return;
+          var first = hijabSwatches.filter(function (el) {
+            return el.getAttribute('data-hijab-group') === group;
+          })[0];
+          if (!first) return;
+          hijabGroup = group;
+          hijabActive = first;
+          render();
+        });
+      });
+
+      function stepHijab(delta) {
+        if (!hijabActive) return;
+        var id = hijabActive.getAttribute('data-variant');
+        var max = parseInt(hijabActive.getAttribute('data-max'), 10) || 99;
+        hijabQty[id] = Math.min(max, Math.max(0, (hijabQty[id] || 0) + delta));
+        hint.removeAttribute('data-error');
+        hint.textContent = '';
+        render();
+      }
+
+      if (hijabDec) hijabDec.addEventListener('click', function () { stepHijab(-1); });
+      if (hijabInc) hijabInc.addEventListener('click', function () { stepHijab(1); });
 
       /* ---------- gallery ---------- */
       function goTo(index) {
@@ -1808,6 +2332,12 @@
           }
         }
         if (st.miswak) items.push({ id: parseInt(miswak.value, 10), quantity: 1 });
+        st.hijabs.forEach(function (h) {
+          var hijabProps = {};
+          hijabProps[LINK] = st.first.getAttribute('data-title');
+          if (T.offer) hijabProps[OFFER] = T.offer;
+          items.push({ id: parseInt(h.el.getAttribute('data-variant'), 10), quantity: h.qty, properties: hijabProps });
+        });
 
         busy = true;
         render();
@@ -1884,6 +2414,52 @@
       "label": "Miswak add-on image",
       "info": "Leave empty to use the miswak product image."
     },
+    {
+      "type": "collection",
+      "id": "hijab_collection",
+      "label": "Hijab collection",
+      "info": "Every available colour of every product becomes a swatch, as in the set builder."
+    },
+    {
+      "type": "text",
+      "id": "hijab_exclude",
+      "label": "Leave out hijabs whose title contains",
+      "default": "Hamper"
+    },
+    { "type": "product", "id": "hijab_product", "label": "Or one hijab product", "info": "Used when no collection is chosen. Each variant is one colour." },
+    {
+      "type": "textarea",
+      "id": "hijab_swatch_colours",
+      "label": "Hijab swatch colours",
+      "info": "One per line, as Colour name: #hex. A colour whose name contains it is painted that colour; any other shows its photo.",
+      "default": "Metallic Golden: #e0b479\nBlood Red: #da1f3d\nEmerald Green: #395759\nBlack: #3a3837\nCarob Brown: #d9a57a\nSlate Gray: #8f96b2\nRoyal Maroon: #9e344a\nDark Maroon: #8e3046\nRoyal Blue: #1e5387\nCanon Pink: #ed95a4\nMidnight Maroon: #943d4e\nFlamingo Pink: #db9aae\nGrape Purple: #b6698f"
+    },
+    { "type": "text", "id": "hijab_tab_1", "label": "First fabric name", "info": "Leave empty to use the collection title.", "default": "Pashmina" },
+    {
+      "type": "collection",
+      "id": "hijab_collection_2",
+      "label": "Second hijab collection",
+      "info": "Adds a fabric switch under the hijab photo."
+    },
+    { "type": "text", "id": "hijab_tab_2", "label": "Second fabric name", "info": "Leave empty to use the collection title.", "default": "Cherry" },
+    {
+      "type": "textarea",
+      "id": "hijab_swatch_colours_2",
+      "label": "Second fabric swatch colours",
+      "info": "One per line, as Colour name: #hex.",
+      "default": "Cherry Red: #c82b3f\nWine Dark Purple: #583142\nWatermelon Pink: #e47172\nBottle Green: #0a4245\nBlue: #0f2842\nJapanese Violet: #6a4759\nBlack: #1f1f1f\nDark Wine: #431822\nGrape Purple: #7a3351\nMint: #96a675\nMint Green: #9db8a4"
+    },
+    {
+      "type": "range",
+      "id": "hijab_discount",
+      "label": "Hijab discount",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 50,
+      "info": "Shown on the page and in the total. Charge it with a matching automatic discount (Buy X get Y) in Shopify admin."
+    },
     { "type": "header", "content": "Introduction" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Wedding season" },
     { "type": "text", "id": "title", "label": "Title", "info": "Leave empty to use the product title." },
@@ -1932,6 +2508,13 @@
     { "type": "text", "id": "scent_label", "label": "Scent label", "default": "Perfume" },
     { "type": "text", "id": "miswak_label", "label": "Miswak name", "info": "Leave empty to use the product title.", "default": "Miswak" },
     { "type": "text", "id": "miswak_text", "label": "Miswak description", "default": "A Sunnah to carry." },
+    { "type": "text", "id": "hijab_label", "label": "Hijab name", "info": "Used in the summary when there is a single colour.", "default": "Hijab" },
+    { "type": "text", "id": "remove_one_label", "label": "Stepper minus label", "default": "Remove one" },
+    { "type": "text", "id": "add_one_label", "label": "Stepper plus label", "default": "Add one" },
+    { "type": "text", "id": "hijab_badge", "label": "Hijab offer badge", "info": "[percent] becomes the discount.", "default": "[percent]% off with the box" },
+    { "type": "text", "id": "hijab_choice_label", "label": "Hijab colour label", "default": "Hijab colour" },
+    { "type": "text", "id": "hijab_fabric_label", "label": "Hijab fabric switch label", "default": "Hijab fabric" },
+    { "type": "text", "id": "hijab_offer_property", "label": "Hijab offer cart property", "default": "Offer" },
     { "type": "text", "id": "add_label", "label": "Add button", "default": "Add" },
     { "type": "text", "id": "added_label", "label": "Added button", "default": "Added" },
     { "type": "text", "id": "included_label", "label": "Included label", "default": "Included" },

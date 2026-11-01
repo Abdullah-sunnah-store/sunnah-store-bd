@@ -182,7 +182,12 @@
         "adding_label": "Adding…",
         "error_text": "We couldn’t add this to your bag. Please try again.",
         "empty_text": "Choose a box product for this section.",
-        "padding_bottom": 0
+        "padding_bottom": 0,
+        "hijab_collection": "pashmina-hijab",
+        "hijab_collection_2": "cherry-hijab",
+        "hijab_tab_1": "Pashmina",
+        "hijab_tab_2": "Cherry",
+        "hijab_swatch_colours_2": "Cherry Red: #c82b3f\nWine Dark Purple: #583142\nWatermelon Pink: #e47172\nBottle Green: #0a4245\nBlue: #0f2842\nJapanese Violet: #6a4759\nBlack: #1f1f1f\nDark Wine: #431822\nGrape Purple: #7a3351\nMint: #96a675\nMint Green: #9db8a4"
       }
     },
     "story": {
