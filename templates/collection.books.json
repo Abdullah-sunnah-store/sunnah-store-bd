@@ -1,0 +1,117 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "header": {
+      "type": "tss-house-header",
+      "settings": {
+        "lede": "The Quran first. Then the books of the deen, stories for little ones, and good reading.",
+        "link_label": "",
+        "link": "#all",
+        "show_crumbs": true,
+        "home_label": "The House",
+        "show_rule": true
+      }
+    },
+    "quran": {
+      "type": "tss-house-rail",
+      "settings": {
+        "layout": "row",
+        "heading": "The Quran",
+        "text": "Five mushafs, from a pocket edition to leather with colour-coded tajweed.",
+        "collection": "quran",
+        "limit": 5,
+        "link_label": "All Qurans",
+        "ratio": "3 / 4",
+        "min_width": 180,
+        "padding_top": 48,
+        "padding_bottom": 0
+      }
+    },
+    "keep": {
+      "type": "tss-house-rail",
+      "settings": {
+        "layout": "band",
+        "eyebrow": "To keep it well",
+        "heading": "A Quran, its cover, and a place to rest",
+        "text": "Add them to any mushaf above, and the gift is kept for a lifetime.",
+        "limit": 3,
+        "link_label": "",
+        "ratio": "1",
+        "min_width": 160,
+        "padding_top": 40,
+        "padding_bottom": 0
+      }
+    },
+    "tiles": {
+      "type": "tss-house-tiles",
+      "blocks": {
+        "tile_1": {
+          "type": "tile",
+          "settings": {
+            "collection": "islamic-books",
+            "text": "Seerah, history and guidance, in Bangla",
+            "show_count": true
+          }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": {
+            "collection": "children-books",
+            "text": "First Islam, first Arabic letters",
+            "show_count": true,
+            "title": "For Children",
+            "eyebrow": "Muslim Kids"
+          }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": {
+            "collection": "general-books",
+            "text": "Bangla essays and the classics, in English",
+            "show_count": true,
+            "title": "General Reading"
+          }
+        }
+      },
+      "block_order": [
+        "tile_1",
+        "tile_2",
+        "tile_3"
+      ],
+      "settings": {
+        "ratio": "4 / 3",
+        "min_width": 260,
+        "large_names": true,
+        "count_label": "[count] titles",
+        "padding_top": 64,
+        "padding_bottom": 0,
+        "accessible_label": "Shop by category"
+      }
+    },
+    "all": {
+      "type": "tss-house-products",
+      "settings": {
+        "heading": "All [title]",
+        "show_sort": true,
+        "per_page": 16,
+        "ratio": "1",
+        "min_width": 250
+      }
+    }
+  },
+  "order": [
+    "header",
+    "quran",
+    "keep",
+    "tiles",
+    "all"
+  ]
+}

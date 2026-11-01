@@ -1,0 +1,100 @@
+{% comment %}
+  Section contract.
+  TSS House — Header. The opening band of a department page: a breadcrumb
+  from the shop, the title, one line of introduction and an optional link
+  (usually down to the product grid at #all). On a collection template the
+  title and introduction default to the collection's own.
+  @example
+  <!-- templates/collection.home-decor.json, first section -->
+{% endcomment %}
+
+{% render 'tss-house-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign resource = collection | default: page
+  assign title = s.title | default: resource.title
+  assign lede = s.lede
+  if lede == blank and collection
+    assign lede = collection.description | strip_html | strip | truncatewords: 30
+  endif
+  assign link_label = s.link_label | replace: '[title]', title
+-%}
+
+<style>
+  #th-header-{{ uid }} .th-header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 24px;
+    padding-block: 32px 28px;
+  }
+
+  #th-header-{{ uid }} .th-header__inner--rule {
+    border-bottom: 1px solid var(--th-line);
+  }
+
+  #th-header-{{ uid }} .th-header__text {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    max-width: 680px;
+  }
+
+  @media (min-width: 990px) {
+    #th-header-{{ uid }} .th-header__inner {
+      padding-block: 48px 40px;
+    }
+  }
+</style>
+
+<div id="th-header-{{ uid }}" class="tss-section tss-house">
+  <div class="th-wrap">
+    <div class="th-header__inner{% if s.show_rule %} th-header__inner--rule{% endif %}">
+      <div class="th-header__text">
+        {%- if s.show_crumbs -%}
+          <nav class="th-crumbs" aria-label="{{ s.crumbs_label | escape }}">
+            <a href="{{ routes.root_url }}">{{ s.home_label | escape }}</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{{ resource.title | default: title | escape }}</span>
+          </nav>
+        {%- endif -%}
+        <h1 class="th-h1">{{ title | escape }}</h1>
+        {%- if lede != blank -%}
+          <p class="th-lede">{{ lede | escape }}</p>
+        {%- endif -%}
+      </div>
+      {%- if link_label != blank -%}
+        <a class="th-link" href="{{ s.link | default: '#all' }}">{{ link_label | escape }} →</a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "TSS House — Header",
+  "tag": "section",
+  "class": "tss-house-header-section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Title", "info": "Leave empty to use the collection or page title." },
+    { "type": "textarea", "id": "lede", "label": "Introduction", "info": "Leave empty to use the collection description." },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Link label",
+      "info": "[title] becomes the title. Leave empty to hide the link.",
+      "default": "Shop all [title]"
+    },
+    { "type": "text", "id": "link", "label": "Link", "info": "Leave empty to jump to the product grid below.", "default": "#all" },
+    { "type": "checkbox", "id": "show_crumbs", "label": "Show breadcrumb", "default": true },
+    { "type": "text", "id": "home_label", "label": "Breadcrumb home label", "default": "The House" },
+    { "type": "text", "id": "crumbs_label", "label": "Breadcrumb accessible name", "default": "Breadcrumb" },
+    { "type": "checkbox", "id": "show_rule", "label": "Line under the header", "default": true }
+  ],
+  "presets": [{ "name": "TSS House — Header" }]
+}
+{% endschema %}

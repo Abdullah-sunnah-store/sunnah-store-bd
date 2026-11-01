@@ -1,0 +1,287 @@
+{% comment %}
+  Section contract.
+  TSS House — Reminder. A green band: "Never miss one" beside a short form —
+  the occasions to be reminded of as checkable chips, a mobile number and an
+  email address — that posts through Shopify's contact form, so each request
+  arrives in the store inbox. Shopify requires an email on contact forms.
+  Every choice is a native checkbox, so the form needs no JavaScript.
+  @example
+  <!-- templates/collection.occasions.json, last section -->
+{% endcomment %}
+
+{% render 'tss-house-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign occasions = s.occasions | newline_to_br | split: '<br />'
+  assign preset = s.checked | split: ','
+  assign form_id = 'th-remind-form-' | append: uid
+-%}
+
+<style>
+  #th-remind-{{ uid }} {
+    padding-block: {{ s.padding_top | times: 0.66 | round }}px {{ s.padding_bottom | times: 0.66 | round }}px;
+  }
+
+  #th-remind-{{ uid }} .th-remind__band {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 28px 40px;
+    padding: 28px 20px;
+  }
+
+  #th-remind-{{ uid }} .th-remind__intro {
+    flex: 1 1 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  #th-remind-{{ uid }} .th-remind__intro .th-lede {
+    max-width: 380px;
+  }
+
+  #th-remind-{{ uid }} .th-remind__form {
+    flex: 1 1 460px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  #th-remind-{{ uid }} .th-remind__form fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  #th-remind-{{ uid }} .th-remind__chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid rgb(247 243 234 / 0.5);
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--th-bg);
+    cursor: pointer;
+  }
+
+  #th-remind-{{ uid }} .th-remind__chip input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  #th-remind-{{ uid }} .th-remind__tick {
+    display: none;
+  }
+
+  #th-remind-{{ uid }} .th-remind__chip:has(input:checked) {
+    border-color: var(--th-bg);
+    background: var(--th-bg);
+    color: var(--th-ink);
+  }
+
+  #th-remind-{{ uid }} .th-remind__chip:has(input:checked) .th-remind__tick {
+    display: inline;
+  }
+
+  #th-remind-{{ uid }} .th-remind__chip:has(input:focus-visible) {
+    outline: 2px solid var(--th-gold);
+    outline-offset: 2px;
+  }
+
+  #th-remind-{{ uid }} label.th-remind__label {
+    font-size: 13px;
+    color: var(--th-mist);
+  }
+
+  #th-remind-{{ uid }} .th-remind__fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  #th-remind-{{ uid }} .th-remind__field {
+    flex: 1 1 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  #th-remind-{{ uid }} .th-remind__field input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 50px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 2px;
+    background: var(--th-paper);
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--th-ink);
+  }
+
+  #th-remind-{{ uid }} .th-remind__form .th-btn {
+    align-self: flex-start;
+  }
+
+  #th-remind-{{ uid }} .th-remind__small {
+    font-size: 12px;
+    color: var(--th-mist);
+  }
+
+  #th-remind-{{ uid }} .th-remind__status {
+    padding: 14px 16px;
+    border-radius: 2px;
+    background: rgb(247 243 234 / 0.12);
+    font-size: 15px;
+  }
+
+  #th-remind-{{ uid }} .th-remind__status--error {
+    background: #f7f3ea;
+    color: #8b1e1e;
+  }
+
+  @media (min-width: 990px) {
+    #th-remind-{{ uid }} {
+      padding-block: {{ s.padding_top }}px {{ s.padding_bottom }}px;
+    }
+
+    #th-remind-{{ uid }} .th-remind__band {
+      padding: 48px;
+    }
+
+    #th-remind-{{ uid }} .th-h2 {
+      font-size: 42px;
+    }
+  }
+</style>
+
+<section id="th-remind-{{ uid }}" class="tss-section tss-house" aria-labelledby="th-remind-{{ uid }}-h">
+  <div class="th-wrap">
+    <div class="th-remind__band th-band">
+      <div class="th-remind__intro">
+        <h2 class="th-h2" id="th-remind-{{ uid }}-h">{{ s.heading | escape }}</h2>
+        {%- if s.text != blank -%}
+          <p class="th-lede">{{ s.text | escape }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- form 'contact', id: form_id, class: 'th-remind__form' -%}
+        <input type="hidden" name="contact[Request]" value="{{ s.heading | escape }}">
+
+        {%- if form.posted_successfully? -%}
+          <p class="th-remind__status" role="status">{{ s.success_text | escape }}</p>
+        {%- elsif form.errors -%}
+          <p class="th-remind__status th-remind__status--error" role="alert">
+            {{ form.errors | default_errors }}
+          </p>
+        {%- endif -%}
+
+        <fieldset>
+          <legend class="visually-hidden">{{ s.occasions_label | escape }}</legend>
+          <div class="th-chips">
+            {%- for occasion in occasions -%}
+              {%- assign label = occasion | strip -%}
+              {%- if label != blank -%}
+                {%- liquid
+                  assign checked = false
+                  for p in preset
+                    assign p_label = p | strip
+                    if p_label == label
+                      assign checked = true
+                    endif
+                  endfor
+                -%}
+                <label class="th-remind__chip">
+                  <input
+                    type="checkbox"
+                    name="contact[{{ s.occasions_label | escape }}: {{ label | escape }}]"
+                    value="{{ s.yes_value | escape }}"
+                    {% if checked %}
+                      checked
+                    {% endif %}
+                  >
+                  <span class="th-remind__tick" aria-hidden="true">✓</span>
+                  {{- label | escape -}}
+                </label>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </fieldset>
+
+        <div class="th-remind__fields">
+          <div class="th-remind__field">
+            <label class="th-remind__label" for="th-remind-{{ uid }}-phone">{{ s.phone_label | escape }}</label>
+            <input
+              id="th-remind-{{ uid }}-phone"
+              type="tel"
+              name="contact[phone]"
+              autocomplete="tel"
+              inputmode="tel"
+              placeholder="{{ s.phone_placeholder | escape }}"
+              required
+            >
+          </div>
+          <div class="th-remind__field">
+            <label class="th-remind__label" for="th-remind-{{ uid }}-email">{{ s.email_label | escape }}</label>
+            <input
+              id="th-remind-{{ uid }}-email"
+              type="email"
+              name="contact[email]"
+              autocomplete="email"
+              spellcheck="false"
+              required
+            >
+          </div>
+        </div>
+
+        <button type="submit" class="th-btn th-btn--gold">{{ s.button_label | escape }}</button>
+        {%- if s.small_print != blank -%}
+          <span class="th-remind__small">{{ s.small_print | escape }}</span>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TSS House — Reminder",
+  "tag": "div",
+  "class": "tss-house-reminder-section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Never miss one" },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "One message two weeks before each occasion you choose. Nothing else." },
+    {
+      "type": "textarea",
+      "id": "occasions",
+      "label": "Occasions",
+      "info": "One per line.",
+      "default": "Ramadan\nEid ul-Fitr\nEid ul-Adha\nWedding season\nNew Year"
+    },
+    { "type": "text", "id": "checked", "label": "Ticked at first", "info": "Occasion names, separated by commas.", "default": "Ramadan, Eid ul-Fitr, Eid ul-Adha" },
+    { "type": "text", "id": "occasions_label", "label": "Occasions field name", "default": "Remind me of" },
+    { "type": "text", "id": "yes_value", "label": "Ticked value", "default": "Yes" },
+    { "type": "text", "id": "phone_label", "label": "Phone label", "default": "Your mobile number, for WhatsApp or SMS" },
+    { "type": "text", "id": "phone_placeholder", "label": "Phone placeholder", "default": "01XXX-XXXXXX" },
+    { "type": "text", "id": "email_label", "label": "Email label", "default": "Your email" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Remind me" },
+    { "type": "text", "id": "small_print", "label": "Small print", "default": "Reply STOP to any message to unsubscribe." },
+    { "type": "text", "id": "success_text", "label": "Success message", "default": "Done. We’ll message you two weeks before each one." },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 80 }
+  ],
+  "presets": [{ "name": "TSS House — Reminder" }]
+}
+{% endschema %}

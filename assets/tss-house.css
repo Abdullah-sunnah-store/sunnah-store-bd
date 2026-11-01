@@ -1,0 +1,438 @@
+/*
+  TSS House — the department, gifting, occasions and cart design layer.
+  Scoped to .tss-house so it sits beside the original TSS tokens. It also
+  re-points the shared --tss-* tokens, so older TSS sections (the cart) pick
+  up the House palette by adding the class.
+*/
+
+.tss-house {
+  --th-bg: #f7f3ea;
+  --th-paper: #fffdf8;
+  --th-sand: #efe8da;
+  --th-ink: #1c2420;
+  --th-muted: #4a524c;
+  --th-subtle: #5e6660;
+  --th-green: #1e4a37;
+  --th-green-hover: #143527;
+  --th-line: #e4dccb;
+  --th-line-strong: #d8cfbd;
+  --th-gold: #d9c9a3;
+  --th-mist: #dce3dd;
+  --th-serif: 'Cormorant Garamond', Georgia, serif;
+  --th-sans: 'Jost', system-ui, -apple-system, sans-serif;
+  --th-gutter: 20px;
+
+  --tss-ivory: var(--th-bg);
+  --tss-ivory-2: var(--th-sand);
+  --tss-ink: var(--th-ink);
+  --tss-green: var(--th-green);
+  --tss-green-dark: var(--th-green-hover);
+  --tss-green-mid: var(--th-green);
+  --tss-sans: var(--th-sans);
+
+  background: var(--th-bg);
+  font-family: var(--th-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--th-ink);
+}
+
+.tss-house a {
+  color: var(--th-green);
+}
+
+.tss-house a:hover {
+  color: var(--th-green-hover);
+}
+
+.tss-house :focus-visible {
+  outline: 2px solid var(--th-green);
+  outline-offset: 2px;
+}
+
+.th-wrap {
+  box-sizing: border-box;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--th-gutter);
+}
+
+/* ---------- type ---------- */
+.th-crumbs {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--th-subtle);
+}
+
+.tss-house .th-crumbs a {
+  color: var(--th-subtle);
+  text-decoration: none;
+}
+
+.th-crumbs [aria-current] {
+  color: var(--th-ink);
+}
+
+.th-h1 {
+  margin: 0;
+  font-family: var(--th-serif);
+  font-size: 42px;
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.th-h2 {
+  margin: 0;
+  font-family: var(--th-serif);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.th-lede {
+  margin: 0;
+  max-width: 640px;
+  font-size: 16px;
+  color: var(--th-muted);
+  text-wrap: pretty;
+}
+
+.th-eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--th-subtle);
+}
+
+.th-eyebrow--accent {
+  font-weight: 500;
+  color: var(--th-green);
+}
+
+.th-note {
+  font-size: 13px;
+  color: var(--th-subtle);
+}
+
+/* ---------- links and buttons ---------- */
+.tss-house .th-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--th-green);
+}
+
+.tss-house .th-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 0 28px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: var(--th-green);
+  font-family: var(--th-sans);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--th-bg);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.tss-house .th-btn:hover {
+  background: var(--th-green-hover);
+  color: var(--th-bg);
+}
+
+.tss-house .th-btn--light {
+  background: var(--th-bg);
+  color: var(--th-ink);
+}
+
+.tss-house .th-btn--light:hover {
+  background: var(--th-paper);
+  color: var(--th-ink);
+}
+
+.tss-house .th-btn--dark {
+  background: var(--th-ink);
+  color: var(--th-bg);
+}
+
+.tss-house .th-btn--outline {
+  border-color: var(--th-ink);
+  background: transparent;
+  color: var(--th-ink);
+}
+
+.tss-house .th-btn--outline:hover {
+  background: var(--th-paper);
+  color: var(--th-ink);
+}
+
+.tss-house .th-btn--gold {
+  background: var(--th-gold);
+  color: var(--th-ink);
+}
+
+.tss-house .th-btn--gold:hover {
+  background: var(--th-bg);
+  color: var(--th-ink);
+}
+
+/* ---------- chips ---------- */
+.th-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.th-chips--scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  margin-inline: calc(var(--th-gutter) * -1);
+  padding-inline: var(--th-gutter);
+  scrollbar-width: none;
+}
+
+.th-chips--scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.tss-house .th-chip {
+  box-sizing: border-box;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--th-line-strong);
+  border-radius: 21px;
+  background: var(--th-paper);
+  font-family: var(--th-sans);
+  font-size: 14px;
+  color: var(--th-ink);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tss-house .th-chip:hover {
+  border-color: var(--th-ink);
+  color: var(--th-ink);
+}
+
+.tss-house .th-chip[aria-current='true'],
+.tss-house .th-chip[aria-current='page'],
+.tss-house .th-chip[aria-pressed='true'] {
+  border-color: var(--th-ink);
+  background: var(--th-ink);
+  color: var(--th-bg);
+}
+
+/* ---------- section heads ---------- */
+.th-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.th-head__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.th-head__text .th-lede {
+  font-size: 15px;
+}
+
+/* ---------- cards and grids ---------- */
+.th-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 14px;
+}
+
+.th-grid--one {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tss-house .th-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  color: var(--th-ink);
+  text-decoration: none;
+}
+
+.tss-house .th-card:hover {
+  color: var(--th-ink);
+}
+
+.th-card__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--th-ratio, 1);
+  border-radius: 2px;
+  background: var(--th-sand);
+}
+
+.th-card__media img,
+.th-card__media svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.th-card:hover .th-card__media img {
+  transform: scale(1.03);
+}
+
+.th-card__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.th-card__name {
+  min-width: 0;
+  font-family: var(--th-serif);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.th-card__name--lg {
+  font-size: 23px;
+  line-height: 1.1;
+}
+
+.th-card__text {
+  font-size: 14px;
+  color: var(--th-muted);
+}
+
+.th-card__price {
+  font-size: 15px;
+}
+
+.th-card__price s {
+  margin-inline-start: 6px;
+  color: var(--th-subtle);
+}
+
+.th-card__sold {
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-start: 10px;
+  padding: 4px 10px;
+  border-radius: 2px;
+  background: var(--th-paper);
+  font-size: 12px;
+  color: var(--th-subtle);
+}
+
+.th-panel {
+  border: 1px solid var(--th-line);
+  border-radius: 3px;
+  background: var(--th-paper);
+}
+
+.th-band {
+  border-radius: 3px;
+  background: var(--th-green);
+  color: var(--th-bg);
+}
+
+.th-band .th-eyebrow {
+  color: var(--th-gold);
+}
+
+.th-band .th-lede,
+.th-band .th-card__text,
+.th-band .th-card__price {
+  color: var(--th-mist);
+}
+
+.tss-house .th-band .th-card,
+.tss-house .th-band .th-card:hover {
+  color: var(--th-bg);
+}
+
+@media (min-width: 750px) {
+  .th-grid {
+    grid-template-columns: repeat(auto-fill, minmax(var(--th-min, 220px), 1fr));
+    gap: 40px 24px;
+  }
+
+  .th-grid--fit {
+    grid-template-columns: repeat(auto-fit, minmax(var(--th-min, 220px), 1fr));
+  }
+
+  .th-chips--scroll {
+    flex-wrap: wrap;
+    overflow: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  .th-card__name {
+    font-size: 20px;
+  }
+
+  .th-card__name--lg {
+    font-size: 26px;
+  }
+}
+
+@media (min-width: 990px) {
+  .tss-house {
+    --th-gutter: 40px;
+  }
+
+  .th-h1 {
+    font-size: 60px;
+  }
+
+  .th-h2 {
+    font-size: 38px;
+  }
+
+  .th-lede {
+    font-size: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .th-card__media img,
+  .tss-house .th-btn {
+    transition: none;
+  }
+
+  .th-card:hover .th-card__media img {
+    transform: none;
+  }
+}
+
+.th-band .th-note {
+  color: var(--th-mist);
+}

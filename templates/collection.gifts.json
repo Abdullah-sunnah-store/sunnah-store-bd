@@ -1,0 +1,168 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "finder": {
+      "type": "tss-gift-finder",
+      "blocks": {
+        "question_1": {
+          "type": "question",
+          "settings": {
+            "label": "Who is it for?",
+            "kind": "tag",
+            "options": "Parents | parents | for your parents\nHusband | husband | for your husband\nWife | wife | for your wife\nFriend | friend | for a friend\nTeacher | teacher | for a teacher\nChild | child | for a child\nColleague | colleague | for a colleague",
+            "default": ""
+          }
+        },
+        "question_2": {
+          "type": "question",
+          "settings": {
+            "label": "The occasion",
+            "kind": "tag",
+            "options": "Nikah | nikah\nAqiqah | aqiqah\nHajj & Umrah | hajj-umrah\nEid | eid\nHousewarming | housewarming\nGraduation | graduation\nJust because | just-because",
+            "default": ""
+          }
+        },
+        "question_3": {
+          "type": "question",
+          "settings": {
+            "label": "Your budget",
+            "kind": "price",
+            "options": "Under ৳1,500 | -1500\n৳1,500–5,000 | 1500-5000\n৳5,000–15,000 | 5000-15000\n৳15,000+ | 15000-",
+            "default": ""
+          }
+        }
+      },
+      "block_order": [
+        "question_1",
+        "question_2",
+        "question_3"
+      ],
+      "settings": {
+        "title": "Find the gift",
+        "lede": "Tell us who it’s for and what it’s for. We’ll show you what we’d give, wrapped by hand.",
+        "shortcuts_label": "Or go straight to",
+        "button_lead": "Show gifts",
+        "all_label": "Show all gifts"
+      }
+    },
+    "ready": {
+      "type": "tss-house-rail",
+      "settings": {
+        "layout": "row",
+        "heading": "Ready to send",
+        "text": "Already chosen and boxed. Nothing to put together.",
+        "collection": "ready-to-send",
+        "limit": 4,
+        "link_label": "See all [count]",
+        "ratio": "4 / 5",
+        "min_width": 230,
+        "padding_top": 64,
+        "padding_bottom": 0
+      }
+    },
+    "occasions": {
+      "type": "tss-house-tiles",
+      "blocks": {
+        "tile_1": {
+          "type": "tile",
+          "settings": {
+            "collection": "nikah",
+            "text": "",
+            "show_count": true,
+            "eyebrow": "Wedding season",
+            "accent": true
+          }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": {
+            "collection": "aqiqah",
+            "text": "",
+            "show_count": true,
+            "eyebrow": "New baby"
+          }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": {
+            "collection": "hajj-umrah",
+            "text": "",
+            "show_count": true,
+            "eyebrow": "For the journey",
+            "title": "Hajj & Umrah"
+          }
+        },
+        "tile_4": {
+          "type": "tile",
+          "settings": {
+            "collection": "eid",
+            "text": "",
+            "show_count": true,
+            "eyebrow": "Twice a year"
+          }
+        }
+      },
+      "block_order": [
+        "tile_1",
+        "tile_2",
+        "tile_3",
+        "tile_4"
+      ],
+      "settings": {
+        "ratio": "4 / 5",
+        "min_width": 230,
+        "large_names": true,
+        "count_label": "[count] gifts",
+        "padding_top": 72,
+        "padding_bottom": 0,
+        "accessible_label": "Shop by category",
+        "heading": "By occasion",
+        "link_label": "Housewarming, graduation and more",
+        "link_collection": "shop-by-occasion"
+      }
+    },
+    "box": {
+      "type": "tss-house-feature",
+      "settings": {
+        "tone": "paper",
+        "image_fit": "contain",
+        "eyebrow": "Our signature",
+        "title": "Build your own box",
+        "text": "Choose the pieces yourself. We’ll size the box, wrap it by hand, and send it as one considered whole.",
+        "price_line": "",
+        "button_label": "Begin your box",
+        "link": "/pages/custom-gift-box",
+        "button_style": "dark",
+        "padding_top": 72,
+        "padding_bottom": 0
+      }
+    },
+    "corporate": {
+      "type": "tss-house-strip",
+      "settings": {
+        "tone": "sand",
+        "title": "Gifting for a team or your clients?",
+        "text": "Corporate and bulk orders, put together by our gifting desk.",
+        "button_label": "Corporate & bulk gifts",
+        "link": "/collections/corporate",
+        "padding_top": 32,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "finder",
+    "ready",
+    "occasions",
+    "box",
+    "corporate"
+  ]
+}

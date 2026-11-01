@@ -1,0 +1,178 @@
+{% comment %}
+  Section contract.
+  TSS House — Collection tiles. A row of collection tiles: image, name with a
+  piece count beside it, an optional eyebrow above and a line of description
+  below. Used for "Shop by category", "By occasion" and "Any time of year".
+  Each tile is a block; its image and name fall back to the collection's own.
+  @example
+  <!-- templates/collection.home-decor.json, under the header -->
+{% endcomment %}
+
+{% render 'tss-house-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign link = s.link
+  if link == blank and s.link_collection != blank
+    assign link = s.link_collection.url
+  endif
+-%}
+
+<style>
+  #th-tiles-{{ uid }} {
+    padding-block: {{ s.padding_top | times: 0.66 | round }}px {{ s.padding_bottom | times: 0.66 | round }}px;
+  }
+
+  #th-tiles-{{ uid }} .th-tiles__head {
+    margin-bottom: 20px;
+  }
+
+  #th-tiles-{{ uid }} .th-grid {
+    --th-min: {{ s.min_width }}px;
+  }
+
+  @media (min-width: 990px) {
+    #th-tiles-{{ uid }} {
+      padding-block: {{ s.padding_top }}px {{ s.padding_bottom }}px;
+    }
+
+    #th-tiles-{{ uid }} .th-tiles__head {
+      margin-bottom: 24px;
+    }
+  }
+</style>
+
+<section
+  id="th-tiles-{{ uid }}"
+  class="tss-section tss-house"
+  {% if s.heading != blank %}
+    aria-labelledby="th-tiles-{{ uid }}-h"
+  {% else %}
+    aria-label="{{ s.accessible_label | escape }}"
+  {% endif %}
+>
+  <div class="th-wrap">
+    {%- if s.heading != blank or s.link_label != blank -%}
+      <div class="th-head th-tiles__head">
+        <div class="th-head__text">
+          {%- if s.heading != blank -%}
+            <h2 class="th-h2" id="th-tiles-{{ uid }}-h">{{ s.heading | escape }}</h2>
+          {%- endif -%}
+          {%- if s.text != blank -%}
+            <p class="th-lede">{{ s.text | escape }}</p>
+          {%- endif -%}
+        </div>
+        {%- if s.link_label != blank and link != blank -%}
+          <a class="th-link" href="{{ link }}">{{ s.link_label | escape }} →</a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="th-grid th-grid--fit">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign b = block.settings
+          assign c = b.collection
+          assign img = b.image | default: c.featured_image
+          assign name = b.title | default: c.title
+          assign href = b.link | default: c.url
+          assign count = ''
+          if b.show_count and c != blank
+            assign count = s.count_label | replace: '[count]', c.products_count
+          endif
+        -%}
+        <a class="th-card" href="{{ href | default: '#' }}" {{ block.shopify_attributes }}>
+          <div class="th-card__media" style="--th-ratio: {{ s.ratio }}">
+            {%- if img != blank -%}
+              {{
+                img
+                | image_url: width: 1200
+                | image_tag:
+                  widths: '360,480,640,800,1000,1200',
+                  sizes: '(min-width: 990px) 25vw, 50vw',
+                  loading: 'lazy',
+                  alt: img.alt | default: name
+              }}
+            {%- else -%}
+              {{ 'collection-1' | placeholder_svg_tag }}
+            {%- endif -%}
+          </div>
+          {%- if b.eyebrow != blank -%}
+            <span class="th-eyebrow{% if b.accent %} th-eyebrow--accent{% endif %}">{{ b.eyebrow | escape }}</span>
+          {%- endif -%}
+          <span class="th-card__row">
+            <span class="th-card__name{% if s.large_names %} th-card__name--lg{% endif %}">{{ name | escape }}</span>
+            {%- if count != blank -%}
+              <span class="th-note">{{ count | escape }}</span>
+            {%- endif -%}
+          </span>
+          {%- if b.text != blank -%}
+            <span class="th-card__text">{{ b.text | escape }}</span>
+          {%- endif -%}
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TSS House — Tiles",
+  "tag": "div",
+  "class": "tss-house-tiles-section",
+  "max_blocks": 8,
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "text", "id": "text", "label": "Text" },
+    { "type": "text", "id": "link_label", "label": "Link label" },
+    { "type": "url", "id": "link", "label": "Link" },
+    { "type": "collection", "id": "link_collection", "label": "Or link to a collection" },
+    {
+      "type": "text",
+      "id": "accessible_label",
+      "label": "Accessible name",
+      "info": "Used when there is no heading.",
+      "default": "Shop by category"
+    },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Image shape",
+      "options": [
+        { "value": "4 / 5", "label": "Portrait" },
+        { "value": "4 / 3", "label": "Landscape" },
+        { "value": "1", "label": "Square" }
+      ],
+      "default": "4 / 5"
+    },
+    { "type": "range", "id": "min_width", "label": "Smallest tile width", "min": 160, "max": 360, "step": 10, "unit": "px", "default": 220 },
+    { "type": "checkbox", "id": "large_names", "label": "Large names", "default": true },
+    { "type": "text", "id": "count_label", "label": "Count label", "info": "[count] becomes the number of products.", "default": "[count] pieces" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 56 }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Tile",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Leave empty to use the collection image." },
+        { "type": "text", "id": "title", "label": "Name", "info": "Leave empty to use the collection title." },
+        { "type": "url", "id": "link", "label": "Link", "info": "Leave empty to link to the collection." },
+        { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+        { "type": "checkbox", "id": "accent", "label": "Green eyebrow", "default": false },
+        { "type": "text", "id": "text", "label": "Description" },
+        { "type": "checkbox", "id": "show_count", "label": "Show product count", "default": true }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TSS House — Tiles",
+      "blocks": [{ "type": "tile" }, { "type": "tile" }, { "type": "tile" }, { "type": "tile" }]
+    }
+  ]
+}
+{% endschema %}

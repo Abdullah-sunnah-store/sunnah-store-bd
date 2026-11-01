@@ -1,0 +1,334 @@
+{% comment %}
+  Section contract.
+  TSS House — Gift finder. The opening of the Gifts page: breadcrumb, title,
+  a line of introduction and "Or go straight to" links on one side; on the
+  other a panel of questions answered with chips ("Who is it for?", "The
+  occasion", "Your budget"), and one button that reads the answers back.
+
+  Each question is a block. Its options are lines of "Label | value | phrase":
+    - a Tag question narrows the collection by product tag (value = tag);
+    - a Price question adds Shopify's price filter (value = min-max, e.g.
+      1500-5000, -1500 or 15000-), so the Search & Discovery price filter must
+      be on for the collection;
+    - the optional phrase is used in the button ("for your wife").
+  One answer per question; pressing it again clears it. Without JavaScript the
+  button opens the whole collection.
+  @example
+  <!-- templates/collection.gifts.json, first section; Collection empty = this collection -->
+{% endcomment %}
+
+{% render 'tss-house-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign source = s.collection | default: collection
+  assign base_url = source.url | default: routes.all_products_collection_url
+  assign title = s.title | default: source.title
+-%}
+
+<style>
+  #th-finder-{{ uid }} .th-finder__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 32px 56px;
+    padding-block: 32px 40px;
+    border-bottom: 1px solid var(--th-line);
+  }
+
+  #th-finder-{{ uid }} .th-finder__intro {
+    flex: 1 1 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  #th-finder-{{ uid }} .th-finder__intro .th-lede {
+    max-width: 380px;
+  }
+
+  #th-finder-{{ uid }} .th-finder__shortcuts {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 12px;
+    font-size: 15px;
+  }
+
+  #th-finder-{{ uid }} .th-finder__shortcuts .th-link {
+    min-height: 36px;
+    font-size: 15px;
+    font-weight: 400;
+  }
+
+  #th-finder-{{ uid }} .th-finder__panel {
+    flex: 999 1 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+    padding: 20px;
+  }
+
+  #th-finder-{{ uid }} .th-finder__q {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--th-sand);
+  }
+
+  #th-finder-{{ uid }} .th-finder__label {
+    font-family: var(--th-serif);
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  #th-finder-{{ uid }} .th-finder__go {
+    align-self: stretch;
+    min-height: 54px;
+  }
+
+  @media (min-width: 750px) {
+    #th-finder-{{ uid }} .th-finder__panel {
+      gap: 24px;
+      padding: 32px;
+    }
+
+    #th-finder-{{ uid }} .th-finder__q {
+      grid-template-columns: 170px minmax(0, 1fr);
+      gap: 16px;
+      padding-bottom: 24px;
+    }
+
+    #th-finder-{{ uid }} .th-finder__label {
+      padding-top: 6px;
+    }
+
+    #th-finder-{{ uid }} .th-finder__go {
+      align-self: flex-end;
+      padding-inline: 32px;
+    }
+  }
+
+  @media (min-width: 990px) {
+    #th-finder-{{ uid }} .th-finder__inner {
+      padding-block: 56px 64px;
+    }
+
+    #th-finder-{{ uid }} .th-finder__intro {
+      padding-top: 8px;
+    }
+
+    #th-finder-{{ uid }} .th-h1 {
+      font-size: 64px;
+      line-height: 1;
+    }
+  }
+</style>
+
+<div id="th-finder-{{ uid }}" class="tss-section tss-house">
+  <div class="th-wrap">
+    <div class="th-finder__inner">
+      <div class="th-finder__intro">
+        <nav class="th-crumbs" aria-label="{{ s.crumbs_label | escape }}">
+          <a href="{{ routes.root_url }}">{{ s.home_label | escape }}</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{{ s.crumb | default: source.title | escape }}</span>
+        </nav>
+        <h1 class="th-h1">{{ title | escape }}</h1>
+        {%- if s.lede != blank -%}
+          <p class="th-lede">{{ s.lede | escape }}</p>
+        {%- endif -%}
+        {%- if s.shortcuts != blank -%}
+          <nav class="th-finder__shortcuts" aria-labelledby="th-finder-{{ uid }}-or">
+            <span class="th-crumbs" id="th-finder-{{ uid }}-or">{{ s.shortcuts_label | escape }}</span>
+            {%- for link in s.shortcuts.links -%}
+              <a class="th-link" href="{{ link.url }}">{{ link.title | escape }} →</a>
+            {%- endfor -%}
+          </nav>
+        {%- endif -%}
+      </div>
+
+      <div class="th-finder__panel th-panel" role="region" aria-label="{{ s.panel_label | escape }}" data-finder>
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign b = block.settings
+            assign lines = b.options | newline_to_br | split: '<br />'
+            assign default = b.default | strip
+          -%}
+          <div
+            class="th-finder__q"
+            role="group"
+            aria-labelledby="th-finder-{{ uid }}-{{ block.id }}"
+            data-question="{{ b.kind }}"
+            {{ block.shopify_attributes }}
+          >
+            <span class="th-finder__label" id="th-finder-{{ uid }}-{{ block.id }}">{{ b.label | escape }}</span>
+            <div class="th-chips">
+              {%- for line in lines -%}
+                {%- liquid
+                  assign parts = line | split: '|'
+                  assign label = parts[0] | strip
+                  assign value = parts[1] | strip | default: label
+                  assign phrase = parts[2] | strip | default: label
+                  assign pressed = 'false'
+                  if label == default
+                    assign pressed = 'true'
+                  endif
+                -%}
+                {%- if label != blank -%}
+                  <button
+                    type="button"
+                    class="th-chip"
+                    aria-pressed="{{ pressed }}"
+                    data-value="{{ value | escape }}"
+                    data-phrase="{{ phrase | escape }}"
+                  >
+                    {{- label | escape -}}
+                  </button>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endfor -%}
+
+        <a class="th-btn th-finder__go" href="{{ base_url }}" data-go>{{ s.all_label | escape }}</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var root = document.getElementById('th-finder-{{ uid }}');
+    if (!root || root.hasAttribute('data-ready')) return;
+    root.setAttribute('data-ready', '');
+
+    var BASE = {{ base_url | json }};
+    var LEAD = {{ s.button_lead | json }};
+    var ALL = {{ s.all_label | json }};
+    var questions = Array.from(root.querySelectorAll('[data-question]'));
+    var go = root.querySelector('[data-go]');
+
+    function handle(value) {
+      return value.toLowerCase().trim().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
+    }
+
+    function render() {
+      var tags = [];
+      var phrases = [];
+      var url = new URL(BASE, window.location.origin);
+
+      for (var q of questions) {
+        var on = q.querySelector('[aria-pressed="true"]');
+        if (!on) continue;
+        var value = on.getAttribute('data-value');
+        phrases.push(on.getAttribute('data-phrase'));
+        if (q.getAttribute('data-question') === 'price') {
+          var range = value.replace(/[^\d-]/g, '').split('-');
+          if (range[0]) url.searchParams.set('filter.v.price.gte', range[0]);
+          if (range[1]) url.searchParams.set('filter.v.price.lte', range[1]);
+        } else {
+          tags.push(handle(value));
+        }
+      }
+
+      if (tags.length) url.pathname = url.pathname.replace(/\/$/, '') + '/' + tags.map(encodeURIComponent).join('+');
+      go.href = url.pathname + url.search;
+      go.textContent = phrases.length ? LEAD + ' ' + phrases.join(' · ') : ALL;
+    }
+
+    root.addEventListener('click', function (event) {
+      var chip = event.target.closest('[data-question] .th-chip');
+      if (!chip) return;
+      var wasOn = chip.getAttribute('aria-pressed') === 'true';
+      chip.closest('[data-question]').querySelectorAll('.th-chip').forEach(function (c) {
+        c.setAttribute('aria-pressed', 'false');
+      });
+      chip.setAttribute('aria-pressed', wasOn ? 'false' : 'true');
+      render();
+    });
+
+    render();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "TSS House — Gift finder",
+  "tag": "section",
+  "class": "tss-gift-finder-section",
+  "max_blocks": 4,
+  "settings": [
+    { "type": "collection", "id": "collection", "label": "Collection to search", "info": "Leave empty to use this page’s collection." },
+    { "type": "text", "id": "title", "label": "Title", "default": "Find the gift" },
+    {
+      "type": "textarea",
+      "id": "lede",
+      "label": "Introduction",
+      "default": "Tell us who it’s for and what it’s for. We’ll show you what we’d give, wrapped by hand."
+    },
+    { "type": "text", "id": "crumb", "label": "Breadcrumb label", "info": "Leave empty to use the collection title." },
+    { "type": "text", "id": "home_label", "label": "Breadcrumb home label", "default": "The House" },
+    { "type": "text", "id": "crumbs_label", "label": "Breadcrumb accessible name", "default": "Breadcrumb" },
+    { "type": "text", "id": "shortcuts_label", "label": "Shortcuts label", "default": "Or go straight to" },
+    { "type": "link_list", "id": "shortcuts", "label": "Shortcut links" },
+    { "type": "text", "id": "panel_label", "label": "Finder accessible name", "default": "Gift finder" },
+    { "type": "text", "id": "button_lead", "label": "Button start", "info": "Followed by the chosen answers.", "default": "Show gifts" },
+    { "type": "text", "id": "all_label", "label": "Button with no answers", "default": "Show all gifts" }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Question", "default": "Who is it for?" },
+        {
+          "type": "select",
+          "id": "kind",
+          "label": "Narrows by",
+          "options": [
+            { "value": "tag", "label": "Product tag" },
+            { "value": "price", "label": "Price" }
+          ],
+          "default": "tag"
+        },
+        {
+          "type": "textarea",
+          "id": "options",
+          "label": "Answers",
+          "info": "One per line: Label | tag or min-max | phrase for the button.",
+          "default": "Parents | parents | for your parents\nHusband | husband | for your husband\nWife | wife | for your wife\nFriend | friend | for a friend\nTeacher | teacher | for a teacher\nChild | child | for a child\nColleague | colleague | for a colleague"
+        },
+        { "type": "text", "id": "default", "label": "Chosen at first", "info": "An answer label, or empty." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TSS House — Gift finder",
+      "blocks": [
+        { "type": "question" },
+        {
+          "type": "question",
+          "settings": {
+            "label": "The occasion",
+            "options": "Nikah | nikah\nAqiqah | aqiqah\nHajj & Umrah | hajj-umrah\nEid | eid\nHousewarming | housewarming\nGraduation | graduation\nJust because | just-because"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "label": "Your budget",
+            "kind": "price",
+            "options": "Under ৳1,500 | -1500\n৳1,500–5,000 | 1500-5000\n৳5,000–15,000 | 5000-15000\n৳15,000+ | 15000-"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

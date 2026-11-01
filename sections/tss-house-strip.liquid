@@ -1,0 +1,169 @@
+{% comment %}
+  Section contract.
+  TSS House — Strip. A single wide line that sends the shopper somewhere:
+  an optional thumbnail, a title and one sentence, and an outline button.
+  "Take three sets together" on Stationery; "Gifting for a team?" on Gifts.
+  The whole strip is the link when it has a thumbnail.
+  @example
+  <!-- templates/collection.gifts.json, last section -->
+{% endcomment %}
+
+{% render 'tss-house-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign link = s.link
+  if link == blank and s.product != blank
+    assign link = s.product.url
+  endif
+  assign img = s.image | default: s.product.featured_image
+  assign button = s.button_label
+  if s.product != blank
+    assign price = s.product.price | money
+    assign button = button | replace: '[price]', price
+  endif
+  assign tag = 'div'
+  if img != blank and link != blank
+    assign tag = 'a'
+  endif
+-%}
+
+<style>
+  #th-strip-{{ uid }} {
+    padding-block: {{ s.padding_top | times: 0.66 | round }}px {{ s.padding_bottom | times: 0.66 | round }}px;
+  }
+
+  #th-strip-{{ uid }} .th-strip__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+    padding: 20px;
+    border-radius: 3px;
+    color: var(--th-ink);
+    text-decoration: none;
+  }
+
+  #th-strip-{{ uid }} .th-strip__inner--sand {
+    background: var(--th-sand);
+  }
+
+  #th-strip-{{ uid }} .th-strip__img {
+    flex: none;
+    width: 80px;
+    height: 80px;
+    border-radius: 2px;
+    object-fit: cover;
+  }
+
+  #th-strip-{{ uid }} .th-strip__text {
+    flex: 1 1 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  #th-strip-{{ uid }} .th-strip__title {
+    font-family: var(--th-serif);
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  #th-strip-{{ uid }} .th-strip__body {
+    font-size: 14px;
+    color: var(--th-muted);
+  }
+
+  #th-strip-{{ uid }} .th-btn {
+    min-height: 48px;
+    padding-inline: 24px;
+  }
+
+  @media (min-width: 990px) {
+    #th-strip-{{ uid }} {
+      padding-block: {{ s.padding_top }}px {{ s.padding_bottom }}px;
+    }
+
+    #th-strip-{{ uid }} .th-strip__inner {
+      padding: 24px 32px;
+    }
+
+    #th-strip-{{ uid }} .th-strip__img {
+      width: 96px;
+      height: 96px;
+    }
+
+    #th-strip-{{ uid }} .th-strip__title {
+      font-size: 26px;
+    }
+
+    #th-strip-{{ uid }} .th-strip__body {
+      font-size: 15px;
+    }
+  }
+</style>
+
+<div id="th-strip-{{ uid }}" class="tss-section tss-house">
+  <div class="th-wrap">
+    <{{ tag }}
+      class="th-strip__inner{% if s.tone == 'sand' %} th-strip__inner--sand{% else %} th-panel{% endif %}"
+      {% if tag == 'a' %}
+        href="{{ link }}"
+      {% endif %}
+    >
+      {%- if img != blank -%}
+        {{
+          img
+          | image_url: width: 200
+          | image_tag: class: 'th-strip__img', width: 96, height: 96, loading: 'lazy', alt: img.alt | default: s.title
+        }}
+      {%- endif -%}
+      <span class="th-strip__text">
+        <span class="th-strip__title">{{ s.title | escape }}</span>
+        {%- if s.text != blank -%}
+          <span class="th-strip__body">{{ s.text | escape }}</span>
+        {%- endif -%}
+      </span>
+      {%- if button != blank and link != blank -%}
+        {%- if tag == 'a' -%}
+          <span class="th-btn th-btn--outline">{{ button | escape }}</span>
+        {%- else -%}
+          <a class="th-btn th-btn--outline" href="{{ link }}">{{ button | escape }}</a>
+        {%- endif -%}
+      {%- endif -%}
+    </{{ tag }}>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "TSS House — Strip",
+  "tag": "div",
+  "class": "tss-house-strip-section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "tone",
+      "label": "Background",
+      "options": [
+        { "value": "paper", "label": "Paper with a line" },
+        { "value": "sand", "label": "Sand" }
+      ],
+      "default": "sand"
+    },
+    { "type": "product", "id": "product", "label": "Product", "info": "Supplies the thumbnail, link and [price] when those are empty." },
+    { "type": "image_picker", "id": "image", "label": "Thumbnail" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Gifting for a team or your clients?" },
+    { "type": "text", "id": "text", "label": "Text", "default": "Corporate and bulk orders, put together by our gifting desk." },
+    { "type": "text", "id": "button_label", "label": "Button label", "info": "[price] becomes the product’s price.", "default": "Corporate & bulk gifts" },
+    { "type": "url", "id": "link", "label": "Link", "info": "Leave empty to link to the product." },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 32 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 0 }
+  ],
+  "presets": [{ "name": "TSS House — Strip" }]
+}
+{% endschema %}

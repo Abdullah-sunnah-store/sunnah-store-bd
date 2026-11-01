@@ -1,0 +1,15 @@
+{% doc %}
+  Loads the TSS House design layer: the shared TSS base, the Jost face and
+  tss-house.css. Render at the top of every House section; repeat renders
+  resolve to the same cached URLs.
+
+  @example
+  {% render 'tss-house-base' %}
+{% enddoc %}
+
+{% render 'tss-base' %}
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&display=swap"
+>
+{{ 'tss-house.css' | asset_url | stylesheet_tag }}

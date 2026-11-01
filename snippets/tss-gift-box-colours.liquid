@@ -1,0 +1,131 @@
+{% doc %}
+  Renders the box colour choices for one box of the TSS — Gift box section.
+  Colour blocks win when the section has any: each is a property on the
+  box's line. Otherwise the box product's own variants are the colours. A box
+  with neither gets one hidden, checked choice so the script always finds one.
+
+  Every choice carries data-variant, data-price and data-title; block choices
+  also carry data-property, and data-mood when the block has a mood line.
+
+  @param {object} box - The box product
+  @param {object} current - The box variant used for block colours
+  @param {object[]} colours - The section's colour blocks
+  @param {number} slot - 1 for the first box, 2 for the second
+  @param {string} name - Radio group name for the second box
+  @param {string} colour_property - Line-item property name for block colours
+  @param {string} sold_out_label - Note shown on unavailable choices
+
+  @example
+  {% render 'tss-gift-box-colours', box: box, current: current, colours: colour_blocks, slot: 1, name: '', colour_property: 'Box colour', sold_out_label: 'Sold out' %}
+{% enddoc %}
+
+{%- liquid
+  assign colour_option = box.options_with_values.first
+  if slot == 1
+    assign variant_name = 'id'
+    assign property_name = 'properties[' | append: colour_property | append: ']'
+  else
+    assign variant_name = name
+    assign property_name = name
+  endif
+-%}
+
+{%- if colours.size > 0 -%}
+  {%- if slot == 1 -%}
+    <input type="hidden" name="id" value="{{ current.id }}">
+  {%- endif -%}
+  {%- assign first_open = true -%}
+  {%- for block in colours -%}
+    {%- liquid
+      assign checked = false
+      if first_open and block.settings.sold_out == false and current.available
+        assign checked = true
+        assign first_open = false
+      endif
+    -%}
+    <label class="tss-gbx__tile" {% if slot == 1 %}{{ block.shopify_attributes }}{% endif %}>
+      <input
+        type="radio"
+        name="{{ property_name | escape }}"
+        value="{{ block.settings.name | escape }}"
+        data-variant="{{ current.id }}"
+        data-price="{{ current.price }}"
+        data-title="{{ block.settings.name | escape }}"
+        data-property
+        {% if block.settings.mood != blank %}
+          data-mood="{{ block.settings.mood | escape }}"
+        {% endif %}
+        {% if block.settings.image != blank %}
+          data-media="colour-{{ block.id }}"
+        {% endif %}
+        {% if checked %}
+          checked
+        {% endif %}
+        {% if block.settings.sold_out or current.available == false %}
+          disabled
+        {% endif %}
+      >
+      {%- if block.settings.swatch != blank -%}
+        <span class="tss-gbx__swatch" style="--swatch: {{ block.settings.swatch }}" aria-hidden="true"></span>
+      {%- else -%}
+        <span class="tss-gbx__mark" aria-hidden="true"></span>
+      {%- endif -%}
+      <span class="tss-gbx__tile-text">
+        {{- block.settings.name | escape -}}
+        {%- if block.settings.sold_out -%}
+          <span class="tss-gbx__tile-note">{{ sold_out_label | escape }}</span>
+        {%- endif -%}
+      </span>
+    </label>
+  {%- endfor -%}
+{%- elsif box.has_only_default_variant -%}
+  <input
+    type="radio"
+    name="{{ variant_name | escape }}"
+    value="{{ current.id }}"
+    data-variant="{{ current.id }}"
+    data-price="{{ current.price }}"
+    data-title="{{ box.title | escape }}"
+    checked
+    hidden
+  >
+{%- else -%}
+  {%- for variant in box.variants -%}
+    {%- liquid
+      assign swatch = nil
+      for value in colour_option.values
+        if value == variant.option1
+          assign swatch = value.swatch.color
+        endif
+      endfor
+    -%}
+    <label class="tss-gbx__tile">
+      <input
+        type="radio"
+        name="{{ variant_name | escape }}"
+        value="{{ variant.id }}"
+        data-variant="{{ variant.id }}"
+        data-price="{{ variant.price }}"
+        data-title="{{ variant.title | escape }}"
+        data-media="{{ variant.featured_media.id }}"
+        {% if variant.id == current.id %}
+          checked
+        {% endif %}
+        {% unless variant.available %}
+          disabled
+        {% endunless %}
+      >
+      {%- if swatch -%}
+        <span class="tss-gbx__swatch" style="--swatch: {{ swatch }}" aria-hidden="true"></span>
+      {%- else -%}
+        <span class="tss-gbx__mark" aria-hidden="true"></span>
+      {%- endif -%}
+      <span class="tss-gbx__tile-text">
+        {{- variant.title | escape -}}
+        {%- unless variant.available -%}
+          <span class="tss-gbx__tile-note">{{ sold_out_label | escape }}</span>
+        {%- endunless -%}
+      </span>
+    </label>
+  {%- endfor -%}
+{%- endif -%}

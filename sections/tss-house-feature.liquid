@@ -1,0 +1,226 @@
+{% comment %}
+  Section contract.
+  TSS House — Feature. One collection or page told large: an image beside an
+  eyebrow, title, text, an optional price line and a button. Green for a house
+  edition (The Kiswah Edition, the Deen Calendar), paper for a service (Build
+  your own box).
+  @example
+  <!-- templates/collection.home-decor.json, after the category tiles -->
+{% endcomment %}
+
+{% render 'tss-house-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign link = s.link
+  if link == blank and s.collection != blank
+    assign link = s.collection.url
+  endif
+  assign price_line = s.price_line
+  if price_line contains '[from]' and s.collection != blank
+    assign from = nil
+    for product in s.collection.products limit: 50
+      if from == nil or product.price_min < from
+        assign from = product.price_min
+      endif
+    endfor
+    if from != nil
+      assign from_money = from | money
+      assign price_line = price_line | replace: '[from]', from_money
+    endif
+  endif
+  # Without a collection there is no price to quote.
+  if price_line contains '[from]'
+    assign price_line = ''
+  endif
+  assign img = s.image | default: s.collection.featured_image
+
+  assign tone_class = 'th-band'
+  if s.tone == 'paper'
+    assign tone_class = 'th-panel'
+  endif
+-%}
+
+<style>
+  #th-feature-{{ uid }} {
+    padding-block: {{ s.padding_top | times: 0.66 | round }}px {{ s.padding_bottom | times: 0.66 | round }}px;
+  }
+
+  #th-feature-{{ uid }} .th-feature__card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: hidden;
+  }
+
+  #th-feature-{{ uid }} .th-feature__media {
+    min-height: 260px;
+    background: {% if s.image_fit == 'contain' %}#fff{% else %}var(--th-sand){% endif %};
+  }
+
+  #th-feature-{{ uid }} .th-feature__media img,
+  #th-feature-{{ uid }} .th-feature__media svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: {{ s.image_fit }};
+  }
+
+  #th-feature-{{ uid }} .th-feature__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 14px;
+    min-width: 0;
+    padding: 32px 24px;
+  }
+
+  #th-feature-{{ uid }} .th-feature__title {
+    font-size: 34px;
+  }
+
+  #th-feature-{{ uid }} .th-feature__body .th-lede {
+    max-width: 420px;
+    font-size: 16px;
+  }
+
+  #th-feature-{{ uid }} .th-feature__price {
+    font-size: 15px;
+  }
+
+  #th-feature-{{ uid }} .th-btn {
+    margin-top: 8px;
+  }
+
+  @media (min-width: 750px) {
+    #th-feature-{{ uid }} .th-feature__card {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #th-feature-{{ uid }} .th-feature__media {
+      min-height: 420px;
+      {%- if s.image_side == 'end' %}
+        order: 2;
+      {%- endif %}
+    }
+
+    #th-feature-{{ uid }} .th-feature__body {
+      padding: 56px;
+    }
+  }
+
+  @media (min-width: 990px) {
+    #th-feature-{{ uid }} {
+      padding-block: {{ s.padding_top }}px {{ s.padding_bottom }}px;
+    }
+
+    #th-feature-{{ uid }} .th-feature__title {
+      font-size: 46px;
+    }
+  }
+</style>
+
+<section id="th-feature-{{ uid }}" class="tss-section tss-house" aria-labelledby="th-feature-{{ uid }}-h">
+  <div class="th-wrap">
+    <div class="th-feature__card {{ tone_class }}">
+      <div class="th-feature__media">
+        {%- if img != blank -%}
+          {{
+            img
+            | image_url: width: 1600
+            | image_tag:
+              widths: '480,720,960,1200,1600',
+              sizes: '(min-width: 750px) 50vw, 100vw',
+              loading: 'lazy',
+              alt: img.alt | default: s.title
+          }}
+        {%- else -%}
+          {{ 'lifestyle-1' | placeholder_svg_tag }}
+        {%- endif -%}
+      </div>
+      <div class="th-feature__body">
+        {%- if s.eyebrow != blank -%}
+          <span class="th-eyebrow">{{ s.eyebrow | escape }}</span>
+        {%- endif -%}
+        <h2 class="th-h2 th-feature__title" id="th-feature-{{ uid }}-h">{{ s.title | escape }}</h2>
+        {%- if s.text != blank -%}
+          <p class="th-lede">{{ s.text | escape }}</p>
+        {%- endif -%}
+        {%- if price_line != blank -%}
+          <span class="th-feature__price">{{ price_line | escape }}</span>
+        {%- endif -%}
+        {%- if s.button_label != blank and link != blank -%}
+          <a class="th-btn th-btn--{{ s.button_style }}" href="{{ link }}">{{ s.button_label | escape }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TSS House — Feature",
+  "tag": "div",
+  "class": "tss-house-feature-section",
+  "settings": [
+    { "type": "collection", "id": "collection", "label": "Collection", "info": "Supplies the image, link and [from] price when those are empty." },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Image fit",
+      "options": [
+        { "value": "cover", "label": "Fill" },
+        { "value": "contain", "label": "Fit on white" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "image_side",
+      "label": "Image side",
+      "options": [
+        { "value": "start", "label": "Start" },
+        { "value": "end", "label": "End" }
+      ],
+      "default": "start"
+    },
+    {
+      "type": "select",
+      "id": "tone",
+      "label": "Background",
+      "options": [
+        { "value": "green", "label": "Green" },
+        { "value": "paper", "label": "Paper" }
+      ],
+      "default": "green"
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "From the house" },
+    { "type": "text", "id": "title", "label": "Title", "default": "The Kiswah Edition" },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Five calligraphy frames in gold embroidery on black velvet: Asma ul Husna, the Shahadah, the Takbir, Ya Hayyu Ya Qayyum, and Qarib."
+    },
+    { "type": "text", "id": "price_line", "label": "Price line", "info": "[from] becomes the collection’s lowest price.", "default": "From [from]" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "See the five frames" },
+    { "type": "url", "id": "link", "label": "Button link", "info": "Leave empty to link to the collection." },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" },
+        { "value": "green", "label": "Green" }
+      ],
+      "default": "light"
+    },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 0 }
+  ],
+  "presets": [{ "name": "TSS House — Feature" }]
+}
+{% endschema %}

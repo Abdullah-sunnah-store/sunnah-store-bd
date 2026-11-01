@@ -1,0 +1,179 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "header": {
+      "type": "tss-house-header",
+      "settings": {
+        "lede": "Every occasion we gift for, in the order it comes.",
+        "link_label": "",
+        "link": "#all",
+        "show_crumbs": true,
+        "home_label": "The House",
+        "show_rule": false,
+        "title": "The year in gifts"
+      }
+    },
+    "now": {
+      "type": "tss-house-now",
+      "blocks": {
+        "card_1": {
+          "type": "card",
+          "settings": {
+            "size": "big",
+            "collection": "wedding-anniversary",
+            "title": "Wedding season",
+            "text": "Nikah Nama frames, conversation cards and flowers for the couple.",
+            "link_label": "Shop [count] wedding gifts"
+          }
+        },
+        "card_2": {
+          "type": "card",
+          "settings": {
+            "size": "small",
+            "collection": "new-year",
+            "eyebrow": "1 January",
+            "title": "New Year",
+            "text": "The 2027 Deen Calendar, from 10 November.",
+            "link_label": "Shop [count] New Year gifts"
+          }
+        }
+      },
+      "block_order": [
+        "card_1",
+        "card_2"
+      ],
+      "settings": {
+        "label": "Now · November to January"
+      }
+    },
+    "year": {
+      "type": "tss-house-timeline",
+      "blocks": {
+        "occasion_1": {
+          "type": "occasion",
+          "settings": {
+            "date": "From about 9 February",
+            "collection": "ramadan",
+            "title": "Ramadan",
+            "text": "Journals, dua cards and Ramadan cards",
+            "show_count": false
+          }
+        },
+        "occasion_2": {
+          "type": "occasion",
+          "settings": {
+            "date": "About 10 March",
+            "collection": "eid-ul-fitr",
+            "title": "Eid ul-Fitr",
+            "text": "Salami cheque books and gifts for the family",
+            "show_count": true
+          }
+        },
+        "occasion_3": {
+          "type": "occasion",
+          "settings": {
+            "date": "April to May",
+            "collection": "hajj-umrah",
+            "title": "Hajj & Umrah",
+            "text": "For the one who’s leaving",
+            "show_count": true
+          }
+        },
+        "occasion_4": {
+          "type": "occasion",
+          "settings": {
+            "date": "About 17 May",
+            "collection": "eid-ul-adha",
+            "title": "Eid ul-Adha",
+            "text": "Qurans, dua sets and gifts for the house",
+            "show_count": true
+          }
+        }
+      },
+      "block_order": [
+        "occasion_1",
+        "occasion_2",
+        "occasion_3",
+        "occasion_4"
+      ],
+      "settings": {
+        "heading": "The year ahead",
+        "note": "Expected dates in Bangladesh. They follow the moon and may move by a day."
+      }
+    },
+    "anytime": {
+      "type": "tss-house-tiles",
+      "blocks": {
+        "tile_1": {
+          "type": "tile",
+          "settings": {
+            "collection": "aqiqah",
+            "text": "",
+            "show_count": true,
+            "title": "New baby & Aqiqah"
+          }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": {
+            "collection": "housewarming",
+            "text": "",
+            "show_count": true
+          }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": {
+            "collection": "achievement",
+            "text": "",
+            "show_count": true
+          }
+        },
+        "tile_4": {
+          "type": "tile",
+          "settings": {
+            "collection": "wedding-anniversary",
+            "text": "",
+            "show_count": true,
+            "title": "Anniversary"
+          }
+        }
+      },
+      "block_order": [
+        "tile_1",
+        "tile_2",
+        "tile_3",
+        "tile_4"
+      ],
+      "settings": {
+        "ratio": "1",
+        "min_width": 230,
+        "large_names": false,
+        "count_label": "[count]",
+        "padding_top": 72,
+        "padding_bottom": 0,
+        "accessible_label": "Shop by category",
+        "heading": "Any time of year"
+      }
+    },
+    "remind": {
+      "type": "tss-house-reminder",
+      "settings": {}
+    }
+  },
+  "order": [
+    "header",
+    "now",
+    "year",
+    "anytime",
+    "remind"
+  ]
+}

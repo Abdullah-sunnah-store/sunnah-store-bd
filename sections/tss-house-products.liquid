@@ -1,0 +1,232 @@
+{% comment %}
+  Section contract.
+  TSS House — All products. The body of a department collection page, at
+  #all: a heading with a sort control, a row of chip links (the collection
+  itself first, then a menu of its sub-collections), the product grid, and
+  Show more.
+
+  Sort is a GET form and Show more is a link to the next page, so both work
+  without JavaScript. The script submits sort on change and turns Show more
+  into an in-place append through the Section Rendering API.
+  @example
+  <!-- templates/collection.home-decor.json, last section -->
+{% endcomment %}
+
+{% render 'tss-house-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign heading = s.heading | replace: '[title]', collection.title
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+-%}
+
+<style>
+  #th-all-{{ uid }} {
+    padding-block: 40px {{ s.padding_bottom | times: 0.66 | round }}px;
+    scroll-margin-top: 24px;
+  }
+
+  #th-all-{{ uid }} .th-all__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  #th-all-{{ uid }} .th-all__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 16px;
+  }
+
+  #th-all-{{ uid }} .th-all__title {
+    font-size: 28px;
+  }
+
+  #th-all-{{ uid }} .th-all__sort {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--th-muted);
+  }
+
+  #th-all-{{ uid }} .th-all__sort select {
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--th-line-strong);
+    border-radius: 2px;
+    background: var(--th-paper);
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--th-ink);
+  }
+
+  #th-all-{{ uid }} .th-grid {
+    --th-min: {{ s.min_width }}px;
+  }
+
+  #th-all-{{ uid }} .th-all__more {
+    align-self: center;
+    margin-top: 16px;
+  }
+
+  #th-all-{{ uid }} .th-all__empty {
+    padding-block: 40px;
+    color: var(--th-muted);
+  }
+
+  @media (min-width: 990px) {
+    #th-all-{{ uid }} {
+      padding-block: 64px {{ s.padding_bottom }}px;
+    }
+
+    #th-all-{{ uid }} .th-all__inner {
+      gap: 24px;
+    }
+
+    #th-all-{{ uid }} .th-all__title {
+      font-size: 34px;
+    }
+  }
+</style>
+
+<section id="all" class="tss-section tss-house" aria-labelledby="th-all-{{ uid }}-h">
+  <div id="th-all-{{ uid }}" class="th-wrap th-all__inner" data-th-all>
+    <div class="th-all__head">
+      <h2 class="th-h2 th-all__title" id="th-all-{{ uid }}-h">{{ heading | escape }}</h2>
+      {%- if s.show_sort -%}
+        <form class="th-all__sort" method="get" action="{{ collection.url }}#all" data-sort>
+          <label for="th-all-{{ uid }}-sort">{{ s.sort_label | escape }}</label>
+          <select id="th-all-{{ uid }}-sort" name="sort_by">
+            {%- for option in collection.sort_options -%}
+              <option value="{{ option.value | escape }}" {% if option.value == sort_by %}selected{% endif %}>
+                {{- option.name | escape -}}
+              </option>
+            {%- endfor -%}
+          </select>
+          <noscript><button type="submit" class="th-btn th-btn--outline">{{ s.sort_button | escape }}</button></noscript>
+        </form>
+      {%- endif -%}
+    </div>
+
+    {%- if s.menu != blank -%}
+      <nav class="th-chips th-chips--scroll" aria-label="{{ s.chips_label | escape }}">
+        <a class="th-chip" href="{{ collection.url }}#all" aria-current="true">{{ s.all_label | escape }}</a>
+        {%- for link in s.menu.links -%}
+          <a class="th-chip" href="{{ link.url }}" {% if link.current %}aria-current="page"{% endif %}>
+            {{- link.title | escape -}}
+          </a>
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+
+    {%- paginate collection.products by s.per_page -%}
+      {%- if collection.products.size == 0 -%}
+        <p class="th-all__empty">{{ s.empty_text | escape }}</p>
+      {%- else -%}
+        <div class="th-grid" data-grid>
+          {%- for product in collection.products -%}
+            {% render 'tss-house-card', product: product, ratio: s.ratio, sizes: '(min-width: 990px) 22vw, 50vw' %}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if paginate.next -%}
+        <a class="th-btn th-btn--outline th-all__more" href="{{ paginate.next.url }}#all" data-more>
+          {{- 'actions.show_more' | t -}}
+        </a>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+
+<script>
+  (function () {
+    var root = document.getElementById('th-all-{{ uid }}');
+    if (!root || root.hasAttribute('data-ready')) return;
+    root.setAttribute('data-ready', '');
+
+    var SECTION_ID = {{ section.id | json }};
+    var sort = root.querySelector('[data-sort]');
+    if (sort) {
+      sort.addEventListener('change', function () {
+        sort.submit();
+      });
+    }
+
+    root.addEventListener('click', async function (event) {
+      var more = event.target.closest('[data-more]');
+      if (!more || !root.contains(more)) return;
+      event.preventDefault();
+      if (more.getAttribute('aria-busy') === 'true') return;
+      more.setAttribute('aria-busy', 'true');
+
+      var url = new URL(more.href, window.location.origin);
+      url.hash = '';
+      url.searchParams.set('section_id', SECTION_ID);
+
+      try {
+        var response = await fetch(url.toString());
+        if (!response.ok) throw new Error(response.statusText);
+        var doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+        var grid = root.querySelector('[data-grid]');
+        var nextGrid = doc.querySelector('[data-grid]');
+        var first = null;
+        if (grid && nextGrid) {
+          for (var card of Array.from(nextGrid.children)) {
+            if (!first) first = card;
+            grid.appendChild(card);
+          }
+        }
+        var nextMore = doc.querySelector('[data-more]');
+        if (nextMore) {
+          more.href = nextMore.getAttribute('href');
+          more.removeAttribute('aria-busy');
+        } else {
+          more.remove();
+        }
+        // Keep keyboard users in place: focus the first new card.
+        var link = first && (first.matches('a') ? first : first.querySelector('a'));
+        if (link) link.focus({ preventScroll: true });
+      } catch (error) {
+        // Fall back to the plain next page.
+        window.location.href = more.href;
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "TSS House — All products",
+  "tag": "div",
+  "class": "tss-house-products-section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "info": "[title] becomes the collection title.", "default": "All [title]" },
+    { "type": "checkbox", "id": "show_sort", "label": "Show sort", "default": true },
+    { "type": "text", "id": "sort_label", "label": "Sort label", "default": "Sort" },
+    { "type": "text", "id": "sort_button", "label": "Sort button (without JavaScript)", "default": "Apply" },
+    { "type": "link_list", "id": "menu", "label": "Chip links", "info": "Sub-collections shown as chips after All." },
+    { "type": "text", "id": "all_label", "label": "First chip label", "default": "All" },
+    { "type": "text", "id": "chips_label", "label": "Chips accessible name", "default": "Filter by category" },
+    { "type": "range", "id": "per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 16 },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Image shape",
+      "options": [
+        { "value": "1", "label": "Square" },
+        { "value": "3 / 4", "label": "Portrait" },
+        { "value": "4 / 5", "label": "Tall" }
+      ],
+      "default": "1"
+    },
+    { "type": "range", "id": "min_width", "label": "Smallest card width", "min": 160, "max": 320, "step": 10, "unit": "px", "default": 220 },
+    { "type": "text", "id": "empty_text", "label": "Empty message", "default": "Nothing here yet. Try another category." },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 80 }
+  ]
+}
+{% endschema %}

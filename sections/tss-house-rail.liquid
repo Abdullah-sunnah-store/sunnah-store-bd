@@ -1,0 +1,178 @@
+{% comment %}
+  Section contract.
+  TSS House — Product row. A heading with a "see all" link above a row of
+  product cards, from hand-picked products or a collection. In the green band
+  layout the heading sits beside smaller cards, as in "To keep it well".
+  Product notes under the name read the custom.card_note metafield.
+  @example
+  <!-- templates/collection.books.json: "The Quran" (row) and "To keep it well" (band) -->
+{% endcomment %}
+
+{% render 'tss-house-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign link = s.link
+  if link == blank and s.collection != blank
+    assign link = s.collection.url
+  endif
+  assign link_label = s.link_label
+  if s.collection != blank
+    assign link_label = link_label | replace: '[count]', s.collection.products_count
+  endif
+  assign band = false
+  if s.layout == 'band'
+    assign band = true
+  endif
+  assign shown = 0
+-%}
+
+<style>
+  #th-rail-{{ uid }} {
+    padding-block: {{ s.padding_top | times: 0.66 | round }}px {{ s.padding_bottom | times: 0.66 | round }}px;
+  }
+
+  #th-rail-{{ uid }} .th-rail__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  #th-rail-{{ uid }} .th-grid {
+    --th-min: {{ s.min_width }}px;
+  }
+
+  #th-rail-{{ uid }} .th-rail__inner.th-band {
+    padding: 28px 20px;
+  }
+
+  #th-rail-{{ uid }} .th-band .th-head__text {
+    gap: 10px;
+  }
+
+  #th-rail-{{ uid }} .th-band .th-lede {
+    font-size: 15px;
+  }
+
+  @media (min-width: 990px) {
+    #th-rail-{{ uid }} {
+      padding-block: {{ s.padding_top }}px {{ s.padding_bottom }}px;
+    }
+
+    #th-rail-{{ uid }} .th-rail__inner {
+      gap: 24px;
+    }
+
+    #th-rail-{{ uid }} .th-rail__inner.th-band {
+      flex-direction: row;
+      align-items: center;
+      gap: 40px;
+      padding: 40px;
+    }
+
+    #th-rail-{{ uid }} .th-band .th-head {
+      flex: 1 1 280px;
+    }
+
+    #th-rail-{{ uid }} .th-band .th-grid {
+      flex: 2 1 560px;
+      min-width: 0;
+    }
+
+    #th-rail-{{ uid }} .th-band .th-h2 {
+      font-size: 36px;
+    }
+  }
+</style>
+
+<section id="th-rail-{{ uid }}" class="tss-section tss-house" aria-labelledby="th-rail-{{ uid }}-h">
+  <div class="th-wrap">
+    <div class="th-rail__inner{% if band %} th-band{% endif %}">
+      <div class="th-head">
+        <div class="th-head__text">
+          {%- if s.eyebrow != blank -%}
+            <span class="th-eyebrow">{{ s.eyebrow | escape }}</span>
+          {%- endif -%}
+          <h2 class="th-h2" id="th-rail-{{ uid }}-h">{{ s.heading | escape }}</h2>
+          {%- if s.text != blank -%}
+            <p class="th-lede">{{ s.text | escape }}</p>
+          {%- endif -%}
+        </div>
+        {%- if link_label != blank and link != blank and band == false -%}
+          <a class="th-link" href="{{ link }}">{{ link_label | escape }} →</a>
+        {%- endif -%}
+      </div>
+
+      <div class="th-grid th-grid--fit">
+        {%- if s.products != blank -%}
+          {%- for product in s.products limit: s.limit -%}
+            {%- assign shown = shown | plus: 1 -%}
+            {% render 'tss-house-card', product: product, ratio: s.ratio, large: s.large_names, sizes: '(min-width: 990px) 20vw, 50vw' %}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for product in s.collection.products limit: s.limit -%}
+            {%- assign shown = shown | plus: 1 -%}
+            {% render 'tss-house-card', product: product, ratio: s.ratio, large: s.large_names, sizes: '(min-width: 990px) 20vw, 50vw' %}
+          {%- endfor -%}
+        {%- endif -%}
+        {%- if shown == 0 -%}
+          {%- for i in (1..4) -%}
+            <div class="th-card">
+              <div class="th-card__media" style="--th-ratio: {{ s.ratio }}">{{ 'product-1' | placeholder_svg_tag }}</div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TSS House — Product row",
+  "tag": "div",
+  "class": "tss-house-rail-section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "row", "label": "Heading above" },
+        { "value": "band", "label": "Green band, heading beside" }
+      ],
+      "default": "row"
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Duas you can hold" },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Arabic with harakat, translation and transliteration, on cards made to stand on a desk."
+    },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "product_list", "id": "products", "label": "Or pick products", "limit": 12 },
+    { "type": "range", "id": "limit", "label": "Products shown", "min": 2, "max": 12, "step": 1, "default": 4 },
+    { "type": "text", "id": "link_label", "label": "Link label", "info": "[count] becomes the collection’s product count.", "default": "See all [count]" },
+    { "type": "url", "id": "link", "label": "Link", "info": "Leave empty to link to the collection." },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Image shape",
+      "options": [
+        { "value": "3 / 4", "label": "Portrait" },
+        { "value": "4 / 5", "label": "Tall" },
+        { "value": "1", "label": "Square" }
+      ],
+      "default": "3 / 4"
+    },
+    { "type": "range", "id": "min_width", "label": "Smallest card width", "min": 140, "max": 320, "step": 10, "unit": "px", "default": 200 },
+    { "type": "checkbox", "id": "large_names", "label": "Large names", "default": false },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 0 }
+  ],
+  "presets": [{ "name": "TSS House — Product row" }]
+}
+{% endschema %}

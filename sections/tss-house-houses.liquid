@@ -1,0 +1,319 @@
+{% comment %}
+  Section contract.
+  TSS House — Houses. Large paper cards, two up on a desktop, each with a
+  tall image, an eyebrow (the label it is sold under), a title, a line and a
+  row of chip links from a menu ("For him" / "For her"). Below them, smaller
+  side-by-side cards with the image at the start ("Prayer" / "Food").
+  @example
+  <!-- templates/collection.lifestyle.json, under the header -->
+{% endcomment %}
+
+{% render 'tss-house-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign houses = section.blocks | where: 'type', 'house'
+  assign cards = section.blocks | where: 'type', 'card'
+-%}
+
+<style>
+  #th-houses-{{ uid }} {
+    padding-block: {{ s.padding_top | times: 0.66 | round }}px {{ s.padding_bottom | times: 0.66 | round }}px;
+  }
+
+  #th-houses-{{ uid }} .th-houses__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  #th-houses-{{ uid }} .th-houses__grid + .th-houses__grid {
+    margin-top: 16px;
+  }
+
+  #th-houses-{{ uid }} .th-house {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #th-houses-{{ uid }} .th-house__media {
+    display: block;
+    height: 340px;
+    background: var(--th-sand);
+  }
+
+  #th-houses-{{ uid }} .th-house__media img,
+  #th-houses-{{ uid }} .th-house__media svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 25%;
+  }
+
+  #th-houses-{{ uid }} .th-house__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px 20px;
+  }
+
+  #th-houses-{{ uid }} .th-house__title {
+    font-size: 34px;
+  }
+
+  #th-houses-{{ uid }} .th-house__title-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  #th-houses-{{ uid }} .th-house__body .th-lede {
+    font-size: 15px;
+  }
+
+  #th-houses-{{ uid }} .th-house .th-chips {
+    margin-top: 6px;
+  }
+
+  #th-houses-{{ uid }} .th-row-card {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    overflow: hidden;
+    color: var(--th-ink);
+    text-decoration: none;
+  }
+
+  #th-houses-{{ uid }} .th-row-card img,
+  #th-houses-{{ uid }} .th-row-card svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 150px;
+    object-fit: cover;
+  }
+
+  #th-houses-{{ uid }} .th-row-card__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 20px;
+  }
+
+  #th-houses-{{ uid }} .th-row-card__title {
+    font-family: var(--th-serif);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.05;
+  }
+
+  #th-houses-{{ uid }} .th-row-card__more {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--th-green);
+  }
+
+  @media (min-width: 750px) {
+    #th-houses-{{ uid }} .th-houses__grid {
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+    }
+
+    #th-houses-{{ uid }} .th-houses__grid + .th-houses__grid {
+      margin-top: 24px;
+    }
+
+    #th-houses-{{ uid }} .th-row-card {
+      grid-template-columns: 200px minmax(0, 1fr);
+    }
+
+    #th-houses-{{ uid }} .th-row-card img {
+      min-height: 220px;
+    }
+
+    #th-houses-{{ uid }} .th-row-card__body {
+      padding: 28px;
+    }
+
+    #th-houses-{{ uid }} .th-row-card__title {
+      font-size: 30px;
+    }
+  }
+
+  @media (min-width: 990px) {
+    #th-houses-{{ uid }} {
+      padding-block: {{ s.padding_top }}px {{ s.padding_bottom }}px;
+    }
+
+    #th-houses-{{ uid }} .th-house__media {
+      height: 560px;
+    }
+
+    #th-houses-{{ uid }} .th-house__body {
+      padding: 32px;
+    }
+
+    #th-houses-{{ uid }} .th-house__title {
+      font-size: 42px;
+    }
+  }
+</style>
+
+<div id="th-houses-{{ uid }}" class="tss-section tss-house">
+  <div class="th-wrap">
+    {%- if houses.size > 0 -%}
+      <section class="th-houses__grid" aria-label="{{ s.houses_label | escape }}">
+        {%- for block in houses -%}
+          {%- liquid
+            assign b = block.settings
+            assign href = b.link | default: b.collection.url
+            assign img = b.image | default: b.collection.featured_image
+          -%}
+          <div class="th-house th-panel" {{ block.shopify_attributes }}>
+            <a class="th-house__media" href="{{ href | default: '#' }}" tabindex="-1" aria-hidden="true">
+              {%- if img != blank -%}
+                {{
+                  img
+                  | image_url: width: 1400
+                  | image_tag:
+                    widths: '480,720,960,1200,1400',
+                    sizes: '(min-width: 750px) 50vw, 100vw',
+                    loading: 'lazy',
+                    alt: ''
+                }}
+              {%- else -%}
+                {{ 'lifestyle-2' | placeholder_svg_tag }}
+              {%- endif -%}
+            </a>
+            <div class="th-house__body">
+              {%- if b.eyebrow != blank -%}
+                <span class="th-eyebrow">{{ b.eyebrow | escape }}</span>
+              {%- endif -%}
+              <h2 class="th-h2 th-house__title">
+                {%- if href != blank -%}
+                  <a class="th-house__title-link" href="{{ href }}">{{ b.title | escape }}</a>
+                {%- else -%}
+                  {{ b.title | escape }}
+                {%- endif -%}
+              </h2>
+              {%- if b.text != blank -%}
+                <p class="th-lede">{{ b.text | escape }}</p>
+              {%- endif -%}
+              {%- if b.menu != blank -%}
+                <nav class="th-chips" aria-label="{{ b.title | escape }}">
+                  {%- for link in b.menu.links -%}
+                    <a class="th-chip" href="{{ link.url }}">
+                      {{- link.title | escape -}}
+                      {%- if b.show_counts and link.type == 'collection_link' %} · {{ link.object.products_count }}{% endif -%}
+                    </a>
+                  {%- endfor -%}
+                </nav>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      </section>
+    {%- endif -%}
+
+    {%- if cards.size > 0 -%}
+      <section class="th-houses__grid" aria-label="{{ s.cards_label | escape }}">
+        {%- for block in cards -%}
+          {%- liquid
+            assign b = block.settings
+            assign c = b.collection
+            assign href = b.link | default: c.url
+            assign img = b.image | default: c.featured_image
+            assign title = b.title | default: c.title
+            assign more = b.more_label
+            if c != blank
+              assign more = more | replace: '[count]', c.products_count
+            endif
+          -%}
+          <a class="th-row-card th-panel" href="{{ href | default: '#' }}" {{ block.shopify_attributes }}>
+            {%- if img != blank -%}
+              {{
+                img
+                | image_url: width: 600
+                | image_tag: widths: '200,300,400,600', sizes: '200px', loading: 'lazy', alt: img.alt | default: title
+              }}
+            {%- else -%}
+              {{ 'collection-2' | placeholder_svg_tag }}
+            {%- endif -%}
+            <span class="th-row-card__body">
+              {%- if b.eyebrow != blank -%}
+                <span class="th-eyebrow">{{ b.eyebrow | escape }}</span>
+              {%- endif -%}
+              <span class="th-row-card__title">{{ title | escape }}</span>
+              {%- if b.text != blank -%}
+                <span class="th-card__text">{{ b.text | escape }}</span>
+              {%- endif -%}
+              {%- if more != blank -%}
+                <span class="th-row-card__more">{{ more | escape }} →</span>
+              {%- endif -%}
+            </span>
+          </a>
+        {%- endfor -%}
+      </section>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "TSS House — Houses",
+  "tag": "div",
+  "class": "tss-house-houses-section",
+  "settings": [
+    { "type": "text", "id": "houses_label", "label": "Large cards accessible name", "default": "Our two houses" },
+    { "type": "text", "id": "cards_label", "label": "Small cards accessible name", "default": "Prayer and food" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 0 }
+  ],
+  "blocks": [
+    {
+      "type": "house",
+      "name": "Large card",
+      "limit": 4,
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "url", "id": "link", "label": "Link", "info": "Leave empty to link to the collection." },
+        { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Horsemen" },
+        { "type": "text", "id": "title", "label": "Title", "default": "For him" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Thobes and panjabis, oud, and leather cut to last." },
+        { "type": "link_list", "id": "menu", "label": "Chip links" },
+        { "type": "checkbox", "id": "show_counts", "label": "Show collection counts on chips", "default": true }
+      ]
+    },
+    {
+      "type": "card",
+      "name": "Small card",
+      "limit": 4,
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Leave empty to use the collection image." },
+        { "type": "url", "id": "link", "label": "Link", "info": "Leave empty to link to the collection." },
+        { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+        { "type": "text", "id": "title", "label": "Title", "info": "Leave empty to use the collection title." },
+        { "type": "text", "id": "text", "label": "Text" },
+        { "type": "text", "id": "more_label", "label": "Link label", "info": "[count] becomes the product count.", "default": "[count] pieces" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TSS House — Houses",
+      "blocks": [
+        { "type": "house" },
+        { "type": "house", "settings": { "eyebrow": "Qudsiyah", "title": "For her", "text": "Pashmina and cherry hijabs, abayas, and scent." } },
+        { "type": "card", "settings": { "title": "Prayer", "text": "Prayer mats, tasbeeh, prayer caps and the Quran clip" } },
+        { "type": "card", "settings": { "eyebrow": "Life", "title": "Food", "text": "Teas, blackseed honey and chocolate" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

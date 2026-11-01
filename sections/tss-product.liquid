@@ -182,6 +182,57 @@
     margin-top: 32px;
   }
 
+  #tss-product-{{ uid }} .tss-pd__qty-wrap {
+    margin-top: 20px;
+  }
+
+  #tss-product-{{ uid }} .tss-pd__qty {
+    display: inline-flex;
+    align-items: stretch;
+    margin-top: 10px;
+    border: 1px solid rgb(8 41 30 / 0.2);
+  }
+
+  #tss-product-{{ uid }} .tss-pd__qty-btn {
+    width: 40px;
+    min-height: 40px;
+    border: 0;
+    background: none;
+    font-size: 18px;
+    color: var(--tss-ink);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  #tss-product-{{ uid }} .tss-pd__qty-btn:hover {
+    background-color: rgb(8 41 30 / 0.06);
+  }
+
+  #tss-product-{{ uid }} .tss-pd__qty-btn:focus-visible,
+  #tss-product-{{ uid }} .tss-pd__qty-input:focus-visible {
+    outline: 2px solid var(--tss-gold);
+    outline-offset: -2px;
+  }
+
+  #tss-product-{{ uid }} .tss-pd__qty-input {
+    width: 48px;
+    border: 0;
+    border-inline: 1px solid rgb(8 41 30 / 0.12);
+    background: none;
+    font: inherit;
+    font-size: 15px;
+    text-align: center;
+    color: var(--tss-ink);
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+
+  #tss-product-{{ uid }} .tss-pd__qty-input::-webkit-inner-spin-button,
+  #tss-product-{{ uid }} .tss-pd__qty-input::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+  }
+
   #tss-product-{{ uid }} .tss-pd__legend {
     display: block;
     padding: 0;
@@ -256,6 +307,28 @@
     grid-template-columns: repeat({{ s.swatch_columns | default: 3 }}, 1fr);
     gap: 12px;
     margin-top: 14px;
+  }
+
+  /* Gift wrap colours: compact, all on one row. */
+  #tss-product-{{ uid }} .tss-pd__swatches.tss-pd__swatches--wrap {
+    grid-template-columns: none;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  #tss-product-{{ uid }} .tss-pd__swatches--wrap .tss-pd__chip {
+    height: 28px;
+  }
+
+  #tss-product-{{ uid }} .tss-pd__swatches--wrap .tss-pd__chip-label {
+    margin-top: 6px;
+    overflow: hidden;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   #tss-product-{{ uid }} .tss-pd__swatch {
@@ -899,7 +972,29 @@
       <input type="hidden" name="form_type" value="product">
       <input type="hidden" name="utf8" value="✓">
       <input type="hidden" name="id" value="{{ cv.id }}" data-variant-id>
-      <input type="hidden" name="quantity" value="1">
+
+      <div class="tss-pd__qty-wrap">
+        <label class="tss-pd__legend" for="tss-pd-qty-{{ uid }}">{{ 'content.quantity' | t }}</label>
+        <div class="tss-pd__qty">
+          <button type="button" class="tss-pd__qty-btn" data-qty-step="-1" aria-label="{{ 'accessibility.decrease_quantity' | t }}">
+            <span aria-hidden="true">&minus;</span>
+          </button>
+          <input
+            id="tss-pd-qty-{{ uid }}"
+            class="tss-pd__qty-input"
+            type="number"
+            name="quantity"
+            value="1"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            data-quantity
+          >
+          <button type="button" class="tss-pd__qty-btn" data-qty-step="1" aria-label="{{ 'accessibility.increase_quantity' | t }}">
+            <span aria-hidden="true">+</span>
+          </button>
+        </div>
+      </div>
 
       {%- unless p.has_only_default_variant -%}
       {%- for option in p.options_with_values -%}
@@ -1123,7 +1218,48 @@
           >
 
           <div class="tss-pd__gift-panel" id="tss-pd-gift-panel-{{ uid }}" data-gift-panel hidden>
-            {%- if s.gift_wrap_options != blank -%}
+            {%- assign wrap_product = s.gift_wrap_product -%}
+            {%- if wrap_product != blank and wrap_product.has_only_default_variant == false -%}
+              {%- comment -%} Mirrors the wrap product's first option (e.g. Wrapping Paper colours) as swatches. {%- endcomment -%}
+              <fieldset class="tss-pd__gift-group">
+                <legend class="tss-pd__gift-legend">{{ s.gift_wrap_label | default: 'Gift wrap' | escape }}</legend>
+                <div class="tss-pd__swatches tss-pd__swatches--wrap">
+                  {%- assign wrap_checked = false -%}
+                  {%- for value in wrap_product.options_with_values.first.values -%}
+                    {%- liquid
+                      unless value.available
+                        continue
+                      endunless
+                      assign vname = value.name | default: value
+                      assign chip = 'background-color:#ede8df;'
+                      if value.swatch.image != blank
+                        assign chip_url = value.swatch.image | image_url: width: 160
+                        assign chip = 'background-image:url(' | append: chip_url | append: ');'
+                      elsif value.swatch.color != blank
+                        assign chip = 'background-color:' | append: value.swatch.color | append: ';'
+                      elsif value.variant.featured_image != blank
+                        assign chip_url = value.variant.featured_image | image_url: width: 160
+                        assign chip = 'background-image:url(' | append: chip_url | append: ');'
+                      endif
+                    -%}
+                    <label class="tss-pd__swatch">
+                      <input
+                        type="radio"
+                        class="tss-pd__opt-input"
+                        name="properties[{{ s.gift_wrap_property | default: 'Gift Wrap' | escape }}]"
+                        value="{{ vname | escape }}"
+                        data-gift-field
+                        {% unless wrap_checked %}checked{% endunless %}
+                        disabled
+                      >
+                      <span class="tss-pd__chip" style="{{ chip }}"></span>
+                      <span class="tss-pd__chip-label">{{ vname | escape }}</span>
+                    </label>
+                    {%- assign wrap_checked = true -%}
+                  {%- endfor -%}
+                </div>
+              </fieldset>
+            {%- elsif s.gift_wrap_options != blank -%}
               <fieldset class="tss-pd__gift-group">
                 <legend class="tss-pd__gift-legend">{{ s.gift_wrap_label | default: 'Gift wrap' | escape }}</legend>
                 <div class="tss-pd__pills">
@@ -1347,6 +1483,7 @@
     var stickyAdd = root.querySelector('[data-sticky-add]');
     var sticky = root.querySelector('[data-sticky]');
     var idInput = root.querySelector('[data-variant-id]');
+    var qtyInput = root.querySelector('[data-quantity]');
     var errorEl = root.querySelector('[data-error]');
     var wasEl = root.querySelector('[data-was]');
     var rail = root.querySelector('[data-rail]');
@@ -1548,6 +1685,23 @@
       }).catch(function () {});
     }
 
+    /* ---------- quantity ---------- */
+    function readQty() {
+      var n = qtyInput ? parseInt(qtyInput.value, 10) : 1;
+      return isNaN(n) || n < 1 ? 1 : n;
+    }
+
+    if (qtyInput) {
+      root.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-qty-step]');
+        if (!btn) return;
+        qtyInput.value = Math.max(1, readQty() + parseInt(btn.getAttribute('data-qty-step'), 10));
+      });
+      qtyInput.addEventListener('change', function () {
+        qtyInput.value = readQty();
+      });
+    }
+
     /* ---------- add to cart ---------- */
     function setError(text) {
       if (!errorEl) return;
@@ -1568,7 +1722,7 @@
            inside it for layout and have no business being posted to cart/add. */
         var body = new FormData();
         body.append('id', idInput.value);
-        body.append('quantity', '1');
+        body.append('quantity', String(readQty()));
 
         var props = form.querySelectorAll('[name^="properties["]');
         for (var i = 0; i < props.length; i++) {
@@ -1735,6 +1889,12 @@
     },
     { "type": "header", "content": "Gift wrap" },
     { "type": "text", "id": "gift_wrap_label", "label": "Wrap label", "default": "Gift wrap" },
+    {
+      "type": "product",
+      "id": "gift_wrap_product",
+      "label": "Wrap product",
+      "info": "Shows this product's colour variants as wrap swatches (e.g. Wrapping Paper). Leave empty to use the text options below."
+    },
     {
       "type": "textarea",
       "id": "gift_wrap_options",

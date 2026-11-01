@@ -83,6 +83,7 @@
         "gift_value": "Yes",
         "gift_attribute": "gift_order",
         "gift_wrap_label": "Gift wrap",
+        "gift_wrap_product": "wrapping-paper",
         "gift_wrap_options": "Classic Ivory (Free)\nSignature Green\nPremium Gold",
         "gift_wrap_property": "Gift Wrap",
         "occasion_label": "Occasion",

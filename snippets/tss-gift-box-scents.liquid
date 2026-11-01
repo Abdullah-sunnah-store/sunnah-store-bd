@@ -1,0 +1,124 @@
+{% doc %}
+  Renders the perfume choices for the TSS — Gift box section. With a
+  collection, every variant of every product in it is a choice; otherwise the
+  perfume product's variants are. A single-variant product shows its title.
+
+  Slot 0 is the paid add-on with one box: each choice's value is its variant
+  id and it carries data-price and data-title. Slots 1 and 2 are the free
+  perfumes with two boxes: the value is the scent name, sent as a property.
+
+  @param {object} [collection] - Collection whose products are the perfumes
+  @param {object} [product] - Perfume product used when there is no collection
+  @param {number} slot - 0 for the add-on, 1 or 2 for each of two boxes
+  @param {string} name - Radio group name
+  @param {boolean} show_price - Show each choice's price
+  @param {object} [image] - Fallback card image when a scent has none of its own
+  @param {string} [label] - Name shown instead of the scent when there is only one
+  @param {string} [note] - Small line under the name, e.g. "free"
+
+  @example
+  {% render 'tss-gift-box-scents', collection: section.settings.perfume_collection, product: perfume, slot: 0, name: 'tss-gbx-123-scent', show_price: true, image: perfume_image, label: 'Spray perfume' %}
+{% enddoc %}
+
+{%- liquid
+  # Without a collection, the one product is looked up by handle so both
+  # cases share a single loop.
+  assign from_collection = false
+  if collection != blank and collection.products_count > 0
+    assign from_collection = true
+    assign products = collection.products
+  else
+    assign products = product.handle | split: ','
+  endif
+  assign first_open = true
+
+  # With a single scent there is nothing to tell apart, so the card uses the
+  # add-on's own name.
+  assign scent_count = 0
+  for entry in products limit: 50
+    assign item = entry
+    unless from_collection
+      assign item = all_products[entry]
+    endunless
+    assign scent_count = scent_count | plus: item.variants.size
+  endfor
+-%}
+
+{%- for entry in products limit: 50 -%}
+  {%- liquid
+    assign item = entry
+    unless from_collection
+      assign item = all_products[entry]
+    endunless
+  -%}
+  {%- for variant in item.variants -%}
+    {%- liquid
+      if item.has_only_default_variant
+        assign scent_name = item.title
+      elsif from_collection
+        assign scent_name = item.title | append: ' – ' | append: variant.title
+      else
+        assign scent_name = variant.title
+      endif
+
+      assign checked = false
+      if first_open and variant.available
+        assign checked = true
+        assign first_open = false
+      endif
+    -%}
+    {%- liquid
+      assign scent_image = variant.featured_image | default: item.featured_image | default: image
+      assign scent_text = scent_name
+      if scent_count == 1
+        if label != blank
+          assign scent_text = label
+        endif
+        assign scent_image = image | default: scent_image
+      endif
+    -%}
+    <label class="tss-gbx__tile tss-gbx__tile--solid tss-gbx__tile--card">
+      <input
+        type="radio"
+        name="{{ name | escape }}"
+        {% if slot == 0 %}
+          value="{{ variant.id }}"
+          data-price="{{ variant.price }}"
+          data-title="{{ scent_name | escape }}"
+        {% else %}
+          value="{{ scent_name | escape }}"
+          data-scent="{{ slot }}"
+        {% endif %}
+        {% if checked %}
+          checked
+        {% endif %}
+        {% unless variant.available %}
+          disabled
+        {% endunless %}
+      >
+      {%- if scent_image != blank -%}
+        {{-
+          scent_image
+          | image_url: width: 600
+          | image_tag:
+            class: 'tss-gbx__thumb',
+            loading: 'lazy',
+            widths: '300, 450, 600',
+            sizes: '(min-width: 990px) 240px, 50vw',
+            alt: ''
+        -}}
+      {%- endif -%}
+      <span class="tss-gbx__card-body">
+        <span class="tss-gbx__mark" aria-hidden="true"></span>
+        <span class="tss-gbx__tile-text">
+          {{- scent_text | escape -}}
+          {%- if show_price -%}
+            <span class="tss-gbx__tile-note">+ {{ variant.price | money }}</span>
+          {%- elsif note != blank -%}
+            <span class="tss-gbx__tile-note">{{ note | escape }}</span>
+          {%- endif -%}
+        </span>
+      </span>
+    </label>
+  {%- endfor -%}
+{%- endfor -%}

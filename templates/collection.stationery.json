@@ -1,0 +1,135 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "header": {
+      "type": "tss-house-header",
+      "settings": {
+        "lede": "Duas to keep on the desk, notebooks to write in, and cards to say it by hand.",
+        "link_label": "Shop all [title]",
+        "link": "#all",
+        "show_crumbs": true,
+        "home_label": "The House",
+        "show_rule": true
+      }
+    },
+    "tiles": {
+      "type": "tss-house-tiles",
+      "blocks": {
+        "tile_1": {
+          "type": "tile",
+          "settings": {
+            "collection": "dua-cards",
+            "text": "Rabbana, Masnoon, Ruqyah and Hajj sets",
+            "show_count": true
+          }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": {
+            "collection": "notebooks",
+            "text": "Spiral notebooks with a line worth rereading",
+            "show_count": true
+          }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": {
+            "collection": "journals",
+            "text": "For Ramadan, for Hajj, for the working week",
+            "show_count": true
+          }
+        },
+        "tile_4": {
+          "type": "tile",
+          "settings": {
+            "collection": "cards",
+            "text": "Foil cards and the Eid salami cheque book",
+            "show_count": true,
+            "title": "Eid & Ramadan Cards"
+          }
+        }
+      },
+      "block_order": [
+        "tile_1",
+        "tile_2",
+        "tile_3",
+        "tile_4"
+      ],
+      "settings": {
+        "ratio": "4 / 5",
+        "min_width": 220,
+        "large_names": true,
+        "count_label": "[count] pieces",
+        "padding_top": 40,
+        "padding_bottom": 56,
+        "accessible_label": "Shop by category"
+      }
+    },
+    "feature": {
+      "type": "tss-house-feature",
+      "settings": {
+        "collection": "new-year",
+        "tone": "green",
+        "eyebrow": "Arriving 10 November",
+        "title": "The 2027 Deen Calendar",
+        "text": "A year of reminders for the desk. In editions for yourself, for your circle of friends, and for your whole community.",
+        "price_line": "",
+        "button_label": "Tell me when it’s here",
+        "button_style": "light"
+      }
+    },
+    "duas": {
+      "type": "tss-house-rail",
+      "settings": {
+        "layout": "row",
+        "heading": "Duas you can hold",
+        "text": "Arabic with harakat, translation and transliteration, on cards made to stand on a desk.",
+        "collection": "dua-cards",
+        "limit": 4,
+        "link_label": "All dua cards",
+        "ratio": "3 / 4",
+        "min_width": 200,
+        "padding_top": 72,
+        "padding_bottom": 0
+      }
+    },
+    "combo": {
+      "type": "tss-house-strip",
+      "settings": {
+        "tone": "paper",
+        "product": "dua-card-combo-at-15-discount",
+        "title": "Take three sets together",
+        "text": "The Dua Card Combo: three sets for less than buying them one by one.",
+        "button_label": "See the combo · [price]",
+        "padding_top": 24,
+        "padding_bottom": 0
+      }
+    },
+    "all": {
+      "type": "tss-house-products",
+      "settings": {
+        "heading": "All [title]",
+        "show_sort": true,
+        "per_page": 16,
+        "ratio": "1",
+        "min_width": 250
+      }
+    }
+  },
+  "order": [
+    "header",
+    "tiles",
+    "feature",
+    "duas",
+    "combo",
+    "all"
+  ]
+}

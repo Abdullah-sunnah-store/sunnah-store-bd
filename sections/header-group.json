@@ -14,12 +14,6 @@
     "tss_header": {
       "type": "tss-header",
       "blocks": {
-        "n1": {
-          "type": "notice",
-          "settings": {
-            "text": "Complimentary gift wrapping on every order."
-          }
-        },
         "n2": {
           "type": "notice",
           "settings": {
@@ -40,7 +34,6 @@
         }
       },
       "block_order": [
-        "n1",
         "n2",
         "n3",
         "n4"
@@ -56,16 +49,18 @@
         "show_desktop_nav": true,
         "show_utility": true,
         "notice_seconds": 5,
+        "show_offer": true,
+        "offer_link": "shopify://pages/set-builder",
+        "offer_badge": "50% OFF",
+        "offer_label": "Buy two, receive four",
+        "offer_bg": "#b8860b",
+        "offer_color": "#ffffff",
         "show_promo": true,
         "promo_text": "Create Your Own Gift Box",
         "promo_link": "shopify://pages/custom-gift-box",
         "promo_icon": "🎁",
         "promo_bg": "#fafafa",
-        "promo_bg_hover": "#edf5e8",
-        "show_offer": true,
-        "offer_link": "shopify://pages/set-builder",
-        "offer_badge": "50% OFF",
-        "offer_label": "Buy two, receive four"
+        "promo_bg_hover": "#edf5e8"
       }
     }
   },

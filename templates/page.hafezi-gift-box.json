@@ -1,0 +1,339 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "gift_box": {
+      "type": "tss-gift-box",
+      "blocks": {
+        "colour_navy": {
+          "type": "colour",
+          "settings": {
+            "name": "Navy Floral",
+            "swatch": "#1f2a44",
+            "mood": "Quiet and classic, with a soft floral pattern.",
+            "sold_out": false
+          }
+        },
+        "colour_black": {
+          "type": "colour",
+          "settings": {
+            "name": "Black",
+            "swatch": "#1c1c1a",
+            "mood": "Understated, for the one who likes things simple.",
+            "sold_out": false
+          }
+        },
+        "colour_red": {
+          "type": "colour",
+          "settings": {
+            "name": "Red",
+            "swatch": "#6b1f22",
+            "mood": "Deep and warm, the wedding-season favourite.",
+            "sold_out": false
+          }
+        },
+        "card_nikah": {
+          "type": "card_image",
+          "settings": {
+            "card": "Nikah Dua"
+          }
+        },
+        "card_umrah": {
+          "type": "card_image",
+          "settings": {
+            "card": "Umrah Mubarak"
+          }
+        },
+        "card_husband": {
+          "type": "card_image",
+          "settings": {
+            "card": "For Husband"
+          }
+        },
+        "card_wife": {
+          "type": "card_image",
+          "settings": {
+            "card": "For Wife"
+          }
+        },
+        "card_loved_ones": {
+          "type": "card_image",
+          "settings": {
+            "card": "For Loved ones"
+          }
+        },
+        "card_needs_dua": {
+          "type": "card_image",
+          "settings": {
+            "card": "For someone who needs Dua"
+          }
+        },
+        "inside_quran": {
+          "type": "inside",
+          "settings": {
+            "image": "shopify://shop_images/in-box-hafezi-quran.jpg",
+            "name": "Hafezi Qur’an"
+          }
+        },
+        "inside_mat": {
+          "type": "inside",
+          "settings": {
+            "image": "shopify://shop_images/in-box-prayer-mat.jpg",
+            "name": "Prayer mat"
+          }
+        },
+        "inside_tasbih": {
+          "type": "inside",
+          "settings": {
+            "image": "shopify://shop_images/in-box-tasbih.jpg",
+            "name": "Tasbih"
+          }
+        },
+        "inside_card": {
+          "type": "inside",
+          "settings": {
+            "image": "shopify://shop_images/in-box-dua-card.jpg",
+            "name": "Du’a card"
+          }
+        },
+        "inside_box": {
+          "type": "inside",
+          "settings": {
+            "image": "shopify://shop_images/in-box-gift-box.jpg",
+            "name": "Gift box"
+          }
+        }
+      },
+      "block_order": [
+        "colour_navy",
+        "colour_black",
+        "colour_red",
+        "card_nikah",
+        "card_umrah",
+        "card_husband",
+        "card_wife",
+        "card_loved_ones",
+        "card_needs_dua",
+        "inside_quran",
+        "inside_mat",
+        "inside_tasbih",
+        "inside_card",
+        "inside_box"
+      ],
+      "settings": {
+        "product": "wedding-package-turkish-sunnah-premium-gift-box",
+        "perfume_product": "ironwood-spray-perfume",
+        "perfume_collection": "",
+        "miswak_product": "miswak-with-cover-dark-chocolate",
+        "miswak_image": "shopify://shop_images/Miswak-with-leather-cover-DSC03707-3-scaled-1-2048x2048.jpg",
+        "eyebrow": "Wedding season",
+        "title": "The Sunnah Classic",
+        "subtitle": "Wedding gift box",
+        "lede": "For him, for her, or for both. Gift-ready in 24 hours in Dhaka.",
+        "proof": "290+ people bought",
+        "image_ratio": "1 / 1",
+        "inside_label": "In every box",
+        "inside_link_label": "See inside ↓",
+        "inside_anchor": "inside",
+        "colour_label": "Box colour",
+        "card_label": "Card",
+        "name_label": "Name on the Card",
+        "name_placeholder": "e.g. Aisha & Yusuf",
+        "name_help": "Leave it blank if you’d rather not.",
+        "card_options": "Nikah Dua\nUmrah Mubarak\nFor Husband\nFor Wife\nFor Loved ones\nsomeone who needs dua",
+        "addons_label": "Complete the gift",
+        "optional_label": "Optional",
+        "perfume_label": "Spray perfume",
+        "perfume_text": "By Horsemen, packed inside the box.",
+        "perfume_free_text": "Free with 2 boxes, one in each",
+        "scent_label": "Perfume",
+        "miswak_label": "Miswak with Cover",
+        "miswak_text": "Dark chocolate leather. A Sunnah to carry.",
+        "add_label": "Add",
+        "added_label": "Added",
+        "included_label": "Included",
+        "allow_two": true,
+        "count_label": "How many boxes?",
+        "one_label": "1 box",
+        "two_label": "2 boxes",
+        "two_note": "2 perfumes free",
+        "box_label": "Box",
+        "box_one_label": "Box one",
+        "box_two_label": "Box two",
+        "total_label": "Total",
+        "delivery_note": "Delivery added at checkout: ৳100 inside Dhaka.",
+        "button_label": "Order now",
+        "trust_line": "Pay on delivery, by bKash or by card.",
+        "after_add": "checkout",
+        "colour_property": "Box colour",
+        "card_property": "Card",
+        "perfume_property": "Perfume",
+        "link_property": "For",
+        "free_label": "free",
+        "sold_out_label": "Sold out",
+        "image_label": "Image",
+        "adding_label": "Adding…",
+        "error_text": "We couldn’t add this to your bag. Please try again.",
+        "empty_text": "Choose a box product for this section.",
+        "padding_bottom": 0
+      }
+    },
+    "story": {
+      "type": "tss-gift-box-story",
+      "blocks": {
+        "contents": {
+          "type": "contents",
+          "settings": {
+            "eyebrow": "Inside the box",
+            "title": "Everything they’ll unwrap",
+            "text": "",
+            "image": "shopify://shop_images/Nikah_Dua_gift_box.jpg",
+            "anchor": "inside",
+            "rows": "Hafezi Qur’an | Saudi Hafezi Quran | 55 80\nPrayer mat | Soft-touch, travel size | 88 76\nTasbih | 33 beads | 72 63\nDu’a card | Your choice of six | 70 44\nGift box | Hand-wrapped, ribbon closed | 22 30",
+            "item_1_image": "shopify://shop_images/in-box-hafezi-quran.jpg",
+            "item_2_image": "shopify://shop_images/in-box-prayer-mat.jpg",
+            "item_3_image": "shopify://shop_images/in-box-tasbih.jpg",
+            "item_4_image": "shopify://shop_images/in-box-dua-card.jpg",
+            "item_5_image": "shopify://shop_images/in-box-gift-box.jpg"
+          }
+        },
+        "dua": {
+          "type": "dua",
+          "settings": {
+            "eyebrow": "The card",
+            "title": "The du’a on the Nikah card",
+            "arabic": "بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ",
+            "translation": "“May Allah bless you, shower His blessings upon you, and join you together in goodness.”",
+            "source": "Abu Dawud 2130"
+          }
+        },
+        "delivery": {
+          "type": "delivery",
+          "settings": {
+            "eyebrow": "Delivery",
+            "title": "Gift-ready, on time",
+            "text": "",
+            "rows": "Inside Dhaka | Within 24 hours\nOutside Dhaka | 2–4 days\nPayment | Cash on deliver/ Card/ bKash"
+          }
+        },
+        "review_1": {
+          "type": "review",
+          "settings": {
+            "quote": "“Alhamdulillah, very satisfied with my experience at The Sunnah Store. Products are authentic, service is smooth, and delivery is on time. Highly recommend for anyone looking for quality Islamic essentials.😇😇😇”",
+            "name": "Wahidur Rahman",
+            "place": "Dhaka"
+          }
+        },
+        "review_2": {
+          "type": "review",
+          "settings": {
+            "quote": "“মাশাল্লাহ , প্রথমে অনেক ভয়ে ছিলাম , কিন্তু তাদের প্যাকেজিং থেকে শুরু করে প্রতিটা জিনিস অনেক সুন্দর ভাবে গুছিয়ে দিয়েছে অনেক ভালো লেগেছে”",
+            "name": "Fariha Chowdhury",
+            "place": "Chattogram"
+          }
+        },
+        "review_3": {
+          "type": "review",
+          "settings": {
+            "quote": "“Beautiful packaging. Excellent customer service. Highly recommended. My family got really happy seeing the gifts from Sunnah Store. Thank you.”",
+            "name": "Nusrat",
+            "place": "Sylhet"
+          }
+        },
+        "bulk": {
+          "type": "bulk",
+          "settings": {
+            "eyebrow": "Bulk orders",
+            "title": "Gifting for a wedding party or an office?",
+            "text": "Ten boxes or more, with your own card wording. Tell us what you need.",
+            "button_label": "Ask on WhatsApp",
+            "button_link": "https://wa.me/8801796263735?text=Assalamu%20alaikum%2C%20I%27d%20like%20to%20ask%20about%20bulk%20gift%20box%20orders."
+          }
+        },
+        "faq_1": {
+          "type": "faq",
+          "settings": {
+            "question": "Can I add a personal message?",
+            "answer": "<p>Yes. Add it in the order note at checkout and we’ll write it on the card.</p>"
+          }
+        },
+        "faq_2": {
+          "type": "faq",
+          "settings": {
+            "question": "Are the two perfumes really free with two boxes?",
+            "answer": "<p>Yes. Choose a scent for each box and both are included at no extra cost.</p>"
+          }
+        },
+        "faq_3": {
+          "type": "faq",
+          "settings": {
+            "question": "Can I send it straight to the recipient?",
+            "answer": "<p>Of course. Use their address at checkout. We never put a price inside the box.</p>"
+          }
+        },
+        "faq_MJLxz3": {
+          "type": "faq",
+          "settings": {
+            "question": "What if something arrives damaged?",
+            "answer": "<p>The Gift-Ready Promise: We replace it free.</p>"
+          }
+        },
+        "colours": {
+          "type": "colours",
+          "disabled": true,
+          "settings": {
+            "eyebrow": "The colours",
+            "title": "Three boxes, three moods",
+            "text": "",
+            "colour_1_name": "Navy Floral",
+            "colour_1_hex": "#1f2a44",
+            "colour_1_image": "shopify://shop_images/For_someone_who_needs_Dua_gift_box.jpg",
+            "colour_1_text": "Quiet and classic, with a soft floral pattern.",
+            "colour_2_name": "Black",
+            "colour_2_hex": "#1c1c1a",
+            "colour_2_image": "shopify://shop_images/Umrah_Mubarak_gift_box.jpg",
+            "colour_2_text": "Understated, for the one who likes things simple.",
+            "colour_3_name": "Red",
+            "colour_3_hex": "#6b1f22",
+            "colour_3_image": "shopify://shop_images/For_Wife_gift_box.jpg",
+            "colour_3_text": "Deep and warm, the wedding-season favourite."
+          }
+        }
+      },
+      "block_order": [
+        "contents",
+        "dua",
+        "delivery",
+        "review_1",
+        "review_2",
+        "review_3",
+        "bulk",
+        "faq_1",
+        "faq_2",
+        "faq_3",
+        "faq_MJLxz3",
+        "colours"
+      ],
+      "settings": {
+        "reviews_eyebrow": "Kind words",
+        "reviews_title": "Opened, and then kept.",
+        "faq_eyebrow": "Questions",
+        "faq_title": "Before you order",
+        "footer_mark": "",
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    }
+  },
+  "order": [
+    "gift_box",
+    "story"
+  ]
+}

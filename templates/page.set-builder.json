@@ -151,7 +151,10 @@
             "label": "To go with it.",
             "question": "A lid for each mug?",
             "product": "lid-start-with-bismillah",
-            "more_products": ["lid-harf-harmony", "lid-qalam-essence"],
+            "more_products": [
+              "lid-harf-harmony",
+              "lid-qalam-essence"
+            ],
             "name": "Lids",
             "copy": "Bismillah before the first sip. A lid that keeps the reminder on the mug, and the tea warm beneath it.",
             "small_note": "",
@@ -177,6 +180,7 @@
             "label": "And beneath it.",
             "question": "A coaster for each?",
             "product": "coaster-design",
+            "more_products": [],
             "name": "Coasters",
             "copy": "A place for each mug to rest, and a table kept clean.",
             "small_note": "",
@@ -203,6 +207,7 @@
             "label": "To hold it.",
             "question": "Magnetic pins, and no holes?",
             "product": "hijab-magnet",
+            "more_products": [],
             "name": "Magnetic hijab pins",
             "copy": "Holds the fabric without a pin through it. No snags, and no holes in the hijab.",
             "small_note": "",
@@ -228,6 +233,7 @@
             "label": "To shape it.",
             "question": "A scrunchie beneath?",
             "product": "soft-textured-scrunchie",
+            "more_products": [],
             "name": "The scrunchie",
             "copy": "Worn beneath the hijab to give it shape. Keeps everything in place through the day.",
             "small_note": "",
@@ -253,6 +259,7 @@
             "label": "A gift.",
             "question": "Is this for someone?",
             "product": "wishcard",
+            "more_products": [],
             "name": "A handwritten card",
             "copy": "Your message, written by hand on a card and placed with your order.",
             "small_note": "",
@@ -328,11 +335,43 @@
         "regular_label": "Regular price",
         "total_label": "Total",
         "summary_note": "Delivery is added at checkout.",
-        "included_label": "Included"
+        "included_label": "Included",
+        "step_total_label": "Total"
+      }
+    },
+    "179326627017412eb2": {
+      "type": "_blocks",
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 12,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#1C1C1A26",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
       }
     }
   },
   "order": [
-    "main"
+    "main",
+    "179326627017412eb2"
   ]
 }

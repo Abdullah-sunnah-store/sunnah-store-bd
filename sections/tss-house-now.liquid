@@ -1,0 +1,239 @@
+{% comment %}
+  Section contract.
+  TSS House — In season. A green label for the season ("Now · November to
+  January") above its occasions: a large card with the image beside the text
+  and a green button, and smaller cards with the image above and an arrow
+  link. Each card is a block linking to a collection.
+  @example
+  <!-- templates/collection.occasions.json, under the header -->
+{% endcomment %}
+
+{% render 'tss-house-base' %}
+
+{%- assign s = section.settings -%}
+{%- assign uid = section.id -%}
+
+<style>
+  #th-now-{{ uid }} {
+    padding-block: {{ s.padding_top | times: 0.66 | round }}px {{ s.padding_bottom | times: 0.66 | round }}px;
+  }
+
+  #th-now-{{ uid }} .th-now__cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  #th-now-{{ uid }} .th-now__card {
+    flex: 1 1 300px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--th-ink);
+    text-decoration: none;
+  }
+
+  #th-now-{{ uid }} .th-now__card--big {
+    flex: 2 1 560px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  #th-now-{{ uid }} .th-now__media {
+    height: 220px;
+    background: var(--th-sand);
+  }
+
+  #th-now-{{ uid }} .th-now__card--big .th-now__media {
+    height: auto;
+    min-height: 280px;
+  }
+
+  #th-now-{{ uid }} .th-now__media img,
+  #th-now-{{ uid }} .th-now__media svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #th-now-{{ uid }} .th-now__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 20px 20px 24px;
+  }
+
+  #th-now-{{ uid }} .th-now__card--big .th-now__body {
+    gap: 12px;
+    padding: 28px 24px;
+  }
+
+  #th-now-{{ uid }} .th-now__title {
+    font-family: var(--th-serif);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.05;
+  }
+
+  #th-now-{{ uid }} .th-now__card--big .th-now__title {
+    font-size: 36px;
+    font-weight: 500;
+  }
+
+  #th-now-{{ uid }} .th-now__more {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--th-green);
+  }
+
+  #th-now-{{ uid }} .th-now__card--big .th-btn {
+    align-self: flex-start;
+    margin-top: 10px;
+  }
+
+  @media (min-width: 990px) {
+    #th-now-{{ uid }} {
+      padding-block: {{ s.padding_top }}px {{ s.padding_bottom }}px;
+    }
+
+    #th-now-{{ uid }} .th-now__cards {
+      gap: 24px;
+    }
+
+    #th-now-{{ uid }} .th-now__card--big .th-now__media {
+      min-height: 400px;
+    }
+
+    #th-now-{{ uid }} .th-now__body {
+      padding: 24px 28px 28px;
+    }
+
+    #th-now-{{ uid }} .th-now__card--big .th-now__body {
+      padding: 40px;
+    }
+
+    #th-now-{{ uid }} .th-now__title {
+      font-size: 30px;
+    }
+
+    #th-now-{{ uid }} .th-now__card--big .th-now__title {
+      font-size: 44px;
+    }
+  }
+</style>
+
+<section id="th-now-{{ uid }}" class="tss-section tss-house" aria-labelledby="th-now-{{ uid }}-h">
+  <div class="th-wrap">
+    <span class="th-eyebrow th-eyebrow--accent" id="th-now-{{ uid }}-h">{{ s.label | escape }}</span>
+    <div class="th-now__cards">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign b = block.settings
+          assign c = b.collection
+          assign href = b.link | default: c.url
+          assign img = b.image | default: c.featured_image
+          assign title = b.title | default: c.title
+          assign more = b.link_label
+          if c != blank
+            assign more = more | replace: '[count]', c.products_count
+          endif
+          assign big = false
+          if b.size == 'big'
+            assign big = true
+          endif
+        -%}
+        <a
+          class="th-now__card th-panel{% if big %} th-now__card--big{% endif %}"
+          href="{{ href | default: '#' }}"
+          {{ block.shopify_attributes }}
+        >
+          <span class="th-now__media">
+            {%- if img != blank -%}
+              {{
+                img
+                | image_url: width: 1400
+                | image_tag:
+                  widths: '400,600,800,1000,1400',
+                  sizes: '(min-width: 990px) 40vw, 100vw',
+                  loading: 'lazy',
+                  alt: img.alt | default: title
+              }}
+            {%- else -%}
+              {{ 'lifestyle-1' | placeholder_svg_tag }}
+            {%- endif -%}
+          </span>
+          <span class="th-now__body">
+            {%- if b.eyebrow != blank -%}
+              <span class="th-eyebrow">{{ b.eyebrow | escape }}</span>
+            {%- endif -%}
+            <span class="th-now__title">{{ title | escape }}</span>
+            {%- if b.text != blank -%}
+              <span class="th-card__text">{{ b.text | escape }}</span>
+            {%- endif -%}
+            {%- if more != blank -%}
+              {%- if big -%}
+                <span class="th-btn">{{ more | escape }}</span>
+              {%- else -%}
+                <span class="th-now__more">{{ more | escape }} →</span>
+              {%- endif -%}
+            {%- endif -%}
+          </span>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "TSS House — In season",
+  "tag": "div",
+  "class": "tss-house-now-section",
+  "max_blocks": 4,
+  "settings": [
+    { "type": "text", "id": "label", "label": "Season label", "default": "Now · November to January" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 8, "unit": "px", "default": 0 }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Occasion",
+      "settings": [
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "options": [
+            { "value": "big", "label": "Large" },
+            { "value": "small", "label": "Small" }
+          ],
+          "default": "small"
+        },
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Leave empty to use the collection image." },
+        { "type": "url", "id": "link", "label": "Link", "info": "Leave empty to link to the collection." },
+        { "type": "text", "id": "eyebrow", "label": "Date or eyebrow" },
+        { "type": "text", "id": "title", "label": "Title", "info": "Leave empty to use the collection title." },
+        { "type": "text", "id": "text", "label": "Text" },
+        { "type": "text", "id": "link_label", "label": "Link label", "info": "[count] becomes the product count.", "default": "Shop [count] gifts" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TSS House — In season",
+      "blocks": [
+        { "type": "card", "settings": { "size": "big", "title": "Wedding season", "text": "Nikah Nama frames, conversation cards and flowers for the couple.", "link_label": "Shop [count] wedding gifts" } },
+        { "type": "card", "settings": { "eyebrow": "1 January", "title": "New Year", "text": "The 2027 Deen Calendar, from 10 November.", "link_label": "Shop [count] New Year gifts" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,93 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "header": {
+      "type": "tss-house-header",
+      "settings": {
+        "lede": "What you wear, carry and pray on, and what goes on the table.",
+        "link_label": "Shop all [title]",
+        "link": "#all",
+        "show_crumbs": true,
+        "home_label": "The House",
+        "show_rule": false
+      }
+    },
+    "houses": {
+      "type": "tss-house-houses",
+      "blocks": {
+        "block_1": {
+          "type": "house",
+          "settings": {
+            "collection": "him",
+            "eyebrow": "Horsemen",
+            "title": "For him",
+            "text": "Thobes and panjabis, oud, and leather cut to last.",
+            "show_counts": true
+          }
+        },
+        "block_2": {
+          "type": "house",
+          "settings": {
+            "collection": "her",
+            "eyebrow": "Qudsiyah",
+            "title": "For her",
+            "text": "Pashmina and cherry hijabs, abayas, and scent.",
+            "show_counts": true
+          }
+        },
+        "block_3": {
+          "type": "card",
+          "settings": {
+            "collection": "home-accessories",
+            "title": "Prayer",
+            "text": "Prayer mats, tasbeeh, prayer caps and the Quran clip",
+            "more_label": "[count] pieces"
+          }
+        },
+        "block_4": {
+          "type": "card",
+          "settings": {
+            "collection": "foods",
+            "eyebrow": "Life",
+            "title": "Food",
+            "text": "Teas, blackseed honey and chocolate",
+            "more_label": "[count] pieces"
+          }
+        }
+      },
+      "block_order": [
+        "block_1",
+        "block_2",
+        "block_3",
+        "block_4"
+      ],
+      "settings": {
+        "houses_label": "Our two houses",
+        "cards_label": "Prayer and food"
+      }
+    },
+    "all": {
+      "type": "tss-house-products",
+      "settings": {
+        "heading": "All [title]",
+        "show_sort": true,
+        "per_page": 16,
+        "ratio": "1",
+        "min_width": 250
+      }
+    }
+  },
+  "order": [
+    "header",
+    "houses",
+    "all"
+  ]
+}

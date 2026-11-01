@@ -1,0 +1,106 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "header": {
+      "type": "tss-house-header",
+      "settings": {
+        "lede": "Calligraphy for the wall, a mug for the morning, and scent for the whole house.",
+        "link_label": "Shop all [title]",
+        "link": "#all",
+        "show_crumbs": true,
+        "home_label": "The House",
+        "show_rule": true
+      }
+    },
+    "tiles": {
+      "type": "tss-house-tiles",
+      "blocks": {
+        "tile_1": {
+          "type": "tile",
+          "settings": {
+            "collection": "frames",
+            "text": "Calligraphy, the Kiswah Edition, and Nikah Nama",
+            "show_count": true
+          }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": {
+            "collection": "mugs",
+            "text": "Family, reminder and calligraphy mugs, with lids",
+            "show_count": true
+          }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": {
+            "collection": "home-fragrances",
+            "text": "Candles and bakhoor",
+            "show_count": true,
+            "title": "Fragrances"
+          }
+        },
+        "tile_4": {
+          "type": "tile",
+          "settings": {
+            "collection": "showpieces",
+            "text": "Metal calligraphy for a shelf or wall",
+            "show_count": true
+          }
+        }
+      },
+      "block_order": [
+        "tile_1",
+        "tile_2",
+        "tile_3",
+        "tile_4"
+      ],
+      "settings": {
+        "ratio": "4 / 5",
+        "min_width": 220,
+        "large_names": true,
+        "count_label": "[count] pieces",
+        "padding_top": 40,
+        "padding_bottom": 56,
+        "accessible_label": "Shop by category"
+      }
+    },
+    "feature": {
+      "type": "tss-house-feature",
+      "settings": {
+        "collection": "the-kiswah-edition",
+        "tone": "green",
+        "eyebrow": "From the house",
+        "title": "The Kiswah Edition",
+        "text": "Five calligraphy frames in gold embroidery on black velvet: Asma ul Husna, the Shahadah, the Takbir, Ya Hayyu Ya Qayyum, and Qarib.",
+        "price_line": "From [from]",
+        "button_label": "See the five frames",
+        "button_style": "light"
+      }
+    },
+    "all": {
+      "type": "tss-house-products",
+      "settings": {
+        "heading": "All [title]",
+        "show_sort": true,
+        "per_page": 16,
+        "ratio": "1",
+        "min_width": 250
+      }
+    }
+  },
+  "order": [
+    "header",
+    "tiles",
+    "feature",
+    "all"
+  ]
+}
