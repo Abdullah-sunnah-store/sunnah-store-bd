@@ -80,13 +80,10 @@
     background: var(--tss-ivory);
   }
 
-  /* App widgets that inject after the cart form (Essential Upsell's strip)
-     sit on the same measure as the bag and the header. */
+  /* Hide app widgets that inject after the cart form (Essential Upsell's
+     "You may also like" strip) on the cart page. */
   #tss-cart-{{ uid }} [data-cart-body] > :not(form):not(.tss-cart__empty) {
-    box-sizing: border-box;
-    max-width: calc(var(--tss-max) + (var(--tss-gutter) * 2));
-    margin-inline: auto;
-    padding-inline: var(--tss-gutter);
+    display: none;
   }
 
   /* Horizon sections below the bag (e.g. You may also like) take the TSS
