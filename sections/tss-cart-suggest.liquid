@@ -1,0 +1,631 @@
+{% comment %}
+  Section contract.
+  "You may also like" beneath the bag. Each slot block fills one card, in the
+  merchant's order: a piece related to the bag, or one of the best sellers of
+  a chosen collection (e.g. mugs, frames, gift boxes). The order stays fixed;
+  the product in each slot is picked at random on every visit, never repeating
+  one already in the bag or in another slot.
+
+  First paint (and visitors without JavaScript) shows the first available
+  product of each slot. The script then renders this same section file on the
+  recommendations endpoint and on each slot's collection sorted by best
+  selling, picks from those pools, and rebuilds whenever the bag changes.
+  @example
+  <!-- templates/cart.json: related, Mugs, Frames, Gift boxes slots -->
+{% endcomment %}
+
+{% render 'tss-base' %}
+
+{%- liquid
+  assign s = section.settings
+  assign uid = section.id
+  assign fallback = s.collection | default: collections.all
+
+  # Fetched renders only feed the script a pool to pick from.
+  assign pool_mode = false
+  if recommendations.performed
+    assign pool_mode = true
+    assign items = recommendations.products
+    assign pool_size = 10
+  elsif request.page_type == 'collection'
+    assign pool_mode = true
+    assign items = collection.products
+    assign pool_size = 16
+  endif
+
+  assign fallback_url = routes.all_products_collection_url
+  if s.collection != blank
+    assign fallback_url = s.collection.url
+  endif
+
+  assign cart_ids = cart.items | map: 'product_id' | uniq
+  assign taken = cart_ids | join: ','
+  assign taken = ',' | append: taken | append: ','
+-%}
+
+<style>
+  #tss-cs-{{ uid }} {
+    background: var(--tss-ivory);
+    padding-block: {{ s.padding_top | default: 48 }}px {{ s.padding_bottom | default: 64 }}px;
+  }
+
+  /* Same measure as the bag above (tss-cart's layout), so the edges line up. */
+  #tss-cs-{{ uid }} .tss-cs__inner {
+    max-width: calc(var(--tss-max) + (var(--tss-gutter) * 2));
+    margin-inline: auto;
+    padding-inline: var(--tss-gutter);
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__title {
+    font-family: var(--tss-serif);
+    font-size: {{ s.title_size | default: 26 }}px;
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--tss-ink);
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__all {
+    font-size: 14px;
+    color: var(--tss-ink);
+    text-underline-offset: 4px;
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__all:hover {
+    color: var(--tss-gold);
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 12px;
+    margin-top: 24px;
+    transition: opacity 0.3s ease;
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__grid[data-cs-pending] {
+    opacity: 0;
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__slot {
+    display: flex;
+    min-width: 0;
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__slot:empty {
+    display: none;
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__card {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__media {
+    display: block;
+    overflow: hidden;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__media img,
+  #tss-cs-{{ uid }} .tss-cs__media svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__card:hover .tss-cs__media img {
+    transform: scale(1.03);
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__tag {
+    margin-top: 12px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--tss-gold);
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__tag[hidden] + .tss-cs__name {
+    margin-top: 12px;
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__name {
+    margin-top: 4px;
+    font-family: var(--tss-serif);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+    color: var(--tss-ink);
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__name a {
+    text-decoration: none;
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__name a:hover {
+    color: var(--tss-green-mid);
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__price {
+    margin-top: 4px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--tss-gold);
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__add {
+    align-self: flex-start;
+    margin-top: auto;
+    border: 1px solid rgb(8 41 30 / 0.22);
+    border-radius: 2px;
+    padding: 9px 16px;
+    background: transparent;
+    font-family: var(--tss-sans);
+    font-size: 12px;
+    line-height: 1.2;
+    color: var(--tss-green);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__add:hover:not(:disabled) {
+    border-color: var(--tss-ink);
+    background: var(--tss-ink);
+    color: var(--tss-ivory);
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__add:focus-visible,
+  #tss-cs-{{ uid }} .tss-cs__all:focus-visible {
+    outline: 2px solid var(--tss-gold);
+    outline-offset: 2px;
+  }
+
+  #tss-cs-{{ uid }} .tss-cs__add:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+
+  @media (min-width: 64rem) {
+    #tss-cs-{{ uid }} .tss-cs__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 32px 16px;
+    }
+
+    #tss-cs-{{ uid }} .tss-cs__title {
+      font-size: {{ s.title_size | default: 26 | plus: 4 }}px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #tss-cs-{{ uid }} .tss-cs__media img {
+      transition: none;
+    }
+  }
+</style>
+
+<section
+  id="tss-cs-{{ uid }}"
+  class="tss-section"
+  aria-labelledby="tss-cs-heading-{{ uid }}"
+  data-cart-ids="{{ cart_ids | json | escape }}"
+  data-rec-url="{{ routes.product_recommendations_url }}"
+  data-fallback-url="{{ fallback_url }}"
+  data-add-label="{{ s.add_label | default: 'Add to Bag' | escape }}"
+  data-added-label="{{ s.added_label | default: 'Added' | escape }}"
+  data-choose-label="{{ s.choose_label | default: 'Choose options' | escape }}"
+  data-from-label="{{ s.from_label | default: 'From' | escape }}"
+>
+  <div class="tss-cs__inner">
+    <div class="tss-cs__head">
+      <h2 class="tss-cs__title" id="tss-cs-heading-{{ uid }}">
+        {{- s.title | default: 'You may also like' | escape -}}
+      </h2>
+      {%- if s.view_all_label != blank -%}
+        <a class="tss-cs__all" href="{{ fallback_url }}">{{ s.view_all_label | escape }}</a>
+      {%- endif -%}
+    </div>
+
+    <div class="tss-cs__grid" data-cs-grid>
+      {%- if pool_mode -%}
+        {%- assign shown = 0 -%}
+        {%- for item in items -%}
+          {%- liquid
+            if shown >= pool_size
+              break
+            endif
+            unless item.available
+              continue
+            endunless
+            assign item_key = ',' | append: item.id | append: ','
+            if taken contains item_key
+              continue
+            endif
+            assign shown = shown | plus: 1
+          -%}
+          {% render 'tss-cart-suggest-card', item: item %}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign slot_source = fallback
+            if block.type == 'collection' and block.settings.collection != blank
+              assign slot_source = block.settings.collection
+            endif
+            assign slot_item = nil
+            for item in slot_source.products limit: 30
+              unless item.available
+                continue
+              endunless
+              assign item_key = ',' | append: item.id | append: ','
+              if taken contains item_key
+                continue
+              endif
+              assign slot_item = item
+              assign taken = taken | append: item.id | append: ','
+              break
+            endfor
+          -%}
+          <div class="tss-cs__slot" data-cs-slot {{ block.shopify_attributes }}>
+            {%- if slot_item -%}
+              {% render 'tss-cart-suggest-card',
+                item: slot_item,
+                tag: block.settings.tag,
+                add_label: s.add_label,
+                choose_label: s.choose_label,
+                from_label: s.from_label
+              %}
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- unless pool_mode -%}
+    {%- comment -%} What the script fills each slot from, in block order. {%- endcomment -%}
+    {%- capture slots_json -%}
+      [
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign slot_url = ''
+          if block.type == 'collection' and block.settings.collection != blank
+            assign slot_url = block.settings.collection.url
+          endif
+        -%}
+        { "type": {{ block.type | json }}, "url": {{ slot_url | json }}, "tag": {{ block.settings.tag | json }} }
+        {%- unless forloop.last %},{% endunless -%}
+      {%- endfor -%}
+      ]
+    {%- endcapture -%}
+    <script type="application/json" data-cs-slots>{{ slots_json }}</script>
+  {%- endunless -%}
+</section>
+
+{%- unless pool_mode -%}
+<script>
+  (function () {
+    var root = document.getElementById('tss-cs-{{ uid }}');
+    if (!root || root.__tssSuggestBound || !window.fetch) return;
+    root.__tssSuggestBound = true;
+
+    // Fetched renders use the section file, since this section's id only
+    // exists in the cart template.
+    var FILE = 'tss-cart-suggest';
+    var ADD_URL = {{ routes.cart_add_url | append: '.js' | json }};
+    var CART_JS = {{ routes.cart_url | append: '.js' | json }};
+    var d = root.dataset;
+    var grid = root.querySelector('[data-cs-grid]');
+    var slotEls = Array.prototype.slice.call(root.querySelectorAll('[data-cs-slot]'));
+    var slots = [];
+    try {
+      slots = JSON.parse(root.querySelector('[data-cs-slots]').textContent);
+    } catch (e) {
+      return;
+    }
+    // The product each slot shows, kept while it stays valid so a bag change
+    // does not reshuffle everything.
+    var chosen = [];
+    var cache = {};
+    var run = 0;
+
+    function getCards(url) {
+      if (!cache[url]) {
+        cache[url] = fetch(url)
+          .then(function (response) {
+            return response.ok ? response.text() : '';
+          })
+          .then(function (html) {
+            var doc = new DOMParser().parseFromString(html, 'text/html');
+            return Array.prototype.slice.call(doc.querySelectorAll('[data-cs-card]'));
+          })
+          .catch(function () {
+            delete cache[url];
+            return [];
+          });
+      }
+      return cache[url];
+    }
+
+    function relatedUrl(productId) {
+      var url = new URL(d.recUrl, window.location.origin);
+      url.searchParams.set('product_id', productId);
+      url.searchParams.set('limit', '10');
+      url.searchParams.set('intent', 'related');
+      url.searchParams.set('section_id', FILE);
+      return url.toString();
+    }
+
+    function bestUrl(path) {
+      var url = new URL(path || d.fallbackUrl, window.location.origin);
+      url.searchParams.set('sort_by', 'best-selling');
+      url.searchParams.set('section_id', FILE);
+      return url.toString();
+    }
+
+    // Takes the live labels, since fetched renders carry default settings.
+    function prepare(card, tag) {
+      var clone = document.importNode(card, true);
+      var tagEl = clone.querySelector('[data-cs-tag]');
+      if (tagEl) {
+        tagEl.textContent = tag || '';
+        tagEl.hidden = !tag;
+      }
+      var add = clone.querySelector('[data-cs-add]');
+      if (add && add.firstChild) add.firstChild.nodeValue = d.addLabel;
+      var choose = clone.querySelector('[data-cs-choose]');
+      if (choose && choose.firstChild) choose.firstChild.nodeValue = d.chooseLabel;
+      var from = clone.querySelector('[data-cs-from]');
+      if (from) from.textContent = d.fromLabel;
+      return clone;
+    }
+
+    function idOf(card) {
+      return card.getAttribute('data-product-id');
+    }
+
+    function pickRandom(pool, taken) {
+      var free = pool.filter(function (card) {
+        return !taken[idOf(card)];
+      });
+      return free.length ? free[Math.floor(Math.random() * free.length)] : null;
+    }
+
+    async function relatedPool(cartIds) {
+      if (!cartIds.length) return [];
+      // Related lists for the two most recent lines, read in turn.
+      var lists = await Promise.all(
+        cartIds.slice(0, 2).map(function (id) {
+          return getCards(relatedUrl(id));
+        })
+      );
+      var merged = [];
+      var longest = Math.max.apply(null, lists.map(function (list) { return list.length; }));
+      for (var i = 0; i < longest; i++) {
+        lists.forEach(function (list) {
+          if (list[i]) merged.push(list[i]);
+        });
+      }
+      return merged;
+    }
+
+    async function build(cartIds) {
+      var token = ++run;
+      var taken = {};
+      cartIds.forEach(function (id) {
+        taken[String(id)] = true;
+      });
+
+      var needsRelated = slots.some(function (slot) {
+        return slot.type === 'related';
+      });
+      var pools = await Promise.all(
+        [needsRelated ? relatedPool(cartIds) : Promise.resolve([]), getCards(bestUrl())].concat(
+          slots.map(function (slot) {
+            return slot.type === 'collection' && slot.url ? getCards(bestUrl(slot.url)) : Promise.resolve(null);
+          })
+        )
+      );
+      if (token !== run) return;
+
+      var related = pools[0];
+      var fallback = pools[1];
+
+      slots.forEach(function (slot, i) {
+        var el = slotEls[i];
+        if (!el) return;
+        var pool = slot.type === 'related' ? related : pools[i + 2] || fallback;
+
+        var keep = null;
+        if (chosen[i] && !taken[chosen[i]]) {
+          keep = pool.filter(function (card) {
+            return idOf(card) === chosen[i];
+          })[0];
+        }
+        var card = keep || pickRandom(pool, taken) || pickRandom(fallback, taken);
+        if (!card) {
+          chosen[i] = null;
+          el.replaceChildren();
+          return;
+        }
+        chosen[i] = idOf(card);
+        taken[chosen[i]] = true;
+        el.replaceChildren(prepare(card, slot.tag));
+      });
+
+      if (window.tssInit) window.tssInit(root);
+    }
+
+    function readIds() {
+      try {
+        return JSON.parse(d.cartIds || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function reveal() {
+      grid.removeAttribute('data-cs-pending');
+    }
+
+    root.addEventListener('click', async function (event) {
+      var add = event.target instanceof Element ? event.target.closest('[data-cs-add]') : null;
+      if (!add || add.disabled) return;
+
+      var label = add.firstChild;
+      add.disabled = true;
+      try {
+        var response = await fetch(ADD_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ items: [{ id: Number(add.getAttribute('data-cs-add')), quantity: 1 }] })
+        });
+        if (!response.ok) throw new Error(String(response.status));
+        if (label) label.nodeValue = d.addedLabel;
+        var update = new Event('cart:update', { bubbles: true });
+        update.detail = { resource: {}, sourceId: root.id, data: { source: 'tss-cart-suggest' } };
+        document.dispatchEvent(update);
+      } catch (e) {
+        if (label) label.nodeValue = d.addLabel;
+        add.disabled = false;
+      }
+    });
+
+    // Rebuild against the bag as it is now, whoever changed it.
+    document.addEventListener('cart:update', async function () {
+      try {
+        var response = await fetch(CART_JS, { headers: { Accept: 'application/json' } });
+        if (!response.ok) return;
+        var cart = await response.json();
+        var ids = [];
+        cart.items.forEach(function (item) {
+          if (ids.indexOf(item.product_id) === -1) ids.push(item.product_id);
+        });
+        build(ids);
+      } catch (e) {
+        /* keep the current cards */
+      }
+    });
+
+    // Hold the first-paint cards back briefly so they do not visibly swap;
+    // they come back on their own if the requests are slow or fail.
+    grid.setAttribute('data-cs-pending', '');
+    var safety = setTimeout(reveal, 2500);
+    build(readIds())
+      .catch(function () {})
+      .then(function () {
+        clearTimeout(safety);
+        reveal();
+      });
+  })();
+</script>
+{%- endunless -%}
+
+{% schema %}
+{
+  "name": "TSS · Cart suggestions",
+  "tag": "section",
+  "class": "tss-cart-suggest-section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "You may also like" },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Heading size",
+      "min": 18,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    { "type": "text", "id": "view_all_label", "label": "View all label", "default": "View all", "info": "Leave empty to hide the link." },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Fallback collection",
+      "info": "Best sellers from here fill any slot that has nothing to show, and the View all link opens it. Leave empty for all products."
+    },
+    { "type": "header", "content": "Card" },
+    { "type": "text", "id": "add_label", "label": "Add label", "default": "Add to Bag" },
+    { "type": "text", "id": "added_label", "label": "Added label", "default": "Added" },
+    { "type": "text", "id": "choose_label", "label": "Label for products with options", "default": "Choose options" },
+    { "type": "text", "id": "from_label", "label": "\"From\" label", "default": "From" },
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "max_blocks": 8,
+  "blocks": [
+    {
+      "type": "related",
+      "name": "Related to the bag",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "A random pick from Shopify's related products for the newest items in the bag."
+        },
+        { "type": "text", "id": "tag", "label": "Tag", "default": "Goes with your bag", "info": "Leave empty to hide." }
+      ]
+    },
+    {
+      "type": "collection",
+      "name": "From a collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "A random pick from its best sellers on each visit."
+        },
+        { "type": "text", "id": "tag", "label": "Tag", "info": "Leave empty to hide." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TSS · Cart suggestions",
+      "blocks": [
+        { "type": "related" },
+        { "type": "collection", "settings": { "tag": "Mugs" } },
+        { "type": "collection", "settings": { "tag": "Frames" } },
+        { "type": "collection", "settings": { "tag": "Gift boxes" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
+

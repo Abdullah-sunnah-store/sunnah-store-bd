@@ -461,10 +461,32 @@
   }
 
   #tss-sb-{{ uid }} .tss-sb__thumb {
+    position: relative;
     border: 1px solid rgb(26 74 58 / 0.15);
     border-radius: 2px;
     overflow: hidden;
     background: var(--tss-ivory-2);
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__sold-out {
+    position: absolute;
+    inset-block-start: 6px;
+    inset-inline-start: 6px;
+    z-index: 1;
+    padding: 3px 7px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    color: #fff;
+    background: #1f3a33;
+  }
+
+  #tss-sb-{{ uid }} .tss-sb__card--sold-out .tss-sb__card-img,
+  #tss-sb-{{ uid }} .tss-sb__card--sold-out .tss-sb__card-name,
+  #tss-sb-{{ uid }} .tss-sb__card--sold-out .tss-sb__card-price {
+    opacity: 0.55;
   }
 
   #tss-sb-{{ uid }} .tss-sb__thumb img,
@@ -1598,13 +1620,11 @@
               </div>
 
             {%- else -%}
+              {%- assign sold_out_html = '' -%}
               <div class="tss-sb__rail tss-sb__rail--cards">
                 {%- for item in g.collection.products limit: product_limit -%}
                   {%- for variant in item.variants -%}
                     {%- liquid
-                      unless variant.available
-                        continue
-                      endunless
                       if exclude_word != blank
                         assign item_title = item.title | downcase
                         if item_title contains exclude_word
@@ -1621,6 +1641,31 @@
                         assign piece_max = variant.inventory_quantity | at_least: 0
                       endif
                     -%}
+                    {%- unless variant.available -%}
+                      {%- comment -%}
+                        Sold-out pieces are shown after the rest, without data-piece,
+                        so the script never counts or adds them.
+                      {%- endcomment -%}
+                      {%- capture sold_out_card -%}
+                        <article class="tss-sb__card tss-sb__card--sold-out">
+                          <div class="tss-sb__thumb">
+                            <span class="tss-sb__sold-out">{{ 'blocks.sold_out' | t }}</span>
+                            {% render 'tss-image',
+                              image: piece_image,
+                              class: 'tss-sb__card-img',
+                              widths: '160,240,320',
+                              sizes: '160px',
+                              alt: piece_name,
+                              placeholder: 'product-1'
+                            %}
+                          </div>
+                          <h3 class="tss-sb__card-name">{{ piece_name | escape }}</h3>
+                          <p class="tss-sb__card-price">{{ variant.price | money }}</p>
+                        </article>
+                      {%- endcapture -%}
+                      {%- assign sold_out_html = sold_out_html | append: sold_out_card -%}
+                      {%- continue -%}
+                    {%- endunless -%}
                     <article
                       class="tss-sb__card"
                       data-piece="{{ variant.id }}"
@@ -1655,6 +1700,7 @@
                     </article>
                   {%- endfor -%}
                 {%- endfor -%}
+                {{- sold_out_html -}}
               </div>
             {%- endif -%}
           </div>

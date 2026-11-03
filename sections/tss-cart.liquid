@@ -1059,6 +1059,12 @@
       if (response.ok) render(await response.text());
     }
 
+    // Another section added to the bag (e.g. cart suggestions): show it here.
+    document.addEventListener('cart:update', function (event) {
+      if (event.detail && event.detail.sourceId === root.id) return;
+      refresh().catch(function () {});
+    });
+
     function readAttributes() {
       var toggle = root.querySelector('[data-gift-toggle]');
       var message = root.querySelector('[data-gift-message]');

@@ -17,7 +17,9 @@
           "settings": {
             "name": "Navy Floral",
             "swatch": "#1f2a44",
+            "image": "shopify://shop_images/For_Husband_gift_box.jpg",
             "mood": "Quiet and classic, with a soft floral pattern.",
+            "hijab_match": "Royal Blue",
             "sold_out": false
           }
         },
@@ -26,7 +28,9 @@
           "settings": {
             "name": "Black",
             "swatch": "#1c1c1a",
+            "image": "shopify://shop_images/Umrah_Mubarak_gift_box.jpg",
             "mood": "Understated, for the one who likes things simple.",
+            "hijab_match": "Black",
             "sold_out": false
           }
         },
@@ -35,7 +39,9 @@
           "settings": {
             "name": "Red",
             "swatch": "#6b1f22",
+            "image": "shopify://shop_images/For_Wife_gift_box.jpg",
             "mood": "Deep and warm, the wedding-season favourite.",
+            "hijab_match": "Blood Red",
             "sold_out": false
           }
         },
@@ -66,13 +72,13 @@
         "card_loved_ones": {
           "type": "card_image",
           "settings": {
-            "card": "For Loved ones"
+            "card": "For Loved Ones"
           }
         },
         "card_needs_dua": {
           "type": "card_image",
           "settings": {
-            "card": "For someone who needs Dua"
+            "card": "Someone Who Needs Dua"
           }
         },
         "inside_quran": {
@@ -109,6 +115,13 @@
             "image": "shopify://shop_images/in-box-gift-box.jpg",
             "name": "Gift box"
           }
+        },
+        "inside_clip": {
+          "type": "inside",
+          "settings": {
+            "image": "shopify://shop_images/de847dc1-Clip_-1x1Qur_an-clip-10-of-14-scaled-1-jpg.webp",
+            "name": "Quran Clip"
+          }
         }
       },
       "block_order": [
@@ -125,20 +138,22 @@
         "inside_mat",
         "inside_tasbih",
         "inside_card",
-        "inside_box"
+        "inside_box",
+        "inside_clip"
       ],
       "settings": {
-        "product": "wedding-package-turkish-sunnah-premium-gift-box",
+        "product": "the-sunnah-classic-wedding-gift-box",
         "perfume_product": "ironwood-spray-perfume",
         "perfume_collection": "",
         "miswak_product": "miswak-with-cover-dark-chocolate",
         "miswak_image": "shopify://shop_images/Miswak-with-leather-cover-DSC03707-3-scaled-1-2048x2048.jpg",
         "hijab_collection": "pashmina-hijab",
         "hijab_exclude": "Hamper",
+        "hijab_only": "Blood Red, Royal Blue, Black",
         "hijab_product": "",
         "hijab_swatch_colours": "Metallic Golden: #e0b479\nBlood Red: #da1f3d\nEmerald Green: #395759\nBlack: #3a3837\nCarob Brown: #d9a57a\nSlate Gray: #8f96b2\nRoyal Maroon: #9e344a\nDark Maroon: #8e3046\nRoyal Blue: #1e5387\nCanon Pink: #ed95a4\nMidnight Maroon: #943d4e\nFlamingo Pink: #db9aae\nGrape Purple: #b6698f",
         "hijab_tab_1": "Pashmina",
-        "hijab_collection_2": "cherry-hijab",
+        "hijab_collection_2": "",
         "hijab_tab_2": "Cherry",
         "hijab_swatch_colours_2": "Cherry Red: #c82b3f\nWine Dark Purple: #583142\nWatermelon Pink: #e47172\nBottle Green: #0a4245\nBlue: #0f2842\nJapanese Violet: #6a4759\nBlack: #1f1f1f\nDark Wine: #431822\nGrape Purple: #7a3351\nMint: #96a675\nMint Green: #9db8a4",
         "hijab_discount": 50,
@@ -147,16 +162,21 @@
         "subtitle": "Wedding gift box",
         "lede": "For him, for her, or for both. Gift-ready in 24 hours in Dhaka.",
         "proof": "290+ people bought",
+        "worth_text": "Worth ৳2,340 if bought separately",
+        "dispatch_title": "Order by 6 pm, delivered tomorrow in Dhaka",
+        "dispatch_text": "Outside Dhaka 2–4 days · Cash on delivery, card or bKash",
         "image_ratio": "1 / 1",
+        "gallery": "colours",
         "inside_label": "In every box",
         "inside_link_label": "See inside ↓",
         "inside_anchor": "inside",
         "colour_label": "Box colour",
+        "photo_swatches": true,
         "card_label": "Card",
         "name_label": "Name on the Card",
         "name_placeholder": "e.g. Aisha & Yusuf",
         "name_help": "Leave it blank if you’d rather not.",
-        "card_options": "Nikah Dua\nUmrah Mubarak\nFor Husband\nFor Wife\nFor Loved ones\nsomeone who needs dua",
+        "card_options": "Nikah Dua\nUmrah Mubarak\nFor Husband\nFor Wife\nFor Loved Ones\nSomeone Who Needs Dua",
         "addons_label": "Complete the gift",
         "optional_label": "Optional",
         "perfume_label": "Spray perfume",
@@ -175,17 +195,22 @@
         "add_label": "Add",
         "added_label": "Added",
         "included_label": "Included",
-        "allow_two": false,
+        "allow_two": true,
         "count_label": "How many boxes?",
         "one_label": "1 box",
         "two_label": "2 boxes",
         "two_note": "2 perfumes free",
+        "one_hint": "Add a perfume below if you like",
+        "two_hint": "One spray perfume packed in each box",
         "box_label": "Box",
         "box_one_label": "Box one",
         "box_two_label": "Box two",
         "total_label": "Total",
         "delivery_note": "Delivery added at checkout: ৳100 inside Dhaka.",
         "button_label": "Order now",
+        "whatsapp_number": "8801911242132",
+        "whatsapp_message": "Assalamu alaikum, I'd like to ask about [title].",
+        "whatsapp_label": "Chat on WhatsApp",
         "trust_line": "Pay on delivery, by bKash or by card.",
         "after_add": "checkout",
         "colour_property": "Box colour",
@@ -204,6 +229,30 @@
     "story": {
       "type": "tss-gift-box-story",
       "blocks": {
+        "review_1": {
+          "type": "review",
+          "settings": {
+            "quote": "“Alhamdulillah, very satisfied with my experience at The Sunnah Store. Products are authentic, service is smooth, and delivery is on time. Highly recommend for anyone looking for quality Islamic essentials.😇😇😇”",
+            "name": "Wahidur Rahman",
+            "place": "Dhaka"
+          }
+        },
+        "review_2": {
+          "type": "review",
+          "settings": {
+            "quote": "“মাশাল্লাহ , প্রথমে অনেক ভয়ে ছিলাম , কিন্তু তাদের প্যাকেজিং থেকে শুরু করে প্রতিটা জিনিস অনেক সুন্দর ভাবে গুছিয়ে দিয়েছে অনেক ভালো লেগেছে”",
+            "name": "Fariha Chowdhury",
+            "place": "Chattogram"
+          }
+        },
+        "review_3": {
+          "type": "review",
+          "settings": {
+            "quote": "“Beautiful packaging. Excellent customer service. Highly recommended. My family got really happy seeing the gifts from Sunnah Store. Thank you.”",
+            "name": "Nusrat",
+            "place": "Sylhet"
+          }
+        },
         "contents": {
           "type": "contents",
           "settings": {
@@ -237,30 +286,6 @@
             "title": "Gift-ready, on time",
             "text": "",
             "rows": "Inside Dhaka | Within 24 hours\nOutside Dhaka | 2–4 days\nPayment | Cash on deliver/ Card/ bKash"
-          }
-        },
-        "review_1": {
-          "type": "review",
-          "settings": {
-            "quote": "“Alhamdulillah, very satisfied with my experience at The Sunnah Store. Products are authentic, service is smooth, and delivery is on time. Highly recommend for anyone looking for quality Islamic essentials.😇😇😇”",
-            "name": "Wahidur Rahman",
-            "place": "Dhaka"
-          }
-        },
-        "review_2": {
-          "type": "review",
-          "settings": {
-            "quote": "“মাশাল্লাহ , প্রথমে অনেক ভয়ে ছিলাম , কিন্তু তাদের প্যাকেজিং থেকে শুরু করে প্রতিটা জিনিস অনেক সুন্দর ভাবে গুছিয়ে দিয়েছে অনেক ভালো লেগেছে”",
-            "name": "Fariha Chowdhury",
-            "place": "Chattogram"
-          }
-        },
-        "review_3": {
-          "type": "review",
-          "settings": {
-            "quote": "“Beautiful packaging. Excellent customer service. Highly recommended. My family got really happy seeing the gifts from Sunnah Store. Thank you.”",
-            "name": "Nusrat",
-            "place": "Sylhet"
           }
         },
         "bulk": {
@@ -324,12 +349,12 @@
         }
       },
       "block_order": [
-        "contents",
-        "dua",
-        "delivery",
         "review_1",
         "review_2",
         "review_3",
+        "contents",
+        "dua",
+        "delivery",
         "bulk",
         "faq_1",
         "faq_2",

@@ -1,0 +1,45 @@
+{% doc %}
+  Renders one product card for the cart suggestions section.
+
+  @param {product} item - The product to show
+  @param {string} [tag] - Small label above the title; hidden when empty
+  @param {string} [add_label] - Add button label
+  @param {string} [choose_label] - Label for products that need an option picked
+  @param {string} [from_label] - Prefix for a varying price
+
+  @example
+  {% render 'tss-cart-suggest-card', item: product, tag: 'Mugs', add_label: 'Add to Bag' %}
+{% enddoc %}
+
+{%- assign iv = item.selected_or_first_available_variant -%}
+<article class="tss-cs__card" data-cs-card data-product-id="{{ item.id }}">
+  <a class="tss-cs__media" href="{{ item.url }}" tabindex="-1" aria-hidden="true">
+    {% render 'tss-image',
+      image: item.featured_image,
+      widths: '240,360,480,640',
+      sizes: '(min-width: 64rem) 300px, 46vw',
+      alt: '',
+      placeholder: 'product-2'
+    %}
+  </a>
+  <p class="tss-cs__tag" data-cs-tag {% if tag == blank %}hidden{% endif %}>{{ tag | escape }}</p>
+  <h3 class="tss-cs__name"><a href="{{ item.url }}">{{ item.title | escape }}</a></h3>
+  <p class="tss-cs__price">
+    {%- if item.price_varies -%}
+      <span data-cs-from>{{ from_label | default: 'From' | escape }}</span> {{ item.price_min | money }}
+    {%- else -%}
+      {{ item.price | money }}
+    {%- endif -%}
+  </p>
+  {%- if item.has_only_default_variant -%}
+    <button type="button" class="tss-cs__add" data-cs-add="{{ iv.id }}">
+      {{- add_label | default: 'Add to Bag' | escape -}}
+      <span class="tss-sr-only">: {{ item.title | escape }}</span>
+    </button>
+  {%- else -%}
+    <a class="tss-cs__add" href="{{ item.url }}" data-cs-choose>
+      {{- choose_label | default: 'Choose options' | escape -}}
+      <span class="tss-sr-only">: {{ item.title | escape }}</span>
+    </a>
+  {%- endif -%}
+</article>

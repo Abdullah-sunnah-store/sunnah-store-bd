@@ -85,18 +85,30 @@
   endif
 
   # Colour and card block images join the gallery after the product's own media.
-  assign media_count = box.media.size | at_most: 10
-  assign slide_count = media_count
+  # "Colours only" keeps just the colour images, when there are any.
+  assign colour_image_count = 0
   for block in colour_blocks
     if block.settings.image != blank
-      assign slide_count = slide_count | plus: 1
+      assign colour_image_count = colour_image_count | plus: 1
     endif
   endfor
-  for block in card_blocks
-    if block.settings.image != blank
-      assign slide_count = slide_count | plus: 1
-    endif
-  endfor
+  assign colours_only = false
+  if s.gallery == 'colours' and colour_image_count > 0
+    assign colours_only = true
+  endif
+
+  assign media_count = box.media.size | at_most: 10
+  if colours_only
+    assign media_count = 0
+  endif
+  assign slide_count = media_count | plus: colour_image_count
+  unless colours_only
+    for block in card_blocks
+      if block.settings.image != blank
+        assign slide_count = slide_count | plus: 1
+      endif
+    endfor
+  endunless
 
   assign title = s.title | default: box.title | default: page.title
   assign card_options = s.card_options | newline_to_br | split: '<br />'
@@ -122,6 +134,8 @@
   assign hijab_keep = 100 | minus: s.hijab_discount
   assign hijab_swatch_lines = s.hijab_swatch_colours | newline_to_br | split: '<br />'
   assign hijab_exclude = s.hijab_exclude | strip | downcase
+  # When set, only colours whose name contains one of these words are offered.
+  assign hijab_only = s.hijab_only | downcase | split: ','
 
   # A second fabric (Cherry) adds a switch under the hijab photo.
   assign hijab_group_count = 0
@@ -194,6 +208,60 @@
   /* ---------- media ---------- */
   #tss-gbx-{{ uid }} .tss-gbx__media {
     min-width: 0;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__stage {
+    position: relative;
+  }
+
+  /* Colour shortcut over the photo, bottom start corner. */
+  #tss-gbx-{{ uid }} .tss-gbx__quick {
+    position: absolute;
+    z-index: 1;
+    inset-block-end: 16px;
+    inset-inline-start: 16px;
+    display: flex;
+    gap: 10px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__quick[hidden] {
+    display: none;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__qswatch {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 4px solid var(--tss-ivory);
+    border-radius: 50%;
+    background: var(--swatch, var(--tss-ivory-2));
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.25);
+    cursor: pointer;
+    transition: transform 0.25s var(--tss-ease), box-shadow 0.25s var(--tss-ease);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__qswatch:hover {
+    transform: scale(1.06);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__qswatch[aria-pressed='true'] {
+    box-shadow: 0 0 0 2px var(--tss-ink), 0 1px 4px rgb(0 0 0 / 0.25);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__qswatch:focus-visible {
+    outline: 2px solid var(--tss-gold);
+    outline-offset: 3px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__qswatch:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #tss-gbx-{{ uid }} .tss-gbx__qswatch {
+      transition: none;
+    }
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__rail {
@@ -316,6 +384,39 @@
     color: rgb(28 28 26 / 0.55);
   }
 
+  /* Its own line under the price and proof. */
+  #tss-gbx-{{ uid }} .tss-gbx__worth {
+    flex-basis: 100%;
+    margin-top: -2px;
+    font-size: 13px;
+    color: rgb(28 28 26 / 0.6);
+  }
+
+  /* Delivery promise: a tinted note between the price and In every box. */
+  #tss-gbx-{{ uid }} .tss-gbx__dispatch {
+    display: grid;
+    gap: 4px;
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    background: var(--tss-ivory-2);
+    color: var(--tss-ink);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__dispatch-title {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__dispatch-text {
+    font-size: 12px;
+    line-height: 1.45;
+    color: rgb(28 28 26 / 0.6);
+    overflow-wrap: anywhere;
+  }
+
   /* ---------- in every box ---------- */
   #tss-gbx-{{ uid }} .tss-gbx__inside {
     display: flex;
@@ -325,12 +426,6 @@
     padding: 12px;
     background: var(--tss-ivory-2);
     color: var(--tss-ink);
-    text-decoration: none;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__inside:focus-visible {
-    outline: 2px solid var(--tss-green);
-    outline-offset: 2px;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__inside-head {
@@ -352,6 +447,12 @@
     white-space: nowrap;
   }
 
+  #tss-gbx-{{ uid }} .tss-gbx__inside-link:focus-visible,
+  #tss-gbx-{{ uid }} .tss-gbx__inside-item:focus-visible {
+    outline: 2px solid var(--tss-green);
+    outline-offset: 2px;
+  }
+
   #tss-gbx-{{ uid }} .tss-gbx__inside-items {
     display: grid;
     grid-template-columns: repeat(var(--tss-gbx-inside, 5), minmax(0, 1fr));
@@ -369,6 +470,155 @@
     text-align: center;
     color: rgb(28 28 26 / 0.75);
     overflow-wrap: anywhere;
+  }
+
+  #tss-gbx-{{ uid }} button.tss-gbx__inside-item {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    cursor: zoom-in;
+  }
+
+  #tss-gbx-{{ uid }} button.tss-gbx__inside-item img {
+    transition: opacity 0.25s var(--tss-ease);
+  }
+
+  #tss-gbx-{{ uid }} button.tss-gbx__inside-item:hover img {
+    opacity: 0.85;
+  }
+
+  /* ---------- in every box: larger view ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox {
+    width: min(92vw, 640px);
+    max-width: none;
+    max-height: 92vh;
+    margin: auto;
+    padding: 0;
+    border: 0;
+    background: var(--tss-ivory);
+    color: var(--tss-ink);
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.35);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox::backdrop {
+    background: rgb(8 41 30 / 0.7);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox[open] {
+    animation: tss-gbx-lightbox-in 0.25s var(--tss-ease);
+  }
+
+  @keyframes tss-gbx-lightbox-in {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox-frame {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-height: 92vh;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox-img {
+    display: block;
+    width: 100%;
+    min-height: 0;
+    max-height: calc(92vh - 64px);
+    aspect-ratio: 1;
+    object-fit: contain;
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox-close {
+    position: absolute;
+    z-index: 1;
+    inset-block-start: 10px;
+    inset-inline-end: 10px;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(245 240 232 / 0.9);
+    color: var(--tss-ink);
+    cursor: pointer;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    font-family: var(--tss-serif);
+    font-size: 18px;
+    line-height: 1.25;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox-count {
+    font-family: var(--tss-sans);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: rgb(28 28 26 / 0.55);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox-step {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid rgb(28 28 26 / 0.15);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--tss-ink);
+    cursor: pointer;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox-step[data-inside-step='-1'] .tss-icon {
+    transform: scaleX(-1);
+  }
+
+  /* Previous/next point the other way in right-to-left languages. */
+  [dir='rtl'] #tss-gbx-{{ uid }} .tss-gbx__lightbox-step .tss-icon {
+    transform: scaleX(-1);
+  }
+
+  [dir='rtl'] #tss-gbx-{{ uid }} .tss-gbx__lightbox-step[data-inside-step='-1'] .tss-icon {
+    transform: none;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox-step[hidden] {
+    visibility: hidden;
+    display: grid;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox-close:focus-visible,
+  #tss-gbx-{{ uid }} .tss-gbx__lightbox-step:focus-visible {
+    outline: 2px solid var(--tss-gold);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #tss-gbx-{{ uid }} .tss-gbx__lightbox[open] {
+      animation: none;
+    }
   }
 
   /* Holds the square until the merchant picks an image. */
@@ -695,8 +945,14 @@
     gap: 10px 12px;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-foot .tss-gbx__stepper {
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-foot .tss-gbx__stepper,
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-qty .tss-gbx__stepper {
     margin-top: 0;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-qty {
+    display: flex;
+    margin-top: 12px;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__hijab-tabs {
@@ -996,6 +1252,49 @@
     opacity: 0.8;
   }
 
+  /* Box count rows: stacked, title and hint at the start, price at the end;
+     the chosen row takes the warm tint and an ink edge. */
+  #tss-gbx-{{ uid }} .tss-gbx__options--rows {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__tile--row {
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 68px;
+    padding: 14px 16px;
+    border-color: rgb(28 28 26 / 0.15);
+    border-radius: 6px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__tile--row:has(input:checked) {
+    border-color: var(--tss-ink);
+    background: var(--tss-ivory-2);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__tile--row .tss-gbx__tile-text {
+    gap: 3px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__row-title {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__tile--row .tss-gbx__tile-note {
+    font-size: 12px;
+    color: rgb(28 28 26 / 0.6);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__row-price {
+    flex: none;
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
   #tss-gbx-{{ uid }} .tss-gbx__sub {
     display: grid;
     gap: 6px;
@@ -1188,8 +1487,28 @@
 
   #tss-gbx-{{ uid }} .tss-gbx__bar-info {
     display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
     min-width: 0;
+  }
+
+  /* WhatsApp at the start of the bar, in WhatsApp's own green. */
+  #tss-gbx-{{ uid }} .tss-gbx__bar-wa {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-inline-end: -4px;
+    border-radius: 50%;
+    background: #25d366;
+    color: #fff;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__bar-wa:focus-visible {
+    outline: 2px solid var(--tss-green);
+    outline-offset: 2px;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__bar-line {
@@ -1225,6 +1544,12 @@
   @media (max-width: 989px) {
     body:has(#tss-gbx-{{ uid }} .tss-gbx__bar) {
       padding-block-end: 80px;
+    }
+
+    /* The bar carries WhatsApp on phones, so the floating launcher steps aside. */
+    body:has(#tss-gbx-{{ uid }} .tss-gbx__bar-wa) .whatsapp-float,
+    body:has(#tss-gbx-{{ uid }} .tss-gbx__bar-wa) .whatsapp-popup {
+      display: none !important;
     }
   }
 
@@ -1291,6 +1616,7 @@
       <input type="hidden" name="quantity" value="1">
 
       <div class="tss-gbx__media">
+        <div class="tss-gbx__stage">
         <div
           class="tss-gbx__rail"
           tabindex="0"
@@ -1299,6 +1625,7 @@
           data-rail
         >
           {%- for media in box.media limit: 10 -%}
+            {%- if colours_only -%}{%- break -%}{%- endif -%}
             <div class="tss-gbx__slide" data-media-id="{{ media.id }}">
               {%- liquid
                 assign loading = 'lazy'
@@ -1339,6 +1666,7 @@
             {%- endif -%}
           {%- endfor -%}
           {%- for block in card_blocks -%}
+            {%- if colours_only -%}{%- break -%}{%- endif -%}
             {%- if block.settings.image != blank -%}
               <div class="tss-gbx__slide" data-media-id="card-{{ block.id }}">
                 {{
@@ -1355,6 +1683,20 @@
           {%- endfor -%}
           {%- if slide_count == 0 -%}
             <div class="tss-gbx__slide">{{ 'product-1' | placeholder_svg_tag }}</div>
+          {%- endif -%}
+        </div>
+          {%- if show_colours and s.photo_swatches -%}
+            {%- comment -%}
+              Shortcut to the Box colour step, filled by the script from the
+              active box's colour choices; the step stays the source of truth.
+            {%- endcomment -%}
+            <div
+              class="tss-gbx__quick"
+              role="group"
+              aria-label="{{ s.colour_label | escape }}"
+              data-quick-colours
+              hidden
+            ></div>
           {%- endif -%}
         </div>
 
@@ -1390,38 +1732,104 @@
           {%- if s.proof != blank -%}
             <p class="tss-gbx__proof">{{ s.proof | escape }}</p>
           {%- endif -%}
+          {%- if s.worth_text != blank -%}
+            <p class="tss-gbx__worth">{{ s.worth_text | escape }}</p>
+          {%- endif -%}
         </div>
 
+        {%- if s.dispatch_title != blank or s.dispatch_text != blank -%}
+          <div class="tss-gbx__dispatch">
+            {%- if s.dispatch_title != blank -%}
+              <p class="tss-gbx__dispatch-title">{{ s.dispatch_title | escape }}</p>
+            {%- endif -%}
+            {%- if s.dispatch_text != blank -%}
+              <p class="tss-gbx__dispatch-text">{{ s.dispatch_text | escape }}</p>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
         {%- if inside_count > 0 -%}
-          <a
-            class="tss-gbx__inside"
-            href="#{{ s.inside_anchor | default: 'inside' | handleize }}"
-          >
-            <span class="tss-gbx__inside-head">
+          {%- comment -%}
+            Each photo opens a larger view in a dialog; the link still jumps to
+            the contents further down the page.
+          {%- endcomment -%}
+          <div class="tss-gbx__inside">
+            <div class="tss-gbx__inside-head">
               <span class="tss-gbx__inside-label">{{ s.inside_label | escape }}</span>
               {%- if s.inside_link_label != blank -%}
-                <span class="tss-gbx__inside-link">{{ s.inside_link_label | escape }}</span>
+                <a class="tss-gbx__inside-link" href="#{{ s.inside_anchor | default: 'inside' | handleize }}">
+                  {{- s.inside_link_label | escape -}}
+                </a>
               {%- endif -%}
-            </span>
-            <span class="tss-gbx__inside-items" style="--tss-gbx-inside: {{ inside_count }}">
+            </div>
+            <div class="tss-gbx__inside-items" style="--tss-gbx-inside: {{ inside_count }}">
               {%- for block in inside_blocks -%}
-                {%- if block.settings.image != blank or block.settings.name != blank -%}
+                {%- if block.settings.image != blank -%}
+                  <button
+                    type="button"
+                    class="tss-gbx__inside-item"
+                    aria-haspopup="dialog"
+                    data-inside-open
+                    data-src="{{ block.settings.image | image_url: width: 1600 }}"
+                    data-name="{{ block.settings.name | escape }}"
+                    {{ block.shopify_attributes }}
+                  >
+                    {{-
+                      block.settings.image
+                      | image_url: width: 240
+                      | image_tag: loading: 'lazy', widths: '120, 180, 240', sizes: '(min-width: 990px) 100px, 18vw', alt: ''
+                    -}}
+                    {{- block.settings.name | escape -}}
+                  </button>
+                {%- elsif block.settings.name != blank -%}
                   <span class="tss-gbx__inside-item" {{ block.shopify_attributes }}>
-                    {%- if block.settings.image != blank -%}
-                      {{-
-                        block.settings.image
-                        | image_url: width: 240
-                        | image_tag: loading: 'lazy', widths: '120, 180, 240', sizes: '(min-width: 990px) 100px, 18vw', alt: ''
-                      -}}
-                    {%- else -%}
-                      <span class="tss-gbx__inside-blank" aria-hidden="true"></span>
-                    {%- endif -%}
+                    <span class="tss-gbx__inside-blank" aria-hidden="true"></span>
                     {{- block.settings.name | escape -}}
                   </span>
                 {%- endif -%}
               {%- endfor -%}
-            </span>
-          </a>
+            </div>
+          </div>
+
+          <dialog
+            class="tss-gbx__lightbox"
+            aria-labelledby="tss-gbx-{{ uid }}-lightbox-name"
+            data-inside-dialog
+          >
+            <div class="tss-gbx__lightbox-frame">
+              <button
+                type="button"
+                class="tss-gbx__lightbox-close"
+                aria-label="{{ 'accessibility.close_dialog' | t }}"
+                data-inside-close
+              >
+                {%- render 'tss-icon', icon: 'x', size: 20, stroke: 1.5 -%}
+              </button>
+              <img class="tss-gbx__lightbox-img" alt="" width="1600" height="1600" data-inside-img>
+              <div class="tss-gbx__lightbox-bar">
+                <button
+                  type="button"
+                  class="tss-gbx__lightbox-step"
+                  aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+                  data-inside-step="-1"
+                >
+                  {%- render 'tss-icon', icon: 'chevron-right', size: 18, stroke: 1.5 -%}
+                </button>
+                <p class="tss-gbx__lightbox-name">
+                  <span id="tss-gbx-{{ uid }}-lightbox-name" data-inside-name></span>
+                  <span class="tss-gbx__lightbox-count" data-inside-count></span>
+                </p>
+                <button
+                  type="button"
+                  class="tss-gbx__lightbox-step"
+                  aria-label="{{ 'accessibility.slideshow_next' | t }}"
+                  data-inside-step="1"
+                >
+                  {%- render 'tss-icon', icon: 'chevron-right', size: 18, stroke: 1.5 -%}
+                </button>
+              </div>
+            </div>
+          </dialog>
         {%- endif -%}
 
         {%- if s.allow_two -%}
@@ -1430,27 +1838,30 @@
               <span class="tss-gbx__num" aria-hidden="true">{{ step_count | prepend: '0' }}</span>
               {{- s.count_label | escape -}}
             </legend>
-            <div class="tss-gbx__options tss-gbx__options--two">
-              <label class="tss-gbx__tile tss-gbx__tile--solid">
+            {%- comment -%} One full-width row per choice: title and hint, price at the end. {%- endcomment -%}
+            <div class="tss-gbx__options tss-gbx__options--rows">
+              <label class="tss-gbx__tile tss-gbx__tile--row">
                 <input type="radio" name="tss-gbx-{{ uid }}-count" value="1" checked data-count>
-                <span class="tss-gbx__mark" aria-hidden="true"></span>
                 <span class="tss-gbx__tile-text">
-                  {{- s.one_label | escape -}}
-                  <span class="tss-gbx__tile-note" data-count-price="1">{{ current.price | money }}</span>
+                  <span class="tss-gbx__row-title">{{ s.one_label | escape }}</span>
+                  {%- if s.one_hint != blank -%}
+                    <span class="tss-gbx__tile-note">{{ s.one_hint | escape }}</span>
+                  {%- endif -%}
                 </span>
+                <span class="tss-gbx__row-price" data-count-price="1">{{ current.price | money }}</span>
               </label>
-              <label class="tss-gbx__tile tss-gbx__tile--solid">
+              <label class="tss-gbx__tile tss-gbx__tile--row">
                 <input type="radio" name="tss-gbx-{{ uid }}-count" value="2" data-count>
-                <span class="tss-gbx__mark" aria-hidden="true"></span>
                 <span class="tss-gbx__tile-text">
-                  {{- s.two_label | escape -}}
-                  <span class="tss-gbx__tile-note">
-                    {%- if has_perfume and s.two_note != blank -%}
-                      {{ s.two_note | escape }} ·
-                    {% endif -%}
-                    <span data-count-price="2">{{ current.price | times: 2 | money }}</span>
+                  <span class="tss-gbx__row-title">
+                    {{- s.two_label | escape -}}
+                    {%- if has_perfume and s.two_note != blank %} + {{ s.two_note | escape }}{% endif -%}
                   </span>
+                  {%- if s.two_hint != blank -%}
+                    <span class="tss-gbx__tile-note">{{ s.two_hint | escape }}</span>
+                  {%- endif -%}
                 </span>
+                <span class="tss-gbx__row-price" data-count-price="2">{{ current.price | times: 2 | money }}</span>
               </label>
             </div>
           </fieldset>
@@ -1812,6 +2223,20 @@
                                   assign piece_name = variant.title
                                 endif
                               endunless
+                              if hijab_only.size > 0
+                                assign piece_lower = piece_name | downcase
+                                assign piece_wanted = false
+                                for only_word in hijab_only
+                                  assign only_word = only_word | strip
+                                  if only_word != blank and piece_lower contains only_word
+                                    assign piece_wanted = true
+                                    break
+                                  endif
+                                endfor
+                                unless piece_wanted
+                                  continue
+                                endunless
+                              endif
                               assign piece_image = variant.featured_image | default: item.featured_image
                               assign piece_max = 99
                               if variant.inventory_management == 'shopify' and variant.inventory_policy == 'deny'
@@ -1874,8 +2299,24 @@
                         {%- endfor -%}
                       {%- endfor -%}
                     </div>
+                    {%- capture hijab_stepper -%}
+                      {%- if first_open -%}
+                        <span class="tss-gbx__extra-note">{{ s.sold_out_label | escape }}</span>
+                      {%- else -%}
+                        <div class="tss-gbx__stepper">
+                          <button type="button" aria-label="{{ s.remove_one_label | escape }}" data-hijab-dec>−</button>
+                          <output aria-live="polite" data-hijab-qty>0</output>
+                          <button type="button" aria-label="{{ s.add_one_label | escape }}" data-hijab-inc>+</button>
+                        </div>
+                      {%- endif -%}
+                    {%- endcapture -%}
+                    {%- comment -%} With one fabric there is no switch, so the stepper sits under the swatches. {%- endcomment -%}
+                    {%- if hijab_group_count < 2 -%}
+                      <div class="tss-gbx__hijab-qty">{{ hijab_stepper }}</div>
+                    {%- endif -%}
                   </div>
                   {%- comment -%} Fabric switch and stepper share one row under the card. {%- endcomment -%}
+                  {%- if hijab_group_count > 1 -%}
                   <div class="tss-gbx__hijab-foot">
                     {%- if hijab_group_count > 1 -%}
                       <div class="tss-gbx__hijab-tabs" role="group" aria-label="{{ s.hijab_fabric_label | escape }}">
@@ -1898,16 +2339,9 @@
                         {%- endfor -%}
                       </div>
                     {%- endif -%}
-                    {%- if first_open -%}
-                      <span class="tss-gbx__extra-note">{{ s.sold_out_label | escape }}</span>
-                    {%- else -%}
-                      <div class="tss-gbx__stepper">
-                        <button type="button" aria-label="{{ s.remove_one_label | escape }}" data-hijab-dec>−</button>
-                        <output aria-live="polite" data-hijab-qty>0</output>
-                        <button type="button" aria-label="{{ s.add_one_label | escape }}" data-hijab-inc>+</button>
-                      </div>
-                    {%- endif -%}
+                    {{ hijab_stepper }}
                   </div>
+                  {%- endif -%}
                 </div>
               {%- endif -%}
             </div>
@@ -1933,6 +2367,23 @@
     </form>
 
     <div class="tss-gbx__bar">
+      {%- if s.whatsapp_number != blank -%}
+        {%- liquid
+          assign wa_number = s.whatsapp_number | remove: '+' | remove: ' ' | remove: '-'
+          assign wa_text = s.whatsapp_message | replace: '[title]', title
+        -%}
+        <a
+          class="tss-gbx__bar-wa"
+          href="https://wa.me/{{ wa_number }}{% if wa_text != blank %}?text={{ wa_text | url_encode }}{% endif %}"
+          target="_blank"
+          rel="noopener"
+          aria-label="{{ s.whatsapp_label | default: 'Chat on WhatsApp' | escape }}"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.63"/>
+          </svg>
+        </a>
+      {%- endif -%}
       <div class="tss-gbx__bar-info">
         <p class="tss-gbx__bar-line" data-bar-line></p>
         <p class="tss-gbx__bar-total" data-total>{{ current.price | money }}</p>
@@ -2181,6 +2632,8 @@
           hijabCard.setAttribute('data-count', st.hijabs.reduce(function (sum, h) { return sum + h.qty; }, 0));
         }
 
+        paintQuick();
+
         var text = money(st.total);
         totals.forEach(function (el) { el.textContent = text; });
         if (price && st.first) price.textContent = money(cents(st.first));
@@ -2203,6 +2656,98 @@
         submits.forEach(function (b, i) {
           b.setAttribute('aria-disabled', busy || !st.first ? 'true' : 'false');
           b.textContent = busy ? T.adding : labels[i];
+        });
+      }
+
+      /* ---------- colour shortcut on the photo ---------- */
+      var quick = root.querySelector('[data-quick-colours]');
+      var quickFor = 0;
+
+      // One dot per swatched colour of the active box; a tap checks that
+      // radio, so the step, photo, price and summary follow as usual.
+      function paintQuick() {
+        if (!quick) return;
+        if (quickFor !== active) {
+          quickFor = active;
+          quick.replaceChildren();
+          var group = root.querySelector('[data-colours="' + active + '"]');
+          var inputs = group ? Array.prototype.slice.call(group.querySelectorAll('input[type="radio"]')) : [];
+          inputs.forEach(function (input) {
+            var tile = input.closest('.tss-gbx__tile');
+            var swatch = tile && tile.querySelector('.tss-gbx__swatch');
+            if (!swatch) return;
+            var dot = document.createElement('button');
+            dot.type = 'button';
+            dot.className = 'tss-gbx__qswatch';
+            dot.style.setProperty('--swatch', swatch.style.getPropertyValue('--swatch'));
+            dot.setAttribute('aria-label', input.getAttribute('data-title') || input.value);
+            dot.disabled = input.disabled;
+            dot.__input = input;
+            dot.addEventListener('click', function () {
+              if (input.checked || input.disabled) return;
+              input.checked = true;
+              input.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+            quick.appendChild(dot);
+          });
+          quick.hidden = quick.children.length < 2;
+        }
+        Array.prototype.forEach.call(quick.children, function (dot) {
+          dot.setAttribute('aria-pressed', dot.__input.checked ? 'true' : 'false');
+        });
+      }
+      paintQuick();
+
+      /* ---------- in every box: larger view ---------- */
+      var insideDialog = root.querySelector('[data-inside-dialog]');
+      var insideOpeners = Array.prototype.slice.call(root.querySelectorAll('[data-inside-open]'));
+      var insideIndex = 0;
+      var insideReturn = null;
+
+      function showInside(index) {
+        var count = insideOpeners.length;
+        insideIndex = (index + count) % count;
+        var opener = insideOpeners[insideIndex];
+        var img = insideDialog.querySelector('[data-inside-img]');
+        var name = insideDialog.querySelector('[data-inside-name]');
+        var counter = insideDialog.querySelector('[data-inside-count]');
+        img.src = opener.getAttribute('data-src');
+        img.alt = opener.getAttribute('data-name') || '';
+        name.textContent = opener.getAttribute('data-name') || '';
+        counter.textContent = count > 1 ? insideIndex + 1 + ' / ' + count : '';
+        insideDialog.querySelectorAll('[data-inside-step]').forEach(function (step) {
+          step.hidden = count < 2;
+        });
+      }
+
+      if (insideDialog && insideOpeners.length && typeof insideDialog.showModal === 'function') {
+        insideOpeners.forEach(function (opener, i) {
+          opener.addEventListener('click', function () {
+            insideReturn = opener;
+            showInside(i);
+            insideDialog.showModal();
+          });
+        });
+
+        insideDialog.addEventListener('click', function (event) {
+          // A click on the backdrop lands on the dialog itself.
+          if (event.target === insideDialog || event.target.closest('[data-inside-close]')) {
+            insideDialog.close();
+            return;
+          }
+          var step = event.target.closest('[data-inside-step]');
+          if (step) showInside(insideIndex + parseInt(step.getAttribute('data-inside-step'), 10));
+        });
+
+        insideDialog.addEventListener('keydown', function (event) {
+          if (insideOpeners.length < 2) return;
+          var rtl = getComputedStyle(insideDialog).direction === 'rtl';
+          if (event.key === 'ArrowRight') showInside(insideIndex + (rtl ? -1 : 1));
+          else if (event.key === 'ArrowLeft') showInside(insideIndex + (rtl ? 1 : -1));
+        });
+
+        insideDialog.addEventListener('close', function () {
+          if (insideReturn) insideReturn.focus();
         });
       }
 
@@ -2252,6 +2797,32 @@
         });
       });
 
+      // The hijab follows the box colour (e.g. a red box picks the red hijab).
+      // A count already added moves with it, so the order keeps one colour.
+      function matchHijab(colour) {
+        var want = colour && (colour.getAttribute('data-hijab-match') || '').trim().toLowerCase();
+        if (!want || !hijabSwatches.length) return;
+        var match = hijabSwatches.filter(function (el) {
+          return (
+            el.getAttribute('data-hijab-group') === hijabGroup &&
+            (el.getAttribute('data-name') || '').toLowerCase().indexOf(want) > -1
+          );
+        })[0];
+        if (!match || match === hijabActive) return;
+
+        if (hijabActive) {
+          var fromId = hijabActive.getAttribute('data-variant');
+          var toId = match.getAttribute('data-variant');
+          var moving = hijabQty[fromId] || 0;
+          if (moving > 0 && !hijabQty[toId]) {
+            var max = parseInt(match.getAttribute('data-max'), 10) || 99;
+            hijabQty[toId] = Math.min(max, moving);
+            hijabQty[fromId] = 0;
+          }
+        }
+        hijabActive = match;
+      }
+
       function stepHijab(delta) {
         if (!hijabActive) return;
         var id = hijabActive.getAttribute('data-variant');
@@ -2296,6 +2867,7 @@
       form.addEventListener('change', function (event) {
         var target = event.target;
         if (target.closest('[data-colours], [data-cards]')) showVariantMedia(target);
+        if (target.closest('[data-colours]')) matchHijab(target);
         hint.removeAttribute('data-error');
         hint.textContent = '';
         render();
@@ -2371,6 +2943,7 @@
         render();
       });
 
+      matchHijab(root.querySelector('[data-colours="1"] input:checked'));
       render();
     })();
   </script>
@@ -2426,6 +2999,12 @@
       "label": "Leave out hijabs whose title contains",
       "default": "Hamper"
     },
+    {
+      "type": "text",
+      "id": "hijab_only",
+      "label": "Only show these colours",
+      "info": "Comma-separated, e.g. Blood Red, Royal Blue, Black. A colour shows when its name contains one of them. Leave empty to show every colour."
+    },
     { "type": "product", "id": "hijab_product", "label": "Or one hijab product", "info": "Used when no collection is chosen. Each variant is one colour." },
     {
       "type": "textarea",
@@ -2471,6 +3050,9 @@
       "default": "For him, for her, or for both. Gift-ready in 24 hours in Dhaka."
     },
     { "type": "text", "id": "proof", "label": "Proof line", "default": "290+ gifted since 2024" },
+    { "type": "text", "id": "worth_text", "label": "Value line", "info": "Small line under the price, e.g. Worth ৳3,100 if bought separately. Leave empty to hide." },
+    { "type": "text", "id": "dispatch_title", "label": "Delivery headline", "info": "Bold line in the note under the price. Leave both delivery fields empty to hide the note." },
+    { "type": "text", "id": "dispatch_text", "label": "Delivery details" },
     {
       "type": "select",
       "id": "image_ratio",
@@ -2482,6 +3064,17 @@
       ],
       "default": "1 / 1"
     },
+    {
+      "type": "select",
+      "id": "gallery",
+      "label": "Gallery photos",
+      "options": [
+        { "value": "colours", "label": "Box colour images only" },
+        { "value": "all", "label": "Product photos, colour and card images" }
+      ],
+      "default": "colours",
+      "info": "Box colour images only falls back to every photo while no colour has an image."
+    },
     { "type": "header", "content": "In every box" },
     { "type": "paragraph", "content": "Add In the box blocks to show a strip under the price." },
     { "type": "text", "id": "inside_label", "label": "Strip label", "default": "In every box" },
@@ -2489,6 +3082,7 @@
     { "type": "text", "id": "inside_anchor", "label": "Link target", "default": "inside", "info": "Matches the anchor on the Contents block of TSS — Gift box story." },
     { "type": "header", "content": "Steps" },
     { "type": "text", "id": "colour_label", "label": "Colour step", "default": "Box colour" },
+    { "type": "checkbox", "id": "photo_swatches", "label": "Show colour dots on the photo", "info": "A tap picks that box colour and shows its photo.", "default": true },
     { "type": "text", "id": "card_label", "label": "Card step", "default": "Card" },
     { "type": "text", "id": "name_label", "label": "Box name step", "default": "Name on box", "info": "Also the cart line property. Leave empty to hide the step." },
     { "type": "text", "id": "name_placeholder", "label": "Box name placeholder", "default": "e.g. Aisha & Yusuf" },
@@ -2522,7 +3116,9 @@
     { "type": "text", "id": "count_label", "label": "Box count step", "default": "How many boxes?" },
     { "type": "text", "id": "one_label", "label": "One box", "default": "1 box" },
     { "type": "text", "id": "two_label", "label": "Two boxes", "default": "2 boxes" },
-    { "type": "text", "id": "two_note", "label": "Two boxes note", "default": "2 perfumes free" },
+    { "type": "text", "id": "two_note", "label": "Two boxes note", "default": "2 perfumes free", "info": "Joins the title as \"2 boxes + 2 perfumes free\" when a perfume is set." },
+    { "type": "text", "id": "one_hint", "label": "One box hint", "default": "Add a perfume below if you like", "info": "Small line under the title. Leave empty to hide." },
+    { "type": "text", "id": "two_hint", "label": "Two boxes hint", "default": "One spray perfume packed in each box", "info": "Small line under the title. Leave empty to hide." },
     { "type": "text", "id": "box_label", "label": "Single box label", "default": "Box", "info": "Starts the box line in the order summary." },
     { "type": "text", "id": "box_one_label", "label": "First box label", "default": "Box one" },
     { "type": "text", "id": "box_two_label", "label": "Second box label", "default": "Box two" },
@@ -2530,6 +3126,21 @@
     { "type": "text", "id": "total_label", "label": "Total label", "default": "Total" },
     { "type": "text", "id": "delivery_note", "label": "Delivery note", "default": "Delivery added at checkout." },
     { "type": "text", "id": "button_label", "label": "Button label", "default": "Order now" },
+    {
+      "type": "text",
+      "id": "whatsapp_number",
+      "label": "WhatsApp number in the phone bar",
+      "info": "With country code, e.g. 8801911242132. Shows a WhatsApp button beside Order now on phones, in place of the floating one. Leave empty to hide.",
+      "default": "8801911242132"
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_message",
+      "label": "WhatsApp opening message",
+      "info": "[title] becomes the box name.",
+      "default": "Assalamu alaikum, I'd like to ask about [title]."
+    },
+    { "type": "text", "id": "whatsapp_label", "label": "WhatsApp button label for screen readers", "default": "Chat on WhatsApp" },
     { "type": "text", "id": "trust_line", "label": "Trust line", "default": "Cash on delivery across Bangladesh." },
     {
       "type": "select",
@@ -2564,6 +3175,7 @@
         { "type": "color", "id": "swatch", "label": "Swatch" },
         { "type": "image_picker", "id": "image", "label": "Image", "info": "Added to the gallery and shown when this colour is chosen." },
         { "type": "text", "id": "mood", "label": "Mood line", "info": "Shown under the colours when this one is chosen." },
+        { "type": "text", "id": "hijab_match", "label": "Matching hijab colour", "info": "Picking this box colour picks the hijab whose name contains this, e.g. Royal Blue. Leave empty to use the colour name." },
         { "type": "checkbox", "id": "sold_out", "label": "Sold out", "default": false }
       ]
     },

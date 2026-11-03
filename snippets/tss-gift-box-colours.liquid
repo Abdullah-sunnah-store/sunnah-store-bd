@@ -51,6 +51,7 @@
         data-variant="{{ current.id }}"
         data-price="{{ current.price }}"
         data-title="{{ block.settings.name | escape }}"
+        data-hijab-match="{{ block.settings.hijab_match | default: block.settings.name | escape }}"
         data-property
         {% if block.settings.mood != blank %}
           data-mood="{{ block.settings.mood | escape }}"
@@ -107,6 +108,7 @@
         data-variant="{{ variant.id }}"
         data-price="{{ variant.price }}"
         data-title="{{ variant.title | escape }}"
+        data-hijab-match="{{ variant.title | escape }}"
         data-media="{{ variant.featured_media.id }}"
         {% if variant.id == current.id %}
           checked

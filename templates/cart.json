@@ -9,10 +9,53 @@
  */
 {
   "sections": {
+    "tss_cart_suggest": {
+      "type": "tss-cart-suggest",
+      "blocks": {
+        "slot_related": {
+          "type": "related",
+          "settings": {
+            "tag": "Goes with your bag"
+          }
+        },
+        "slot_mug": {
+          "type": "collection",
+          "settings": {
+            "collection": "mugs",
+            "tag": "Mugs"
+          }
+        },
+        "slot_frame": {
+          "type": "collection",
+          "settings": {
+            "collection": "frames",
+            "tag": "Frames"
+          }
+        },
+        "slot_gift_box": {
+          "type": "collection",
+          "settings": {
+            "collection": "hero-gift-box",
+            "tag": "Gift boxes"
+          }
+        }
+      },
+      "block_order": [
+        "slot_related",
+        "slot_mug",
+        "slot_frame",
+        "slot_gift_box"
+      ],
+      "settings": {
+        "title": "You may also like",
+        "view_all_label": "View all",
+        "collection": "all"
+      }
+    },
     "tss_cart": {
       "type": "tss-cart",
       "settings": {
-        "pair_product": "lid-start-with-bismillah",
+        "pair_product": "wrapping-paper",
         "promise_3": "14 days return, replace, refund available",
         "promise_1": "",
         "promise_2": ""
@@ -192,6 +235,7 @@
         }
       },
       "name": "Featured collection",
+      "disabled": true,
       "settings": {
         "collection": "all",
         "layout_type": "grid",
@@ -215,6 +259,7 @@
   },
   "order": [
     "tss_cart",
+    "tss_cart_suggest",
     "product_list_NNFgcy"
   ]
 }

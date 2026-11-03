@@ -592,6 +592,34 @@
     color: var(--tss-gold);
   }
 
+  #tss-drawer-{{ uid }} .tss-drawer__sub.tss-drawer__summary {
+    display: flex;
+  }
+
+  #tss-drawer-{{ uid }} .tss-drawer__child[open] > .tss-drawer__summary svg {
+    transform: rotate(180deg);
+  }
+
+  /* The outer rule rotates every chevron in an open group; keep closed
+     third-level chevrons pointing down. */
+  #tss-drawer-{{ uid }} .tss-drawer__child:not([open]) > .tss-drawer__summary svg {
+    transform: none;
+  }
+
+  #tss-drawer-{{ uid }} .tss-drawer__child[open] > .tss-drawer__summary {
+    color: var(--tss-green);
+  }
+
+  #tss-drawer-{{ uid }} .tss-drawer__grandsubs {
+    padding-bottom: 6px;
+  }
+
+  #tss-drawer-{{ uid }} .tss-drawer__grandsub {
+    padding-block: 6px;
+    padding-inline-start: 32px;
+    font-size: 13px;
+  }
+
   /* Search overlay — full-screen ivory sheet over the header: close top right,
      a single ruled input, then suggested searches and a popular-products rail
      until the shopper types, when live product and collection results take
@@ -1053,7 +1081,27 @@
             </summary>
             <div class="tss-drawer__subs">
               {%- for child in link.links -%}
-                <a href="{{ child.url }}" class="tss-drawer__sub">{{ child.title | escape }}</a>
+                {%- if child.links.size > 0 -%}
+                  {%- comment -%} Third level: its own collapsible group, led by a link to the child page. {%- endcomment -%}
+                  <details class="tss-drawer__child">
+                    <summary class="tss-drawer__sub tss-drawer__summary">
+                      <span>{{ child.title | escape }}</span>
+                      {% render 'tss-icon', icon: 'chevron-down', size: 14, stroke: 1.5 %}
+                    </summary>
+                    <div class="tss-drawer__grandsubs">
+                      <a href="{{ child.url }}" class="tss-drawer__sub tss-drawer__grandsub">
+                        {{- 'actions.view_all' | t }} {{ child.title | escape -}}
+                      </a>
+                      {%- for grandchild in child.links -%}
+                        <a href="{{ grandchild.url }}" class="tss-drawer__sub tss-drawer__grandsub">
+                          {{- grandchild.title | escape -}}
+                        </a>
+                      {%- endfor -%}
+                    </div>
+                  </details>
+                {%- else -%}
+                  <a href="{{ child.url }}" class="tss-drawer__sub">{{ child.title | escape }}</a>
+                {%- endif -%}
               {%- endfor -%}
             </div>
           </details>
