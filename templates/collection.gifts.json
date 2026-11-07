@@ -129,6 +129,22 @@
         "link_collection": "shop-by-occasion"
       }
     },
+    "parents": {
+      "type": "tss-house-rail",
+      "settings": {
+        "layout": "band",
+        "eyebrow": "Birr al-walidayn",
+        "heading": "For your mother and father",
+        "text": "Packages made to say thank you to the two who gave you everything.",
+        "collection": "for-parents",
+        "limit": 3,
+        "link_label": "",
+        "ratio": "1",
+        "min_width": 160,
+        "padding_top": 72,
+        "padding_bottom": 0
+      }
+    },
     "box": {
       "type": "tss-house-feature",
       "settings": {
@@ -154,7 +170,17 @@
         "button_label": "Corporate & bulk gifts",
         "link": "/collections/corporate",
         "padding_top": 32,
-        "padding_bottom": 80
+        "padding_bottom": 0
+      }
+    },
+    "all": {
+      "type": "tss-house-products",
+      "settings": {
+        "heading": "Every gift",
+        "show_sort": true,
+        "per_page": 16,
+        "ratio": "4 / 5",
+        "min_width": 230
       }
     }
   },
@@ -162,7 +188,9 @@
     "finder",
     "ready",
     "occasions",
+    "parents",
     "box",
-    "corporate"
+    "corporate",
+    "all"
   ]
 }

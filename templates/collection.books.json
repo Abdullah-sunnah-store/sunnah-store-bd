@@ -25,7 +25,7 @@
       "settings": {
         "layout": "row",
         "heading": "The Quran",
-        "text": "Five mushafs, from a pocket edition to leather with colour-coded tajweed.",
+        "text": "From a pocket edition to leather with colour-coded tajweed.",
         "collection": "quran",
         "limit": 5,
         "link_label": "All Qurans",
@@ -42,6 +42,11 @@
         "eyebrow": "To keep it well",
         "heading": "A Quran, its cover, and a place to rest",
         "text": "Add them to any mushaf above, and the gift is kept for a lifetime.",
+        "products": [
+          "leather-quran-cover-black",
+          "leather-quran-cover-dark-chocolate",
+          "premium-wooden-rehal-bookstand"
+        ],
         "limit": 3,
         "link_label": "",
         "ratio": "1",
@@ -96,6 +101,34 @@
         "accessible_label": "Shop by category"
       }
     },
+    "shelf": {
+      "type": "tss-house-rail",
+      "settings": {
+        "layout": "row",
+        "eyebrow": "On our shelf",
+        "heading": "Books that shape the week",
+        "text": "Habits, focus, money and meaning. Read with the heart of a believer.",
+        "collection": "general-books",
+        "limit": 5,
+        "link_label": "All [count] titles",
+        "ratio": "3 / 4",
+        "min_width": 180,
+        "padding_top": 72,
+        "padding_bottom": 0
+      }
+    },
+    "journal": {
+      "type": "tss-house-strip",
+      "settings": {
+        "tone": "paper",
+        "title": "Read, then write it down",
+        "text": "Quran, dua and Hajj journals for the lines you want to keep.",
+        "button_label": "See the journals",
+        "link": "/collections/journals",
+        "padding_top": 40,
+        "padding_bottom": 0
+      }
+    },
     "all": {
       "type": "tss-house-products",
       "settings": {
@@ -112,6 +145,8 @@
     "quran",
     "keep",
     "tiles",
+    "shelf",
+    "journal",
     "all"
   ]
 }
