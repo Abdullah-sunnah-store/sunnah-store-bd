@@ -4,12 +4,12 @@
   perfume product's variants are. A single-variant product shows its title.
 
   Slot 0 is the paid add-on with one box: each choice's value is its variant
-  id and it carries data-price and data-title. Slots 1 and 2 are the free
-  perfumes with two boxes: the value is the scent name, sent as a property.
+  id and it carries data-price and data-title. Slots 1 to 3 are the free
+  perfumes with several boxes: the value is the scent name, sent as a property.
 
   @param {object} [collection] - Collection whose products are the perfumes
   @param {object} [product] - Perfume product used when there is no collection
-  @param {number} slot - 0 for the add-on, 1 or 2 for each of two boxes
+  @param {number} slot - 0 for the add-on, 1 to 3 for each box
   @param {string} name - Radio group name
   @param {boolean} show_price - Show each choice's price
   @param {object} [image] - Fallback card image when a scent has none of its own

@@ -1,21 +1,28 @@
 {% comment %}
   TSS — Gift box
-  A single-product gift box page in the Hafezi style:
+  A single-product gift box page. Phones and tablets get one centred column
+  (the "Gift Box page B" design); from 990px the gallery sits sticky on the
+  left with the choices on the right, and the du'a, inside and delivery bands
+  run full width below both. In order:
 
-    gallery with dots · eyebrow, serif title, subtitle, lede, price and proof
-    "In every box" strip linking down to the story's contents
-    01 How many boxes — two boxes switch on tabs, one per box
-    02 Box colour, with the chosen colour's mood line
-    03 Card — the card that goes inside, sent as a line-item property
-    04 Names on the card (optional)
-    05 Complete the gift — perfume and miswak rows with Add toggles; with two
-       boxes both perfumes ride along free as properties instead of paid lines;
-       a hijab row shows its price less the set discount, which a matching
-       automatic discount in Shopify admin must actually charge
-    order summary with one line per item; fixed total bar on small screens
+    intro · eyebrow, serif title with an italic end, introduction
+    gallery · swipeable photos with pill dots; a tap opens the photo viewer
+    price · "From" price, proof and delivery lines
+    Quantity · one, two or three boxes; each box after the first carries a
+       free perfume as a property instead of a paid line
+    Finish · tabs per box, the chosen colour's photo and round swatches
+    The card · card choice per box and the optional name, sent as properties
+    On the Nikah card · dark band with the du'a, its translation and source
+    Inside · numbered list from the In the box blocks; a photo opens the viewer
+    Complete the gift · perfume, miswak, hijab (shown less the set discount,
+       which a matching automatic discount in Shopify admin must charge) and
+       any Add-on product blocks
+    Delivery · "Label | value" rows in two columns
+    Your gift · the chosen box's photo, one line per item, total and Order now
+    fixed bar with the total and Order now
 
   Without JavaScript the form still posts the first box with its card; the
-  add-on lines and the second box need the script.
+  add-on lines and the other boxes need the script.
 
   @example
   <!-- templates/page.hafezi-gift-box.json with Box product set to the gift box,
@@ -55,8 +62,6 @@
     assign perfume_price = perfume.price_min
   endif
   assign scent_group = 'tss-gbx-' | append: uid | append: '-scent'
-  assign scent_group_one = scent_group | append: '-1'
-  assign scent_group_two = scent_group | append: '-2'
   assign perfume_prices_vary = false
   if perfume_price != perfume_price_max
     assign perfume_prices_vary = true
@@ -77,8 +82,8 @@
   assign current = box.selected_or_first_available_variant
   assign colour_blocks = section.blocks | where: 'type', 'colour'
   assign card_blocks = section.blocks | where: 'type', 'card_image'
+  assign addon_blocks = section.blocks | where: 'type', 'addon'
   assign colour_property = s.colour_property | default: 'Box colour'
-  assign colour_two_name = 'tss-gbx-' | append: uid | append: '-colour-2'
   assign show_colours = true
   if colour_blocks.size == 0 and box.has_only_default_variant
     assign show_colours = false
@@ -109,6 +114,60 @@
       endif
     endfor
   endunless
+
+  # The Finish photo follows each box's colour: a colour block's image, or the
+  # variant's own media. It opens on the colour the first box starts with.
+  assign finish_first = ''
+  assign finish_initial = ''
+  if colour_blocks.size > 0
+    for block in colour_blocks
+      if block.settings.image != blank
+        assign finish_first = 'colour-' | append: block.id
+        break
+      endif
+    endfor
+    if current.available
+      for block in colour_blocks
+        unless block.settings.sold_out
+          if block.settings.image != blank
+            assign finish_initial = 'colour-' | append: block.id
+          endif
+          break
+        endunless
+      endfor
+    endif
+  elsif show_colours
+    for variant in box.variants
+      if variant.featured_media
+        assign finish_first = variant.featured_media.id | append: ''
+        break
+      endif
+    endfor
+    if current.featured_media
+      assign finish_initial = current.featured_media.id | append: ''
+    endif
+  endif
+  if finish_initial == blank
+    assign finish_initial = finish_first
+  endif
+  assign has_finish = false
+  if finish_first != blank
+    assign has_finish = true
+  endif
+
+  # The colour line starts on the colour the first box opens with.
+  assign first_colour_name = current.title
+  assign first_mood = ''
+  if colour_blocks.size > 0
+    assign first_colour_name = colour_blocks.first.settings.name
+    for block in colour_blocks
+      unless block.settings.sold_out
+        assign first_colour_name = block.settings.name
+        assign first_mood = block.settings.mood
+        break
+      endunless
+    endfor
+  endif
 
   assign title = s.title | default: box.title | default: page.title
   assign card_options = s.card_options | newline_to_br | split: '<br />'
@@ -147,7 +206,15 @@
     assign hijab_group_count = hijab_group_count | plus: 1
   endif
 
-  # "In every box" strip: one item per block with a name or an image.
+  assign has_addons = false
+  for block in addon_blocks
+    if block.settings.product != blank
+      assign has_addons = true
+      break
+    endif
+  endfor
+
+  # Inside list: one row per In the box block with a name or an image.
   assign inside_blocks = section.blocks | where: 'type', 'inside'
   assign inside_count = 0
   for block in inside_blocks
@@ -156,62 +223,297 @@
     endif
   endfor
 
-  # The mood line starts on the colour the first box opens with.
-  assign first_mood = ''
-  for block in colour_blocks
-    unless block.settings.sold_out
-      assign first_mood = block.settings.mood
-      break
-    endunless
-  endfor
+  assign has_dua = false
+  if s.dua_arabic != blank or s.dua_translation != blank
+    assign has_dua = true
+  endif
+  assign delivery_rows = s.delivery_rows | newline_to_br | split: '<br />'
 
+  # Boxes on offer: one, two, or three.
   assign panel_count = 1
   if s.allow_two
     assign panel_count = 2
+    if s.allow_three
+      assign panel_count = 3
+    endif
   endif
 
-  # Step numbers follow what shows; both boxes share them.
-  assign step = 0
-  if s.allow_two
-    assign step = step | plus: 1
-    assign step_count = step
+  assign has_card_band = false
+  if card_options.size > 0 or s.name_label != blank
+    assign has_card_band = true
   endif
-  if show_colours
-    assign step = step | plus: 1
-    assign step_colour = step
+  if has_perfume and panel_count > 1
+    assign has_card_band = true
   endif
-  if card_options.size > 0
-    assign step = step | plus: 1
-    assign step_card = step
-  endif
-  if s.name_label != blank
-    assign step = step | plus: 1
-    assign step_name = step
-  endif
-  if has_perfume or miswak != blank or has_hijab
-    assign step = step | plus: 1
-    assign step_extras = step
-  endif
+
+  assign finish_sizes = '(min-width: ' | append: s.column_width | append: 'px) ' | append: s.column_width | append: 'px, 100vw'
+  # From 990px the gallery is the left column of two.
+  assign hero_sizes = '(min-width: 1440px) 740px, (min-width: 990px) 52vw, ' | append: finish_sizes
 -%}
+
+{%- comment -%}
+  The Finish photos, rendered once and placed in every box panel and the
+  summary; the script shows the one matching that box's colour.
+{%- endcomment -%}
+{%- capture finish_html -%}
+  {%- if colour_blocks.size > 0 -%}
+    {%- for block in colour_blocks -%}
+      {%- if block.settings.image != blank -%}
+        {%- assign finish_key = 'colour-' | append: block.id -%}
+        <div class="tss-gbx__finish-item" data-finish="{{ finish_key }}" {% unless finish_key == finish_initial %}hidden{% endunless %}>
+          {{-
+            block.settings.image
+            | image_url: width: 1440
+            | image_tag:
+              widths: '480, 720, 960, 1200, 1440',
+              sizes: finish_sizes,
+              loading: 'lazy',
+              alt: block.settings.image.alt | default: block.settings.name
+          -}}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- elsif show_colours -%}
+    {%- assign finish_seen = ',' -%}
+    {%- for variant in box.variants -%}
+      {%- if variant.featured_media -%}
+        {%- liquid
+          assign finish_key = variant.featured_media.id | append: ''
+          assign finish_mark = ',' | append: finish_key | append: ','
+          if finish_seen contains finish_mark
+            continue
+          endif
+          assign finish_seen = finish_seen | append: finish_key | append: ','
+        -%}
+        <div class="tss-gbx__finish-item" data-finish="{{ finish_key }}" {% unless finish_key == finish_initial %}hidden{% endunless %}>
+          {{-
+            variant.featured_media.preview_image
+            | image_url: width: 1440
+            | image_tag:
+              widths: '480, 720, 960, 1200, 1440',
+              sizes: finish_sizes,
+              loading: 'lazy',
+              alt: variant.featured_media.alt | default: variant.title
+          -}}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&display=swap">
+{%- if has_dua -%}
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri&display=swap">
+{%- endif -%}
 
 <style>
   #tss-gbx-{{ uid }} {
-    background: var(--tss-ivory);
+    --gbx-page: #efe9e1;
+    --gbx-bg: #faf7f2;
+    --gbx-ink: #2b2320;
+    --gbx-ink-2: #4a423c;
+    --gbx-muted: #6f675f;
+    --gbx-soft: #8a8178;
+    --gbx-line: #e6dfd5;
+    --gbx-border: #d9d1c5;
+    --gbx-green: #1b4332;
+    --gbx-paper: #fffdf9;
+    --gbx-tint: #f2ece3;
+    --gbx-tint-line: #e2d9cc;
+    --gbx-dot: #cfc6ba;
+    --gbx-night: #14110e;
+    --gbx-night-ink: #ede6dc;
+    --gbx-night-muted: #c4beb6;
+    --gbx-gold: #c9a86a;
+    --gbx-sans: 'Outfit', system-ui, -apple-system, sans-serif;
+    --gbx-serif: 'Cormorant Garamond', Georgia, serif;
+    --gbx-col: {{ s.column_width }}px;
+    --gbx-pad: 24px;
+
+    background: var(--gbx-page);
     padding-block-end: {{ s.padding_bottom }}px;
+    font-family: var(--gbx-sans);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.5;
+    color: var(--gbx-ink);
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__layout {
+  #tss-gbx-{{ uid }} .tss-gbx__col {
+    position: relative;
+    max-width: var(--gbx-col);
     margin-inline: auto;
-    max-width: 1440px;
+    background: var(--gbx-bg);
   }
 
-  /* ---------- media ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__pad {
+    padding-inline: var(--gbx-pad);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  #tss-gbx-{{ uid }} [hidden] {
+    display: none !important;
+  }
+
+  #tss-gbx-{{ uid }} button,
+  #tss-gbx-{{ uid }} input {
+    font: inherit;
+  }
+
+  #tss-gbx-{{ uid }} a {
+    color: var(--gbx-green);
+  }
+
+  #tss-gbx-{{ uid }} a:hover {
+    color: var(--gbx-ink);
+  }
+
+  /* Bands: one per step, split by hairlines. */
+  #tss-gbx-{{ uid }} .tss-gbx__band {
+    min-width: 0;
+    margin: 0;
+    padding: 32px var(--gbx-pad);
+    border: 0;
+    border-top: 1px solid var(--gbx-line);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__band--bleed {
+    padding-inline: 0;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__heading {
+    display: block;
+    width: 100%;
+    margin: 0 0 20px;
+    padding: 0;
+    font-family: var(--gbx-serif);
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--gbx-ink);
+    overflow-wrap: anywhere;
+  }
+
+  /* Headings in full-bleed bands (Finish) keep the side padding. */
+  #tss-gbx-{{ uid }} .tss-gbx__heading.tss-gbx__pad {
+    padding-inline: var(--gbx-pad);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__heading-note {
+    color: var(--gbx-soft);
+  }
+
+  /* ---------- intro ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__intro {
+    padding-block: 28px 8px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__eyebrow {
+    margin: 0 0 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--gbx-muted);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__title {
+    margin: 0;
+    font-family: var(--gbx-serif);
+    font-size: 40px;
+    font-weight: 300;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    color: var(--gbx-ink);
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__title em {
+    font-style: italic;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__subtitle {
+    margin: 6px 0 0;
+    font-family: var(--gbx-serif);
+    font-size: 22px;
+    font-style: italic;
+    line-height: 1.2;
+    color: var(--gbx-muted);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__lede {
+    margin: 14px 0 0;
+    color: var(--gbx-ink-2);
+  }
+
+  /* ---------- gallery ---------- */
   #tss-gbx-{{ uid }} .tss-gbx__media {
     min-width: 0;
+    padding-top: 20px;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__stage {
     position: relative;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__rail {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    background: var(--gbx-tint);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__rail:focus-visible {
+    outline: 2px solid var(--gbx-green);
+    outline-offset: -2px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__slide {
+    flex: none;
+    width: 100%;
+    aspect-ratio: {{ s.image_ratio }};
+    scroll-snap-align: start;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__zoom {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__zoom:focus-visible {
+    outline: 2px solid var(--gbx-green);
+    outline-offset: -4px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__slide img,
+  #tss-gbx-{{ uid }} .tss-gbx__slide svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   /* Colour shortcut over the photo, bottom start corner. */
@@ -224,32 +526,23 @@
     gap: 10px;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__quick[hidden] {
-    display: none;
-  }
-
   #tss-gbx-{{ uid }} .tss-gbx__qswatch {
     width: 40px;
     height: 40px;
     padding: 0;
-    border: 4px solid var(--tss-ivory);
+    border: 4px solid var(--gbx-bg);
     border-radius: 50%;
-    background: var(--swatch, var(--tss-ivory-2));
+    background: var(--swatch, var(--gbx-tint));
     box-shadow: 0 1px 4px rgb(0 0 0 / 0.25);
     cursor: pointer;
-    transition: transform 0.25s var(--tss-ease), box-shadow 0.25s var(--tss-ease);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__qswatch:hover {
-    transform: scale(1.06);
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__qswatch[aria-pressed='true'] {
-    box-shadow: 0 0 0 2px var(--tss-ink), 0 1px 4px rgb(0 0 0 / 0.25);
+    box-shadow: 0 0 0 2px var(--gbx-ink), 0 1px 4px rgb(0 0 0 / 0.25);
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__qswatch:focus-visible {
-    outline: 2px solid var(--tss-gold);
+    outline: 2px solid var(--gbx-green);
     outline-offset: 3px;
   }
 
@@ -258,52 +551,20 @@
     cursor: not-allowed;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    #tss-gbx-{{ uid }} .tss-gbx__qswatch {
-      transition: none;
-    }
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__rail {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    background: var(--tss-ivory-2);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__rail::-webkit-scrollbar {
-    display: none;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__slide {
-    flex: none;
-    width: 100%;
-    aspect-ratio: {{ s.image_ratio }};
-    scroll-snap-align: start;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__slide img,
-  #tss-gbx-{{ uid }} .tss-gbx__slide svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
   #tss-gbx-{{ uid }} .tss-gbx__dots {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 4px;
-    padding-block: 4px;
+    padding-top: 6px;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__dot {
-    display: grid;
-    place-items: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 44px;
-    height: 44px;
+    height: 32px;
     padding: 0;
     border: 0;
     background: none;
@@ -312,52 +573,27 @@
 
   #tss-gbx-{{ uid }} .tss-gbx__dot::before {
     content: '';
+    display: block;
     width: 6px;
     height: 6px;
-    border-radius: 50%;
-    background: rgb(28 28 26 / 0.2);
-    transition: transform 0.4s var(--tss-ease), background-color 0.4s var(--tss-ease);
+    border-radius: 3px;
+    background: var(--gbx-dot);
+    transition: width 0.3s ease, background-color 0.3s ease;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__dot[aria-current='true']::before {
-    background: var(--tss-gold);
-    transform: scale(1.5);
+    width: 18px;
+    background: var(--gbx-ink);
   }
 
-  /* ---------- panel ---------- */
-  #tss-gbx-{{ uid }} .tss-gbx__panel {
-    min-width: 0;
-    padding: 32px var(--tss-gutter) 0;
+  #tss-gbx-{{ uid }} .tss-gbx__dot:focus-visible {
+    outline: 2px solid var(--gbx-green);
+    outline-offset: -4px;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__title {
-    margin-top: 16px;
-    font-family: var(--tss-serif);
-    font-size: 44px;
-    font-weight: 400;
-    line-height: 1.02;
-    color: var(--tss-ink);
-    text-wrap: balance;
-    overflow-wrap: anywhere;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__subtitle {
-    margin-top: 6px;
-    font-family: var(--tss-serif);
-    font-size: 22px;
-    font-style: italic;
-    font-weight: 400;
-    line-height: 1.2;
-    color: rgb(28 28 26 / 0.7);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lede {
-    margin-top: 16px;
-    max-width: 40ch;
-    font-size: 15px;
-    font-weight: 300;
-    line-height: 1.6;
-    color: rgb(28 28 26 / 0.7);
+  /* ---------- price ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__buy {
+    padding-block: 8px 32px;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__price-row {
@@ -365,467 +601,243 @@
     flex-wrap: wrap;
     align-items: baseline;
     justify-content: space-between;
-    gap: 8px 16px;
-    margin-top: 24px;
-    padding-block-end: 20px;
-    border-block-end: 1px solid var(--tss-gold);
+    gap: 4px 16px;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__price {
-    font-family: var(--tss-serif);
+    margin: 0;
+    font-family: var(--gbx-serif);
     font-size: 26px;
-    font-weight: 500;
-    color: var(--tss-ink);
+    font-weight: 400;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__proof {
-    font-size: 11px;
-    letter-spacing: 0.04em;
-    color: rgb(28 28 26 / 0.55);
-  }
-
-  /* Its own line under the price and proof. */
-  #tss-gbx-{{ uid }} .tss-gbx__worth {
-    flex-basis: 100%;
-    margin-top: -2px;
+    margin: 0;
     font-size: 13px;
-    color: rgb(28 28 26 / 0.6);
+    color: var(--gbx-muted);
   }
 
-  /* Delivery promise: a tinted note between the price and In every box. */
-  #tss-gbx-{{ uid }} .tss-gbx__dispatch {
-    display: grid;
-    gap: 4px;
-    margin-top: 16px;
-    padding: 14px 16px;
-    border-radius: 6px;
-    background: var(--tss-ivory-2);
-    color: var(--tss-ink);
+  #tss-gbx-{{ uid }} .tss-gbx__fact {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: var(--gbx-ink-2);
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__dispatch-title {
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.35;
-    overflow-wrap: anywhere;
+  #tss-gbx-{{ uid }} .tss-gbx__fact--strong {
+    font-weight: 400;
+    color: var(--gbx-ink);
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__dispatch-text {
-    font-size: 12px;
-    line-height: 1.45;
-    color: rgb(28 28 26 / 0.6);
-    overflow-wrap: anywhere;
-  }
-
-  /* ---------- in every box ---------- */
-  #tss-gbx-{{ uid }} .tss-gbx__inside {
+  /* ---------- quantity ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__rows {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
-    padding: 12px;
-    background: var(--tss-ivory-2);
-    color: var(--tss-ink);
+    gap: 12px;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__inside-head {
+  #tss-gbx-{{ uid }} .tss-gbx__row {
+    position: relative;
+    display: block;
+    min-height: 72px;
+    padding: 16px 18px;
+    border: 1px solid var(--gbx-border);
+    border-radius: 14px;
+    background: transparent;
+    color: var(--gbx-ink);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__row-top {
     display: flex;
-    flex-wrap: wrap;
     align-items: baseline;
     justify-content: space-between;
-    gap: 4px 12px;
-    font-size: 13px;
+    gap: 12px;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__inside-label {
-    font-weight: 500;
+  #tss-gbx-{{ uid }} .tss-gbx__row-title {
+    min-width: 0;
+    font-size: 17px;
+    font-weight: 400;
+    overflow-wrap: anywhere;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__inside-link {
-    color: var(--tss-green);
-    text-decoration: underline;
+  #tss-gbx-{{ uid }} .tss-gbx__row-price {
+    flex: none;
+    font-size: 15px;
     white-space: nowrap;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__inside-link:focus-visible,
-  #tss-gbx-{{ uid }} .tss-gbx__inside-item:focus-visible {
-    outline: 2px solid var(--tss-green);
-    outline-offset: 2px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__inside-items {
-    display: grid;
-    grid-template-columns: repeat(var(--tss-gbx-inside, 5), minmax(0, 1fr));
-    gap: 6px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__inside-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-    font-size: 11px;
-    line-height: 1.25;
-    text-align: center;
-    color: rgb(28 28 26 / 0.75);
-    overflow-wrap: anywhere;
-  }
-
-  #tss-gbx-{{ uid }} button.tss-gbx__inside-item {
-    padding: 0;
-    border: 0;
-    background: none;
-    font-family: inherit;
-    cursor: zoom-in;
-  }
-
-  #tss-gbx-{{ uid }} button.tss-gbx__inside-item img {
-    transition: opacity 0.25s var(--tss-ease);
-  }
-
-  #tss-gbx-{{ uid }} button.tss-gbx__inside-item:hover img {
-    opacity: 0.85;
-  }
-
-  /* ---------- in every box: larger view ---------- */
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox {
-    width: min(92vw, 640px);
-    max-width: none;
-    max-height: 92vh;
-    margin: auto;
-    padding: 0;
-    border: 0;
-    background: var(--tss-ivory);
-    color: var(--tss-ink);
-    box-shadow: 0 24px 60px rgb(0 0 0 / 0.35);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox::backdrop {
-    background: rgb(8 41 30 / 0.7);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox[open] {
-    animation: tss-gbx-lightbox-in 0.25s var(--tss-ease);
-  }
-
-  @keyframes tss-gbx-lightbox-in {
-    from {
-      opacity: 0;
-      transform: scale(0.97);
-    }
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox-frame {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    max-height: 92vh;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox-img {
+  #tss-gbx-{{ uid }} .tss-gbx__row-note {
     display: block;
-    width: 100%;
-    min-height: 0;
-    max-height: calc(92vh - 64px);
-    aspect-ratio: 1;
-    object-fit: contain;
-    background: var(--tss-ivory-2);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox-close {
-    position: absolute;
-    z-index: 1;
-    inset-block-start: 10px;
-    inset-inline-end: 10px;
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    background: rgb(245 240 232 / 0.9);
-    color: var(--tss-ink);
-    cursor: pointer;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 12px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox-name {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 0;
-    font-family: var(--tss-serif);
-    font-size: 18px;
-    line-height: 1.25;
-    text-align: center;
-    overflow-wrap: anywhere;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox-count {
-    font-family: var(--tss-sans);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    color: rgb(28 28 26 / 0.55);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox-step {
-    flex: none;
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: 1px solid rgb(28 28 26 / 0.15);
-    border-radius: 50%;
-    background: transparent;
-    color: var(--tss-ink);
-    cursor: pointer;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox-step[data-inside-step='-1'] .tss-icon {
-    transform: scaleX(-1);
-  }
-
-  /* Previous/next point the other way in right-to-left languages. */
-  [dir='rtl'] #tss-gbx-{{ uid }} .tss-gbx__lightbox-step .tss-icon {
-    transform: scaleX(-1);
-  }
-
-  [dir='rtl'] #tss-gbx-{{ uid }} .tss-gbx__lightbox-step[data-inside-step='-1'] .tss-icon {
-    transform: none;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox-step[hidden] {
-    visibility: hidden;
-    display: grid;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox-close:focus-visible,
-  #tss-gbx-{{ uid }} .tss-gbx__lightbox-step:focus-visible {
-    outline: 2px solid var(--tss-gold);
-    outline-offset: 2px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    #tss-gbx-{{ uid }} .tss-gbx__lightbox[open] {
-      animation: none;
-    }
-  }
-
-  /* Holds the square until the merchant picks an image. */
-  #tss-gbx-{{ uid }} .tss-gbx__inside-blank {
-    display: block;
-    width: 100%;
-    aspect-ratio: 1;
-    background: rgb(28 28 26 / 0.06);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__inside-item img {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1;
-    object-fit: cover;
-  }
-
-  /* ---------- box tabs ---------- */
-  #tss-gbx-{{ uid }} .tss-gbx__tabs {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 4px;
-    margin-top: 28px;
-    padding: 4px;
-    background: var(--tss-ivory-2);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tab {
-    min-width: 0;
-    min-height: 44px;
-    padding: 8px 12px;
-    border: 0;
-    background: transparent;
-    font-family: var(--tss-sans);
+    margin-top: 4px;
     font-size: 13px;
-    line-height: 1.3;
-    color: rgb(28 28 26 / 0.7);
-    overflow-wrap: anywhere;
-    cursor: pointer;
-    transition: background-color 0.3s var(--tss-ease), color 0.3s var(--tss-ease);
+    color: var(--gbx-muted);
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__tab[aria-selected='true'] {
-    background: var(--tss-ivory);
-    box-shadow: inset 0 0 0 1px var(--tss-gold);
-    font-weight: 500;
-    color: var(--tss-ink);
+  #tss-gbx-{{ uid }} .tss-gbx__row-note--gift {
+    color: var(--gbx-green);
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__tab:focus-visible {
-    outline: 2px solid var(--tss-green);
-    outline-offset: 2px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tabs[hidden],
-  #tss-gbx-{{ uid }} .tss-gbx__box[hidden],
-  #tss-gbx-{{ uid }} .tss-gbx__mood[hidden],
-  #tss-gbx-{{ uid }} [data-scent-group][hidden] {
-    display: none;
-  }
-
-  /* ---------- steps ---------- */
-  #tss-gbx-{{ uid }} .tss-gbx__step {
-    min-width: 0;
-    margin: 0;
-    margin-top: 36px;
-    padding: 0;
-    border: 0;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__legend {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    padding: 0;
-    margin-bottom: 16px;
-    font-family: var(--tss-serif);
-    font-size: 22px;
-    font-weight: 400;
-    color: var(--tss-ink);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__num {
-    font-family: var(--tss-sans);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    color: var(--tss-gold);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__optional {
-    font-family: var(--tss-sans);
-    font-size: 11px;
-    color: rgb(28 28 26 / 0.5);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__options {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr));
-    gap: 8px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__options--two {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  /* Colour tiles: three across, swatch above the name. */
-  #tss-gbx-{{ uid }} .tss-gbx__options--colours {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__options--colours .tss-gbx__tile {
-    flex-direction: column;
-    justify-content: center;
-    gap: 8px;
-    min-height: 76px;
-    padding: 10px 6px;
-    text-align: center;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__options--colours .tss-gbx__swatch {
-    width: 26px;
-    height: 26px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__options--colours .tss-gbx__tile-text {
-    align-items: center;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__mood {
-    margin-top: 12px;
-    font-family: var(--tss-serif);
-    font-size: 18px;
-    font-style: italic;
-    line-height: 1.4;
-    color: rgb(28 28 26 / 0.7);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__help {
-    margin-top: 8px;
-    font-size: 12px;
-    color: rgb(28 28 26 / 0.55);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 48px;
-    padding: 10px 14px;
-    border: 1px solid rgb(28 28 26 / 0.15);
-    background: transparent;
-    font-size: 13px;
-    line-height: 1.35;
-    color: var(--tss-ink);
-    cursor: pointer;
-    transition: border-color 0.3s var(--tss-ease), background-color 0.3s var(--tss-ease);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile:hover {
-    border-color: rgb(28 28 26 / 0.4);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile input {
+  /* Radios and checkboxes fill their tile so the whole tile is the target. */
+  #tss-gbx-{{ uid }} .tss-gbx__row input,
+  #tss-gbx-{{ uid }} .tss-gbx__tile input,
+  #tss-gbx-{{ uid }} .tss-gbx__add input {
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
     margin: 0;
     opacity: 0;
     cursor: pointer;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__tile:has(input:checked) {
-    border-color: var(--tss-green);
-    background: var(--tss-ivory-2);
+  #tss-gbx-{{ uid }} .tss-gbx__row:has(input:checked) {
+    border-color: var(--gbx-green);
+    box-shadow: 0 0 0 0.5px var(--gbx-green);
+    background: var(--gbx-paper);
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__tile:has(input:focus-visible) {
-    outline: 2px solid var(--tss-green);
+  #tss-gbx-{{ uid }} .tss-gbx__row:has(input:focus-visible),
+  #tss-gbx-{{ uid }} .tss-gbx__tile:has(input:focus-visible),
+  #tss-gbx-{{ uid }} .tss-gbx__add:has(input:focus-visible) {
+    outline: 2px solid var(--gbx-green);
     outline-offset: 2px;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__tile:has(input:disabled) {
-    opacity: 0.45;
+  /* ---------- finish ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__tabs {
+    display: flex;
+    gap: 8px;
+    margin: 0 var(--gbx-pad) 16px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__tab {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--gbx-border);
+    border-radius: 22px;
+    background: transparent;
+    font-size: 14px;
+    color: var(--gbx-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__tab[aria-selected='true'] {
+    border-color: var(--gbx-ink);
+    background: var(--gbx-ink);
+    color: var(--gbx-bg);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__tab:focus-visible {
+    outline: 2px solid var(--gbx-green);
+    outline-offset: 2px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__finish {
+    position: relative;
+    aspect-ratio: 900 / 872;
+    overflow: hidden;
+    background: var(--gbx-tint);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__finish-item,
+  #tss-gbx-{{ uid }} .tss-gbx__finish-item img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__finish-item img {
+    object-fit: cover;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__colours {
+    min-width: 0;
+    margin: 0;
+    padding: 16px var(--gbx-pad) 0;
+    border: 0;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__colour-line {
+    margin: 0 0 12px;
+    padding: 0;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__colour-name {
+    font-weight: 400;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__mood {
+    color: var(--gbx-muted);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__swatch-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__swatch-row .tss-gbx__tile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 1.5px solid transparent;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__swatch-row .tss-gbx__tile:has(input:checked) {
+    border-color: var(--gbx-green);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__swatch-row .tss-gbx__tile:has(input:disabled) {
+    opacity: 0.4;
     cursor: not-allowed;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__mark {
-    flex: none;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgb(28 28 26 / 0.2);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile:has(input:checked) .tss-gbx__mark {
-    background: var(--tss-gold);
-  }
-
   #tss-gbx-{{ uid }} .tss-gbx__swatch {
-    flex: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 1px solid rgb(28 28 26 / 0.15);
-    background: var(--swatch, transparent);
+    display: block;
+    width: 34px;
+    height: 34px;
+    border-radius: 17px;
+    background: var(--swatch, var(--gbx-tint));
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18), 0 0 0 1px rgb(43 35 32 / 0.08);
+  }
+
+  /* With a swatch the name is read out but not shown. */
+  #tss-gbx-{{ uid }} .tss-gbx__tile:has(.tss-gbx__swatch) .tss-gbx__tile-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* Without one, the colour is a named pill. */
+  #tss-gbx-{{ uid }} .tss-gbx__swatch-row .tss-gbx__tile:has(.tss-gbx__mark) {
+    padding-inline: 18px;
+    border-width: 1px;
+    border-color: var(--gbx-border);
+    font-size: 14px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__mark {
+    display: none;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__tile-text {
@@ -836,14 +848,260 @@
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__tile-note {
-    font-size: 11px;
-    color: rgb(28 28 26 / 0.55);
+    font-size: 12px;
+    color: var(--gbx-muted);
   }
 
-  /* Complete the gift: one row per extra, with an Add toggle. */
-  #tss-gbx-{{ uid }} .tss-gbx__extras {
+  /* ---------- card ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__for {
+    margin: -8px 0 16px;
+    font-size: 13px;
+    color: var(--gbx-muted);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__set {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__cards {
     display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__cards .tss-gbx__tile,
+  #tss-gbx-{{ uid }} .tss-gbx__scents .tss-gbx__tile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 52px;
+    padding: 10px 12px;
+    border: 1px solid var(--gbx-border);
+    border-radius: 10px;
+    background: transparent;
+    font-size: 14px;
+    line-height: 1.35;
+    color: var(--gbx-ink);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__cards .tss-gbx__tile:has(input:checked),
+  #tss-gbx-{{ uid }} .tss-gbx__scents .tss-gbx__tile:has(input:checked) {
+    border-color: var(--gbx-green);
+    box-shadow: 0 0 0 0.5px var(--gbx-green);
+    background: var(--gbx-paper);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__tile:has(input:disabled) {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__name {
+    margin-top: 20px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__name-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: var(--gbx-ink-2);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__name-label span {
+    color: var(--gbx-muted);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__input {
+    display: block;
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--gbx-border);
+    border-radius: 10px;
+    background: var(--gbx-paper);
+    font-size: 16px;
+    color: var(--gbx-ink);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__input:focus {
+    border-color: var(--gbx-ink);
+    outline: none;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__input:focus-visible {
+    outline: 2px solid var(--gbx-green);
+    outline-offset: 2px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__help {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--gbx-muted);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__box-label {
+    margin: 20px 0 8px;
+    font-size: 13px;
+    color: var(--gbx-ink-2);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__scents {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__tile--card {
+    flex-direction: column;
+    align-items: stretch !important;
+    padding: 0 !important;
+    overflow: hidden;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__thumb {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__card-body {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    padding: 10px 12px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__tile:has(input:disabled) .tss-gbx__thumb {
+    filter: grayscale(1);
+  }
+
+  /* ---------- on the nikah card ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__dua {
+    margin: 0;
+    padding: 56px var(--gbx-pad) 52px;
+    background: var(--gbx-night);
+    color: var(--gbx-night-ink);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__dua-eyebrow {
+    margin: 0 0 24px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--gbx-night-muted);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__dua-arabic {
+    margin: 0;
+    font-family: 'Amiri', serif;
+    font-size: 30px;
+    line-height: 1.9;
+    text-align: center;
+    color: var(--gbx-gold);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__dua-translation {
+    margin: 28px 0 0;
+    font-family: var(--gbx-serif);
+    font-size: 20px;
+    font-style: italic;
+    line-height: 1.35;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__dua-source {
+    margin: 12px 0 0;
+    font-size: 12px;
+    color: var(--gbx-night-muted);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__dua + .tss-gbx__band {
+    border-top: 0;
+    padding-top: 40px;
+  }
+
+  /* ---------- inside ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__inside {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__inside-item {
+    border-top: 1px solid var(--gbx-line);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__inside-item:last-child {
+    border-bottom: 1px solid var(--gbx-line);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__inside-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 14px 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    text-align: start;
+  }
+
+  #tss-gbx-{{ uid }} button.tss-gbx__inside-row {
+    cursor: zoom-in;
+  }
+
+  #tss-gbx-{{ uid }} button.tss-gbx__inside-row:focus-visible {
+    outline: 2px solid var(--gbx-green);
+    outline-offset: 2px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__inside-num {
+    flex: none;
+    align-self: flex-start;
+    width: 24px;
+    padding-top: 2px;
+    font-size: 13px;
+    color: var(--gbx-muted);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__inside-text {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__inside-name {
+    display: block;
+    font-weight: 400;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__inside-note {
+    display: block;
+    font-size: 13px;
+    color: var(--gbx-muted);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__inside-thumb {
+    flex: none;
+    display: block;
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  /* ---------- complete the gift ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__extras {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__extra {
@@ -851,13 +1109,16 @@
     align-items: center;
     gap: 14px;
     padding: 12px;
-    border: 1px solid rgb(28 28 26 / 0.15);
-    transition: border-color 0.3s var(--tss-ease), background-color 0.3s var(--tss-ease);
+    border: 1px solid var(--gbx-border);
+    border-radius: 14px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__extra:has(.tss-gbx__add input:checked) {
-    border-color: var(--tss-green);
-    background: var(--tss-ivory-2);
+  #tss-gbx-{{ uid }} .tss-gbx__extra:has(.tss-gbx__add input:checked),
+  #tss-gbx-{{ uid }} .tss-gbx__extra[data-on] {
+    border-color: var(--gbx-green);
+    box-shadow: 0 0 0 0.5px var(--gbx-green);
+    background: var(--gbx-paper);
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__extra-img {
@@ -865,6 +1126,7 @@
     display: block;
     width: 72px;
     height: 72px;
+    border-radius: 8px;
     object-fit: cover;
   }
 
@@ -872,296 +1134,70 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 2px;
     min-width: 0;
     overflow-wrap: anywhere;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__extra-name {
-    font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__extra-note {
-    font-size: 12px;
-    line-height: 1.4;
-    color: rgb(28 28 26 / 0.6);
+    margin-top: 2px;
+    font-size: 13px;
+    color: var(--gbx-muted);
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__extra-price {
-    font-size: 13px;
+  #tss-gbx-{{ uid }} .tss-gbx__extra-price,
+  #tss-gbx-{{ uid }} .tss-gbx__extra-free {
+    margin-top: 4px;
+    font-size: 14px;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__extra-price s {
     margin-inline-start: 4px;
-    color: rgb(28 28 26 / 0.45);
+    color: var(--gbx-muted);
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__extra-badge {
-    align-self: flex-start;
-    margin-top: 2px;
+    display: inline-block;
     padding: 2px 8px;
-    border-radius: 2px;
-    background: var(--tss-green);
+    border-radius: 10px;
+    background: var(--gbx-green);
     font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    color: var(--tss-ivory);
+    font-weight: 400;
+    color: var(--gbx-bg);
   }
 
-  /* ---------- hijab: photo beside name, price, swatches and stepper ---------- */
-  #tss-gbx-{{ uid }} .tss-gbx__hijab {
-    display: grid;
-    grid-template-columns: 128px minmax(0, 1fr);
-    gap: 12px 16px;
-    align-items: stretch;
-    padding: 12px;
-    border: 1px solid rgb(28 28 26 / 0.15);
-    transition: border-color 0.3s var(--tss-ease), background-color 0.3s var(--tss-ease);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab[data-count]:not([data-count='0']) {
-    border-color: var(--tss-green);
-    background: var(--tss-ivory-2);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-price {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px 10px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-price .tss-gbx__extra-badge {
-    align-self: center;
-    margin-top: 0;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-foot {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px 12px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-foot .tss-gbx__stepper,
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-qty .tss-gbx__stepper {
-    margin-top: 0;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-qty {
-    display: flex;
-    margin-top: 12px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-tabs {
-    display: flex;
-    gap: 6px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-tab {
-    min-width: 0;
-    min-height: 44px;
-    padding: 0 16px;
-    border: 1px solid rgb(28 28 26 / 0.15);
-    border-radius: 2px;
-    background: transparent;
-    font-family: var(--tss-sans);
-    font-size: 12px;
-    color: var(--tss-ink);
-    cursor: pointer;
-    transition: border-color 0.3s var(--tss-ease), background-color 0.3s var(--tss-ease);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-tab[aria-pressed='true'] {
-    border-color: var(--tss-green);
-    background: var(--tss-green);
-    color: var(--tss-ivory);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-tab:focus-visible {
-    outline: 2px solid var(--tss-gold);
-    outline-offset: 2px;
-  }
-
-  /* The photo runs the full height of the name, price and swatches. */
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-media {
-    position: relative;
-    min-height: 128px;
-    overflow: hidden;
-    border: 1px solid rgb(28 28 26 / 0.1);
-    background: #fff;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-media img {
-    position: absolute;
-    inset: 0;
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-body {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hijab-name {
-    font-family: var(--tss-serif);
-    font-size: 20px;
-    line-height: 1.25;
-    overflow-wrap: anywhere;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__swatches {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hswatch {
-    position: relative;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    background: var(--tss-ivory-2) center / cover no-repeat;
-    box-shadow: inset 0 0 0 1px rgb(28 28 26 / 0.08);
-    cursor: pointer;
-    transition: box-shadow 0.25s var(--tss-ease);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hswatch[aria-pressed='true'] {
-    box-shadow: 0 0 0 2px var(--tss-ivory), 0 0 0 3px var(--tss-gold);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hswatch[hidden] {
-    display: none;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hswatch:focus-visible {
-    outline: 2px solid var(--tss-green);
-    outline-offset: 4px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hswatch-badge {
-    position: absolute;
-    inset-block-start: -6px;
-    inset-inline-end: -6px;
-    display: grid;
-    place-items: center;
-    min-width: 16px;
-    height: 16px;
-    padding-inline: 3px;
-    border-radius: 8px;
-    background: var(--tss-gold);
-    font-size: 9px;
-    font-weight: 500;
-    color: var(--tss-ivory);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__hswatch-badge[hidden] {
-    display: none;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__stepper {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-top: 10px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__stepper button {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: 1px solid rgb(26 74 58 / 0.2);
-    border-radius: 2px;
-    background: transparent;
-    font-size: 18px;
-    color: var(--tss-ink);
-    cursor: pointer;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__stepper button:disabled {
-    opacity: 0.3;
-    cursor: default;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__stepper output {
-    width: 28px;
-    font-size: 14px;
-    text-align: center;
-  }
-
-  @media (max-width: 480px) {
-    #tss-gbx-{{ uid }} .tss-gbx__hijab {
-      grid-template-columns: 96px minmax(0, 1fr);
-    }
-
-    #tss-gbx-{{ uid }} .tss-gbx__hijab-media {
-      min-height: 96px;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    #tss-gbx-{{ uid }} .tss-gbx__hijab,
-    #tss-gbx-{{ uid }} .tss-gbx__hijab-tab,
-    #tss-gbx-{{ uid }} .tss-gbx__hswatch {
-      transition: none;
-    }
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__extra-free {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--tss-green);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__add {
+  #tss-gbx-{{ uid }} .tss-gbx__add,
+  #tss-gbx-{{ uid }} .tss-gbx__included {
     position: relative;
     flex: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 88px;
-    min-height: 44px;
-    padding: 0 14px;
-    border: 1px solid var(--tss-green);
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--tss-green);
+    min-width: 84px;
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--gbx-ink);
+    border-radius: 22px;
+    background: transparent;
+    font-size: 14px;
+    color: var(--gbx-ink);
     white-space: nowrap;
     cursor: pointer;
-    transition: background-color 0.3s var(--tss-ease), color 0.3s var(--tss-ease);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__add input {
-    position: absolute;
-    inset: 0;
-    margin: 0;
-    opacity: 0;
-    cursor: pointer;
+  #tss-gbx-{{ uid }} .tss-gbx__add:has(input:checked),
+  #tss-gbx-{{ uid }} .tss-gbx__included {
+    border-color: var(--gbx-green);
+    background: var(--gbx-green);
+    color: var(--gbx-bg);
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__add:has(input:checked) {
-    background: var(--tss-green);
-    color: var(--tss-ivory);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__add:has(input:focus-visible) {
-    outline: 2px solid var(--tss-gold);
-    outline-offset: 2px;
+  #tss-gbx-{{ uid }} .tss-gbx__included {
+    cursor: default;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__add:has(input:disabled) {
@@ -1178,193 +1214,234 @@
     display: inline;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__included {
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    min-height: 40px;
-    padding: 0 12px;
-    background: var(--tss-ivory-2);
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--tss-green);
-    white-space: nowrap;
+  #tss-gbx-{{ uid }} .tss-gbx__sub {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: -4px;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__tile--card {
-    flex-direction: column;
+  /* Hijab: photo beside name, price, swatches and stepper. */
+  #tss-gbx-{{ uid }} .tss-gbx__hijab {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 12px 14px;
     align-items: stretch;
-    gap: 0;
-    padding: 0;
+    padding: 12px;
+    border: 1px solid var(--gbx-border);
+    border-radius: 14px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__thumb {
+  #tss-gbx-{{ uid }} .tss-gbx__hijab[data-count]:not([data-count='0']) {
+    border-color: var(--gbx-green);
+    box-shadow: 0 0 0 0.5px var(--gbx-green);
+    background: var(--gbx-paper);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-media {
+    position: relative;
+    min-height: 96px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--gbx-tint);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-media img {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
+    height: 100%;
     object-fit: cover;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__card-body {
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-body {
     display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-name {
+    font-weight: 400;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-price {
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
-    min-width: 0;
-    padding: 10px 14px;
+    gap: 4px 10px;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__tile:has(input:disabled) .tss-gbx__thumb {
-    filter: grayscale(1);
-  }
-
-  /* Box count tiles: a gold outline with ink text until chosen, then the
-     Order Now button's green and ivory with a gold edge. */
-  #tss-gbx-{{ uid }} .tss-gbx__tile--solid {
-    border-color: var(--tss-gold);
-    background: transparent;
-    color: var(--tss-ink);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile--solid:hover {
-    border-color: var(--tss-gold);
-    background: var(--tss-ivory-2);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile--solid:has(input:checked) {
-    border-color: var(--tss-gold);
-    background: var(--tss-green);
-    box-shadow: inset 0 0 0 1px var(--tss-gold);
-    color: var(--tss-ivory);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile--solid .tss-gbx__mark {
-    background: rgb(184 134 11 / 0.35);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile--solid:has(input:checked) .tss-gbx__mark {
-    background: var(--tss-gold);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile--solid .tss-gbx__tile-note {
-    color: inherit;
-    opacity: 0.8;
-  }
-
-  /* Box count rows: stacked, title and hint at the start, price at the end;
-     the chosen row takes the warm tint and an ink edge. */
-  #tss-gbx-{{ uid }} .tss-gbx__options--rows {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 10px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile--row {
-    justify-content: space-between;
-    gap: 16px;
-    min-height: 68px;
-    padding: 14px 16px;
-    border-color: rgb(28 28 26 / 0.15);
-    border-radius: 6px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile--row:has(input:checked) {
-    border-color: var(--tss-ink);
-    background: var(--tss-ivory-2);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile--row .tss-gbx__tile-text {
-    gap: 3px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__row-title {
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.3;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__tile--row .tss-gbx__tile-note {
-    font-size: 12px;
-    color: rgb(28 28 26 / 0.6);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__row-price {
-    flex: none;
-    font-size: 16px;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__sub {
-    display: grid;
-    gap: 6px;
+  #tss-gbx-{{ uid }} .tss-gbx__swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-top: 8px;
-    padding-inline-start: 16px;
-    border-inline-start: 1px solid var(--tss-gold);
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__sub[hidden],
-  #tss-gbx-{{ uid }} [data-only-one][hidden],
-  #tss-gbx-{{ uid }} [data-only-two][hidden] {
-    display: none;
+  #tss-gbx-{{ uid }} .tss-gbx__hswatch {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--gbx-tint) center / cover no-repeat;
+    box-shadow: inset 0 0 0 1px rgb(43 35 32 / 0.08);
+    cursor: pointer;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__sub .tss-gbx__tile {
-    border-color: transparent;
-    background: rgb(28 28 26 / 0.03);
+  #tss-gbx-{{ uid }} .tss-gbx__hswatch[aria-pressed='true'] {
+    box-shadow: 0 0 0 2px var(--gbx-bg), 0 0 0 3.5px var(--gbx-green);
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__box-label {
-    margin-top: 20px;
-    margin-bottom: 8px;
-    font-size: 10px;
+  #tss-gbx-{{ uid }} .tss-gbx__hswatch:focus-visible {
+    outline: 2px solid var(--gbx-green);
+    outline-offset: 4px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hswatch-badge {
+    position: absolute;
+    inset-block-start: -6px;
+    inset-inline-end: -6px;
+    display: grid;
+    place-items: center;
+    min-width: 16px;
+    height: 16px;
+    padding-inline: 3px;
+    border-radius: 8px;
+    background: var(--gbx-green);
+    font-size: 9px;
     font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: rgb(28 28 26 / 0.6);
+    color: var(--gbx-bg);
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__input {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    border: 1px solid rgb(28 28 26 / 0.15);
-    border-radius: 2px;
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-foot {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-qty {
+    display: flex;
+    margin-top: 8px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-tabs {
+    display: flex;
+    gap: 6px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-tab {
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--gbx-border);
+    border-radius: 22px;
     background: transparent;
-    padding: 14px 16px;
-    font-family: var(--tss-sans);
-    font-size: 14px;
-    color: var(--tss-ink);
-    transition: border-color 0.3s ease;
+    font-size: 13px;
+    color: var(--gbx-ink);
+    cursor: pointer;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__input:focus {
-    border-color: var(--tss-ink);
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-tab[aria-pressed='true'] {
+    border-color: var(--gbx-ink);
+    background: var(--gbx-ink);
+    color: var(--gbx-bg);
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__input:focus-visible {
-    outline: 2px solid var(--tss-gold);
+  #tss-gbx-{{ uid }} .tss-gbx__hijab-tab:focus-visible {
+    outline: 2px solid var(--gbx-green);
     outline-offset: 2px;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__input-label {
-    display: block;
-    margin-bottom: 8px;
+  #tss-gbx-{{ uid }} .tss-gbx__stepper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
-  /* ---------- summary ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__stepper button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--gbx-ink);
+    border-radius: 22px;
+    background: transparent;
+    font-size: 18px;
+    color: var(--gbx-ink);
+    cursor: pointer;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__stepper button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__stepper button:focus-visible {
+    outline: 2px solid var(--gbx-green);
+    outline-offset: 2px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__stepper output {
+    width: 28px;
+    font-size: 15px;
+    text-align: center;
+  }
+
+  /* ---------- delivery ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__delivery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0;
+    font-size: 14px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__delivery div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__delivery dt {
+    font-weight: 400;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__delivery dd {
+    margin: 2px 0 0;
+    color: var(--gbx-ink-2);
+  }
+
+  /* ---------- your gift ---------- */
   #tss-gbx-{{ uid }} .tss-gbx__summary {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid var(--tss-gold);
+    padding: 40px var(--gbx-pad);
+    background: var(--gbx-tint);
+    scroll-margin-top: 24px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__heading--large {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 300;
+    line-height: 1.15;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__finish--summary {
+    margin: 24px 0;
+    border-radius: 12px;
+    aspect-ratio: 4 / 3;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__lines {
-    display: grid;
-    gap: 8px;
-    margin-bottom: 14px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid rgb(28 28 26 / 0.1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__lines:empty {
@@ -1374,10 +1451,10 @@
   #tss-gbx-{{ uid }} .tss-gbx__line {
     display: flex;
     justify-content: space-between;
-    gap: 12px;
-    font-size: 13px;
-    line-height: 1.45;
-    color: rgb(28 28 26 / 0.75);
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gbx-tint-line);
+    font-size: 14px;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__line > :first-child {
@@ -1389,38 +1466,31 @@
     white-space: nowrap;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__note {
-    margin-top: 4px;
-    font-size: 12px;
-    color: rgb(28 28 26 / 0.55);
-  }
-
   #tss-gbx-{{ uid }} .tss-gbx__total {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: 16px;
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__total-label {
-    font-size: 10px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: rgb(28 28 26 / 0.6);
+    padding: 16px 0 4px;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__total-value {
-    font-family: var(--tss-serif);
-    font-size: 26px;
-    font-weight: 500;
+    font-family: var(--gbx-serif);
+    font-size: 30px;
+    font-weight: 400;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__note {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gbx-muted);
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__hint {
-    min-height: 1.5em;
-    margin-top: 8px;
-    font-size: 12px;
-    color: rgb(28 28 26 / 0.6);
+    min-height: 20px;
+    margin: 0;
+    font-size: 13px;
+    color: var(--gbx-muted);
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__hint[data-error='true'] {
@@ -1428,30 +1498,32 @@
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__submit {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 48px;
-    padding: 12px 28px;
+    height: 54px;
+    padding: 0 28px;
     border: 0;
-    background: var(--tss-green);
-    font-family: var(--tss-sans);
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--tss-ivory);
+    border-radius: 12px;
+    background: var(--gbx-green);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--gbx-bg);
     cursor: pointer;
-    transition: background-color 0.3s var(--tss-ease);
+    transition: opacity 0.2s ease;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__summary .tss-gbx__submit {
+    width: 100%;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__submit:hover {
-    background: var(--tss-green-mid);
+    opacity: 0.92;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__submit:focus-visible {
-    outline: 2px solid var(--tss-gold);
-    outline-offset: 2px;
+    outline: 2px solid var(--gbx-green);
+    outline-offset: 3px;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__submit[aria-disabled='true'] {
@@ -1459,15 +1531,21 @@
     cursor: progress;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__summary .tss-gbx__submit {
-    width: 100%;
-    margin-top: 12px;
+  #tss-gbx-{{ uid }} .tss-gbx__ask {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    margin-top: 8px;
+    font-size: 14px;
+    text-align: center;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__trust {
-    margin-top: 12px;
-    font-size: 11px;
-    color: rgb(28 28 26 / 0.55);
+    margin: 4px 0 0;
+    font-size: 12px;
+    text-align: center;
+    color: var(--gbx-muted);
   }
 
   /* ---------- bar ---------- */
@@ -1479,42 +1557,24 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 10px var(--tss-gutter) calc(10px + env(safe-area-inset-bottom));
-    border-top: 1px solid rgb(28 28 26 / 0.1);
-    background: var(--tss-ivory);
+    gap: 12px;
+    max-width: var(--gbx-col);
+    margin-inline: auto;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom)) var(--gbx-pad);
+    border-top: 1px solid var(--gbx-line);
+    background: rgb(250 247 242 / 0.96);
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__bar-info {
-    display: flex;
     flex: 1 1 auto;
-    flex-direction: column;
     min-width: 0;
   }
 
-  /* WhatsApp at the start of the bar, in WhatsApp's own green. */
-  #tss-gbx-{{ uid }} .tss-gbx__bar-wa {
-    flex: none;
-    display: grid;
-    place-items: center;
-    width: 48px;
-    height: 48px;
-    margin-inline-end: -4px;
-    border-radius: 50%;
-    background: #25d366;
-    color: #fff;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
-  }
-
-  #tss-gbx-{{ uid }} .tss-gbx__bar-wa:focus-visible {
-    outline: 2px solid var(--tss-green);
-    outline-offset: 2px;
-  }
-
   #tss-gbx-{{ uid }} .tss-gbx__bar-line {
+    margin: 0;
     overflow: hidden;
-    font-size: 11px;
-    color: rgb(28 28 26 / 0.6);
+    font-size: 12px;
+    color: var(--gbx-ink-2);
     white-space: nowrap;
     text-overflow: ellipsis;
   }
@@ -1524,61 +1584,337 @@
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__bar-total {
-    font-family: var(--tss-serif);
+    margin: 0;
+    font-family: var(--gbx-serif);
     font-size: 22px;
-    font-weight: 500;
-    line-height: 1.15;
+    font-weight: 400;
+    line-height: 1.2;
   }
 
   #tss-gbx-{{ uid }} .tss-gbx__bar .tss-gbx__submit {
     flex: none;
+    height: 48px;
+    font-size: 15px;
   }
 
-  #tss-gbx-{{ uid }} .tss-gbx__empty {
-    padding: 80px var(--tss-gutter);
-    text-align: center;
-    color: rgb(28 28 26 / 0.6);
+  /* WhatsApp at the start of the bar, in WhatsApp's own green. */
+  #tss-gbx-{{ uid }} .tss-gbx__bar-wa {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #25d366;
+    color: #fff;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__bar-wa:hover {
+    color: #fff;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__bar-wa:focus-visible {
+    outline: 2px solid var(--gbx-green);
+    outline-offset: 2px;
   }
 
   /* Room for the fixed bar goes at the page end, not between sections. */
-  @media (max-width: 989px) {
-    body:has(#tss-gbx-{{ uid }} .tss-gbx__bar) {
-      padding-block-end: 80px;
-    }
+  body:has(#tss-gbx-{{ uid }} .tss-gbx__bar) {
+    padding-block-end: 80px;
+  }
 
-    /* The bar carries WhatsApp on phones, so the floating launcher steps aside. */
-    body:has(#tss-gbx-{{ uid }} .tss-gbx__bar-wa) .whatsapp-float,
-    body:has(#tss-gbx-{{ uid }} .tss-gbx__bar-wa) .whatsapp-popup {
-      display: none !important;
+  /* The bar carries WhatsApp, so the floating launcher steps aside. */
+  body:has(#tss-gbx-{{ uid }} .tss-gbx__bar-wa) .whatsapp-float,
+  body:has(#tss-gbx-{{ uid }} .tss-gbx__bar-wa) .whatsapp-popup {
+    display: none !important;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__empty {
+    margin: 0;
+    padding: 80px var(--gbx-pad);
+    text-align: center;
+    color: var(--gbx-muted);
+  }
+
+  /* ---------- photo viewer ---------- */
+  #tss-gbx-{{ uid }} .tss-gbx__viewer {
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--gbx-night-ink);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__viewer::backdrop {
+    background: rgb(20 17 14 / 0.94);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__viewer[open] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    animation: tss-gbx-viewer-in 0.2s ease;
+  }
+
+  @keyframes tss-gbx-viewer-in {
+    from {
+      opacity: 0;
     }
   }
 
+  #tss-gbx-{{ uid }} .tss-gbx__viewer-img {
+    display: block;
+    max-width: 100%;
+    max-height: calc(100dvh - 140px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__viewer-close {
+    position: absolute;
+    inset-block-start: 12px;
+    inset-inline-end: 12px;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: 24px;
+    background: var(--gbx-bg);
+    color: var(--gbx-ink);
+    cursor: pointer;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__viewer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    max-width: var(--gbx-col);
+    width: 100%;
+    padding-inline: 16px;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__viewer-name {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    margin: 0;
+    font-family: var(--gbx-serif);
+    font-size: 18px;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__viewer-count {
+    font-family: var(--gbx-sans);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--gbx-night-muted);
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__viewer-step {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid rgb(237 230 220 / 0.3);
+    border-radius: 22px;
+    background: transparent;
+    color: var(--gbx-night-ink);
+    cursor: pointer;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__viewer-step[data-viewer-step='-1'] .tss-icon {
+    transform: scaleX(-1);
+  }
+
+  /* Previous/next point the other way in right-to-left languages. */
+  [dir='rtl'] #tss-gbx-{{ uid }} .tss-gbx__viewer-step .tss-icon {
+    transform: scaleX(-1);
+  }
+
+  [dir='rtl'] #tss-gbx-{{ uid }} .tss-gbx__viewer-step[data-viewer-step='-1'] .tss-icon {
+    transform: none;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__viewer-step[data-off] {
+    visibility: hidden;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__viewer-close:focus-visible,
+  #tss-gbx-{{ uid }} .tss-gbx__viewer-step:focus-visible {
+    outline: 2px solid var(--gbx-gold);
+    outline-offset: 2px;
+  }
+
+  /* The bar steps away while the summary, with its own Order now, is on screen. */
+  #tss-gbx-{{ uid }} .tss-gbx__bar {
+    transition: transform 0.3s ease, visibility 0s linear 0s;
+  }
+
+  #tss-gbx-{{ uid }} .tss-gbx__bar[data-away] {
+    transform: translateY(110%);
+    visibility: hidden;
+    transition: transform 0.3s ease, visibility 0s linear 0.3s;
+  }
+
+  /* ---------- desktop: gallery on the left, choices on the right ----------
+     The du'a, inside and delivery bands move below both columns, full width. */
   @media (min-width: 990px) {
-    #tss-gbx-{{ uid }} .tss-gbx__layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-      gap: 64px;
-      align-items: start;
-      padding: 40px 48px 0;
+    #tss-gbx-{{ uid }} {
+      --gbx-pad: 0px;
+      background: var(--gbx-bg);
     }
 
-    #tss-gbx-{{ uid }} .tss-gbx__media,
-    #tss-gbx-{{ uid }} .tss-gbx__panel {
+    /* Same measure as the TSS header, so the page lines up with the logo and cart. */
+    #tss-gbx-{{ uid }} .tss-gbx__col {
+      max-width: calc(var(--tss-max) + 2 * var(--tss-gutter));
+      background: transparent;
+    }
+
+    #tss-gbx-{{ uid }} [data-form] {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      column-gap: 64px;
+      align-items: start;
+      padding: 40px var(--tss-gutter) 0;
+    }
+
+    #tss-gbx-{{ uid }} [data-form] > * {
+      grid-column: 2;
+      min-width: 0;
+      max-width: 560px;
+    }
+
+    /* The media cell stretches over the right column's rows only, so the
+       sticky gallery inside it stops before the full-width bands below. */
+    #tss-gbx-{{ uid }} [data-form] > .tss-gbx__media {
+      grid-column: 1;
+      grid-row: 1 / span 40;
+      align-self: stretch;
+      max-width: none;
+      padding-top: 0;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__media-inner {
       position: sticky;
       top: 24px;
     }
 
-    #tss-gbx-{{ uid }} .tss-gbx__panel {
-      padding: 0;
-      max-width: 560px;
+    #tss-gbx-{{ uid }} .tss-gbx__rail {
+      border-radius: 6px;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__intro {
+      padding-top: 8px;
     }
 
     #tss-gbx-{{ uid }} .tss-gbx__title {
-      font-size: 56px;
+      font-size: 52px;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__lede {
+      max-width: 46ch;
+      font-size: 16px;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__buy {
+      padding-bottom: 28px;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__band {
+      padding-block: 28px;
+    }
+
+    /* The gallery shows each colour, so the Finish photo would repeat it. */
+    #tss-gbx-{{ uid }} .tss-gbx__panel .tss-gbx__finish,
+    #tss-gbx-{{ uid }} .tss-gbx__finish--summary {
+      display: none;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__colours {
+      padding-top: 0;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__summary {
+      margin-bottom: 8px;
+      padding: 32px;
+      border-radius: 16px;
+    }
+
+    #tss-gbx-{{ uid }} [data-form] > .tss-gbx__info {
+      grid-column: 1 / -1;
+      order: 10;
+      max-width: none;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__dua {
+      margin-top: 72px;
+      padding: 72px 64px;
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__dua-arabic {
+      font-size: 40px;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__dua-translation {
+      max-width: 36ch;
+      margin-inline: auto;
+      font-size: 26px;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__info.tss-gbx__band {
+      padding-block: 56px;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__info .tss-gbx__heading {
+      margin-bottom: 28px;
+      font-size: 36px;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__inside {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 40px;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__inside-item:last-child {
+      border-bottom: 0;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__inside-row {
+      padding-block: 18px;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__inside-thumb {
+      width: 56px;
+      height: 56px;
+    }
+
+    #tss-gbx-{{ uid }} .tss-gbx__delivery {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 32px;
+      font-size: 15px;
     }
 
     #tss-gbx-{{ uid }} .tss-gbx__bar {
-      display: none;
+      max-width: none;
+      padding-inline: max(var(--tss-gutter), calc((100% - var(--tss-max)) / 2));
     }
   }
 
@@ -1587,13 +1923,10 @@
       scroll-behavior: auto;
     }
 
-    #tss-gbx-{{ uid }} .tss-gbx__dot::before,
-    #tss-gbx-{{ uid }} .tss-gbx__tile,
-    #tss-gbx-{{ uid }} .tss-gbx__tab,
-    #tss-gbx-{{ uid }} .tss-gbx__extra,
-    #tss-gbx-{{ uid }} .tss-gbx__add,
-    #tss-gbx-{{ uid }} .tss-gbx__submit {
-      transition: none;
+    #tss-gbx-{{ uid }} *,
+    #tss-gbx-{{ uid }} *::before {
+      transition: none !important;
+      animation: none !important;
     }
   }
 </style>
@@ -1604,469 +1937,564 @@
   aria-label="{{ title | escape }}"
 >
   {%- if box == blank -%}
-    <p class="tss-gbx__empty">{{ s.empty_text | escape }}</p>
+    <div class="tss-gbx__col">
+      <p class="tss-gbx__empty">{{ s.empty_text | escape }}</p>
+    </div>
   {%- else -%}
-    <form
-      id="tss-gbx-{{ uid }}-form"
-      class="tss-gbx__layout"
-      action="{{ routes.cart_add_url }}"
-      method="post"
-      data-form
-    >
-      <input type="hidden" name="quantity" value="1">
+    <div class="tss-gbx__col">
+      <form
+        id="tss-gbx-{{ uid }}-form"
+        action="{{ routes.cart_add_url }}"
+        method="post"
+        data-form
+      >
+        <input type="hidden" name="quantity" value="1">
 
-      <div class="tss-gbx__media">
-        <div class="tss-gbx__stage">
-        <div
-          class="tss-gbx__rail"
-          tabindex="0"
-          role="region"
-          aria-label="{{ box.title | escape }}"
-          data-rail
-        >
-          {%- for media in box.media limit: 10 -%}
-            {%- if colours_only -%}{%- break -%}{%- endif -%}
-            <div class="tss-gbx__slide" data-media-id="{{ media.id }}">
-              {%- liquid
-                assign loading = 'lazy'
-                if forloop.first
-                  assign loading = 'eager'
-                endif
-              -%}
-              {{
-                media.preview_image
-                | image_url: width: 2000
-                | image_tag:
-                  widths: '480,720,960,1280,1600,2000',
-                  sizes: '(min-width: 990px) 55vw, 100vw',
-                  loading: loading,
-                  alt: media.alt | default: box.title
-              }}
-            </div>
-          {%- endfor -%}
-          {%- for block in colour_blocks -%}
-            {%- if block.settings.image != blank -%}
-              <div class="tss-gbx__slide" data-media-id="colour-{{ block.id }}">
+        <div class="tss-gbx__intro tss-gbx__pad">
+          {%- if s.eyebrow != blank -%}
+            <p class="tss-gbx__eyebrow">{{ s.eyebrow | escape }}</p>
+          {%- endif -%}
+          <h1 class="tss-gbx__title">
+            {{- title | escape -}}
+            {%- if s.title_emphasis != blank %} <em>{{ s.title_emphasis | escape }}</em>{% endif -%}
+          </h1>
+          {%- if s.subtitle != blank -%}
+            <p class="tss-gbx__subtitle">{{ s.subtitle | escape }}</p>
+          {%- endif -%}
+          {%- if s.lede != blank -%}
+            <p class="tss-gbx__lede">{{ s.lede | escape }}</p>
+          {%- endif -%}
+        </div>
+
+        <div class="tss-gbx__media">
+          {%- comment -%} Sticky on desktop; the media cell bounds it to the two-column rows. {%- endcomment -%}
+          <div class="tss-gbx__media-inner">
+          <div class="tss-gbx__stage">
+            <div
+              class="tss-gbx__rail"
+              tabindex="0"
+              role="region"
+              aria-label="{{ box.title | escape }}"
+              data-rail
+            >
+              {%- for media in box.media limit: 10 -%}
+                {%- if colours_only -%}{%- break -%}{%- endif -%}
                 {%- liquid
                   assign loading = 'lazy'
-                  if media_count == 0 and forloop.first
+                  if forloop.first
                     assign loading = 'eager'
                   endif
+                  assign slide_alt = media.alt | default: box.title
                 -%}
-                {{
-                  block.settings.image
-                  | image_url: width: 2000
-                  | image_tag:
-                    widths: '480,720,960,1280,1600,2000',
-                    sizes: '(min-width: 990px) 55vw, 100vw',
-                    loading: loading,
-                    alt: block.settings.image.alt | default: block.settings.name
-                }}
-              </div>
-            {%- endif -%}
-          {%- endfor -%}
-          {%- for block in card_blocks -%}
-            {%- if colours_only -%}{%- break -%}{%- endif -%}
-            {%- if block.settings.image != blank -%}
-              <div class="tss-gbx__slide" data-media-id="card-{{ block.id }}">
-                {{
-                  block.settings.image
-                  | image_url: width: 2000
-                  | image_tag:
-                    widths: '480,720,960,1280,1600,2000',
-                    sizes: '(min-width: 990px) 55vw, 100vw',
-                    loading: 'lazy',
-                    alt: block.settings.image.alt | default: block.settings.card
-                }}
-              </div>
-            {%- endif -%}
-          {%- endfor -%}
-          {%- if slide_count == 0 -%}
-            <div class="tss-gbx__slide">{{ 'product-1' | placeholder_svg_tag }}</div>
-          {%- endif -%}
-        </div>
-          {%- if show_colours and s.photo_swatches -%}
-            {%- comment -%}
-              Shortcut to the Box colour step, filled by the script from the
-              active box's colour choices; the step stays the source of truth.
-            {%- endcomment -%}
-            <div
-              class="tss-gbx__quick"
-              role="group"
-              aria-label="{{ s.colour_label | escape }}"
-              data-quick-colours
-              hidden
-            ></div>
-          {%- endif -%}
-        </div>
-
-        {%- if slide_count > 1 -%}
-          <div class="tss-gbx__dots">
-            {%- for i in (1..slide_count) -%}
-              <button
-                type="button"
-                class="tss-gbx__dot"
-                aria-label="{{ s.image_label | escape }} {{ i }} / {{ slide_count }}"
-                aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
-                data-dot="{{ forloop.index0 }}"
-              ></button>
-            {%- endfor -%}
-          </div>
-        {%- endif -%}
-      </div>
-
-      <div class="tss-gbx__panel">
-        {%- if s.eyebrow != blank -%}
-          <p class="tss-eyebrow">{{ s.eyebrow | escape }}</p>
-        {%- endif -%}
-        <h1 class="tss-gbx__title">{{ title | escape }}</h1>
-        {%- if s.subtitle != blank -%}
-          <p class="tss-gbx__subtitle">{{ s.subtitle | escape }}</p>
-        {%- endif -%}
-        {%- if s.lede != blank -%}
-          <p class="tss-gbx__lede">{{ s.lede | escape }}</p>
-        {%- endif -%}
-
-        <div class="tss-gbx__price-row">
-          <p class="tss-gbx__price" data-price>{{ current.price | money }}</p>
-          {%- if s.proof != blank -%}
-            <p class="tss-gbx__proof">{{ s.proof | escape }}</p>
-          {%- endif -%}
-          {%- if s.worth_text != blank -%}
-            <p class="tss-gbx__worth">{{ s.worth_text | escape }}</p>
-          {%- endif -%}
-        </div>
-
-        {%- if s.dispatch_title != blank or s.dispatch_text != blank -%}
-          <div class="tss-gbx__dispatch">
-            {%- if s.dispatch_title != blank -%}
-              <p class="tss-gbx__dispatch-title">{{ s.dispatch_title | escape }}</p>
-            {%- endif -%}
-            {%- if s.dispatch_text != blank -%}
-              <p class="tss-gbx__dispatch-text">{{ s.dispatch_text | escape }}</p>
-            {%- endif -%}
-          </div>
-        {%- endif -%}
-
-        {%- if inside_count > 0 -%}
-          {%- comment -%}
-            Each photo opens a larger view in a dialog; the link still jumps to
-            the contents further down the page.
-          {%- endcomment -%}
-          <div class="tss-gbx__inside">
-            <div class="tss-gbx__inside-head">
-              <span class="tss-gbx__inside-label">{{ s.inside_label | escape }}</span>
-              {%- if s.inside_link_label != blank -%}
-                <a class="tss-gbx__inside-link" href="#{{ s.inside_anchor | default: 'inside' | handleize }}">
-                  {{- s.inside_link_label | escape -}}
-                </a>
-              {%- endif -%}
-            </div>
-            <div class="tss-gbx__inside-items" style="--tss-gbx-inside: {{ inside_count }}">
-              {%- for block in inside_blocks -%}
-                {%- if block.settings.image != blank -%}
+                <div class="tss-gbx__slide" data-media-id="{{ media.id }}">
                   <button
                     type="button"
-                    class="tss-gbx__inside-item"
+                    class="tss-gbx__zoom"
                     aria-haspopup="dialog"
-                    data-inside-open
-                    data-src="{{ block.settings.image | image_url: width: 1600 }}"
-                    data-name="{{ block.settings.name | escape }}"
-                    {{ block.shopify_attributes }}
+                    aria-label="{{ 'actions.zoom' | t }}: {{ slide_alt | escape }}"
+                    data-view="gallery"
+                    data-src="{{ media.preview_image | image_url: width: 1600 }}"
+                    data-name="{{ slide_alt | escape }}"
                   >
-                    {{-
-                      block.settings.image
-                      | image_url: width: 240
-                      | image_tag: loading: 'lazy', widths: '120, 180, 240', sizes: '(min-width: 990px) 100px, 18vw', alt: ''
-                    -}}
-                    {{- block.settings.name | escape -}}
+                    {{
+                      media.preview_image
+                      | image_url: width: 1440
+                      | image_tag:
+                        widths: '480, 720, 960, 1200, 1440',
+                        sizes: hero_sizes,
+                        loading: loading,
+                        alt: slide_alt
+                    }}
                   </button>
-                {%- elsif block.settings.name != blank -%}
-                  <span class="tss-gbx__inside-item" {{ block.shopify_attributes }}>
-                    <span class="tss-gbx__inside-blank" aria-hidden="true"></span>
-                    {{- block.settings.name | escape -}}
-                  </span>
+                </div>
+              {%- endfor -%}
+              {%- for block in colour_blocks -%}
+                {%- if block.settings.image != blank -%}
+                  {%- liquid
+                    assign loading = 'lazy'
+                    if media_count == 0 and forloop.first
+                      assign loading = 'eager'
+                    endif
+                    assign slide_alt = block.settings.image.alt | default: block.settings.name
+                  -%}
+                  <div class="tss-gbx__slide" data-media-id="colour-{{ block.id }}">
+                    <button
+                      type="button"
+                      class="tss-gbx__zoom"
+                      aria-haspopup="dialog"
+                      aria-label="{{ 'actions.zoom' | t }}: {{ slide_alt | escape }}"
+                      data-view="gallery"
+                      data-src="{{ block.settings.image | image_url: width: 1600 }}"
+                      data-name="{{ slide_alt | escape }}"
+                    >
+                      {{
+                        block.settings.image
+                        | image_url: width: 1440
+                        | image_tag:
+                          widths: '480, 720, 960, 1200, 1440',
+                          sizes: hero_sizes,
+                          loading: loading,
+                          alt: slide_alt
+                      }}
+                    </button>
+                  </div>
                 {%- endif -%}
               {%- endfor -%}
+              {%- for block in card_blocks -%}
+                {%- if colours_only -%}{%- break -%}{%- endif -%}
+                {%- if block.settings.image != blank -%}
+                  {%- assign slide_alt = block.settings.image.alt | default: block.settings.card -%}
+                  <div class="tss-gbx__slide" data-media-id="card-{{ block.id }}">
+                    <button
+                      type="button"
+                      class="tss-gbx__zoom"
+                      aria-haspopup="dialog"
+                      aria-label="{{ 'actions.zoom' | t }}: {{ slide_alt | escape }}"
+                      data-view="gallery"
+                      data-src="{{ block.settings.image | image_url: width: 1600 }}"
+                      data-name="{{ slide_alt | escape }}"
+                    >
+                      {{
+                        block.settings.image
+                        | image_url: width: 1440
+                        | image_tag:
+                          widths: '480, 720, 960, 1200, 1440',
+                          sizes: hero_sizes,
+                          loading: 'lazy',
+                          alt: slide_alt
+                      }}
+                    </button>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if slide_count == 0 -%}
+                <div class="tss-gbx__slide">{{ 'product-1' | placeholder_svg_tag }}</div>
+              {%- endif -%}
             </div>
+            {%- if show_colours and s.photo_swatches -%}
+              {%- comment -%}
+                Shortcut to the Finish step, filled by the script from the
+                active box's colour choices; the step stays the source of truth.
+              {%- endcomment -%}
+              <div
+                class="tss-gbx__quick"
+                role="group"
+                aria-label="{{ s.colour_line_label | escape }}"
+                data-quick-colours
+                hidden
+              ></div>
+            {%- endif -%}
           </div>
 
-          <dialog
-            class="tss-gbx__lightbox"
-            aria-labelledby="tss-gbx-{{ uid }}-lightbox-name"
-            data-inside-dialog
-          >
-            <div class="tss-gbx__lightbox-frame">
-              <button
-                type="button"
-                class="tss-gbx__lightbox-close"
-                aria-label="{{ 'accessibility.close_dialog' | t }}"
-                data-inside-close
-              >
-                {%- render 'tss-icon', icon: 'x', size: 20, stroke: 1.5 -%}
-              </button>
-              <img class="tss-gbx__lightbox-img" alt="" width="1600" height="1600" data-inside-img>
-              <div class="tss-gbx__lightbox-bar">
+          {%- if slide_count > 1 -%}
+            <div class="tss-gbx__dots">
+              {%- for i in (1..slide_count) -%}
                 <button
                   type="button"
-                  class="tss-gbx__lightbox-step"
-                  aria-label="{{ 'accessibility.slideshow_previous' | t }}"
-                  data-inside-step="-1"
-                >
-                  {%- render 'tss-icon', icon: 'chevron-right', size: 18, stroke: 1.5 -%}
-                </button>
-                <p class="tss-gbx__lightbox-name">
-                  <span id="tss-gbx-{{ uid }}-lightbox-name" data-inside-name></span>
-                  <span class="tss-gbx__lightbox-count" data-inside-count></span>
-                </p>
-                <button
-                  type="button"
-                  class="tss-gbx__lightbox-step"
-                  aria-label="{{ 'accessibility.slideshow_next' | t }}"
-                  data-inside-step="1"
-                >
-                  {%- render 'tss-icon', icon: 'chevron-right', size: 18, stroke: 1.5 -%}
-                </button>
-              </div>
+                  class="tss-gbx__dot"
+                  aria-label="{{ s.image_label | escape }} {{ i }} / {{ slide_count }}"
+                  aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+                  data-dot="{{ forloop.index0 }}"
+                ></button>
+              {%- endfor -%}
             </div>
-          </dialog>
-        {%- endif -%}
+          {%- endif -%}
+          </div>
+        </div>
 
-        {%- if s.allow_two -%}
-          <fieldset class="tss-gbx__step">
-            <legend class="tss-gbx__legend">
-              <span class="tss-gbx__num" aria-hidden="true">{{ step_count | prepend: '0' }}</span>
+        <div class="tss-gbx__buy tss-gbx__pad">
+          <div class="tss-gbx__price-row">
+            <p class="tss-gbx__price">
+              {%- if s.price_prefix != blank -%}{{ s.price_prefix | escape }} {% endif -%}
+              <span data-price>{{ current.price | money }}</span>
+            </p>
+            {%- if s.proof != blank -%}
+              <p class="tss-gbx__proof">{{ s.proof | escape }}</p>
+            {%- endif -%}
+          </div>
+          {%- if s.worth_text != blank -%}
+            <p class="tss-gbx__fact">{{ s.worth_text | escape }}</p>
+          {%- endif -%}
+          {%- if s.dispatch_title != blank -%}
+            <p class="tss-gbx__fact tss-gbx__fact--strong">{{ s.dispatch_title | escape }}</p>
+          {%- endif -%}
+          {%- if s.dispatch_text != blank -%}
+            <p class="tss-gbx__fact">{{ s.dispatch_text | escape }}</p>
+          {%- endif -%}
+        </div>
+
+        {%- if panel_count > 1 -%}
+          <fieldset class="tss-gbx__band">
+            <legend class="tss-gbx__heading">
               {{- s.count_label | escape -}}
+              {%- if s.count_note != blank %} <span class="tss-gbx__heading-note">{{ s.count_note | escape }}</span>{% endif -%}
             </legend>
-            {%- comment -%} One full-width row per choice: title and hint, price at the end. {%- endcomment -%}
-            <div class="tss-gbx__options tss-gbx__options--rows">
-              <label class="tss-gbx__tile tss-gbx__tile--row">
-                <input type="radio" name="tss-gbx-{{ uid }}-count" value="1" checked data-count>
-                <span class="tss-gbx__tile-text">
-                  <span class="tss-gbx__row-title">{{ s.one_label | escape }}</span>
-                  {%- if s.one_hint != blank -%}
-                    <span class="tss-gbx__tile-note">{{ s.one_hint | escape }}</span>
-                  {%- endif -%}
-                </span>
-                <span class="tss-gbx__row-price" data-count-price="1">{{ current.price | money }}</span>
-              </label>
-              <label class="tss-gbx__tile tss-gbx__tile--row">
-                <input type="radio" name="tss-gbx-{{ uid }}-count" value="2" data-count>
-                <span class="tss-gbx__tile-text">
-                  <span class="tss-gbx__row-title">
-                    {{- s.two_label | escape -}}
-                    {%- if has_perfume and s.two_note != blank %} + {{ s.two_note | escape }}{% endif -%}
+            <div class="tss-gbx__rows">
+              {%- for n in (1..panel_count) -%}
+                {%- liquid
+                  case n
+                    when 1
+                      assign row_label = s.one_label
+                      assign row_hint = s.one_hint
+                    when 2
+                      assign row_label = s.two_label
+                      assign row_hint = s.two_hint
+                    else
+                      assign row_label = s.three_label
+                      assign row_hint = s.three_hint
+                  endcase
+                -%}
+                <label class="tss-gbx__row">
+                  <input
+                    type="radio"
+                    name="tss-gbx-{{ uid }}-count"
+                    value="{{ n }}"
+                    data-count
+                    {% if n == 1 %}
+                      checked
+                    {% endif %}
+                  >
+                  <span class="tss-gbx__row-top">
+                    <span class="tss-gbx__row-title">{{ row_label | escape }}</span>
+                    <span class="tss-gbx__row-price" data-count-price="{{ n }}">{{ current.price | times: n | money }}</span>
                   </span>
-                  {%- if s.two_hint != blank -%}
-                    <span class="tss-gbx__tile-note">{{ s.two_hint | escape }}</span>
+                  {%- if row_hint != blank -%}
+                    <span class="tss-gbx__row-note{% if n > 1 %} tss-gbx__row-note--gift{% endif %}">{{ row_hint | escape }}</span>
                   {%- endif -%}
-                </span>
-                <span class="tss-gbx__row-price" data-count-price="2">{{ current.price | times: 2 | money }}</span>
-              </label>
+                </label>
+              {%- endfor -%}
             </div>
           </fieldset>
-
-          {%- comment -%} Each box is set up on its own tab; shown with two boxes. {%- endcomment -%}
-          <div class="tss-gbx__tabs" role="tablist" aria-label="{{ s.count_label | escape }}" data-only-two hidden>
-            {%- for slot in (1..2) -%}
-              <button
-                type="button"
-                class="tss-gbx__tab"
-                id="tss-gbx-{{ uid }}-tab-{{ slot }}"
-                role="tab"
-                aria-controls="tss-gbx-{{ uid }}-box-{{ slot }}"
-                aria-selected="{% if slot == 1 %}true{% else %}false{% endif %}"
-                tabindex="{% if slot == 1 %}0{% else %}-1{% endif %}"
-                data-tab="{{ slot }}"
-              >
-                {%- if slot == 1 -%}{{ s.box_one_label | escape }}{%- else -%}{{ s.box_two_label | escape }}{%- endif -%}
-                <span data-tab-colour="{{ slot }}"></span>
-              </button>
-            {%- endfor -%}
-          </div>
         {%- endif -%}
 
         {%- comment -%}
-          The box colour: colour blocks, the product's variants, or — with
-          neither — a hidden choice and no step.
+          Finish: with several boxes, tabs pick which box is being styled; the
+          Finish and Card panels of that box show together.
         {%- endcomment -%}
-        {%- capture colours_one -%}
-          {%- render 'tss-gift-box-colours',
-            box: box,
-            current: current,
-            colours: colour_blocks,
-            slot: 1,
-            name: '',
-            colour_property: colour_property,
-            sold_out_label: s.sold_out_label
-          -%}
-        {%- endcapture -%}
-        {%- if s.allow_two -%}
-          {%- capture colours_two -%}
-            {%- render 'tss-gift-box-colours',
-              box: box,
-              current: current,
-              colours: colour_blocks,
-              slot: 2,
-              name: colour_two_name,
-              colour_property: colour_property,
-              sold_out_label: s.sold_out_label
-            -%}
-          {%- endcapture -%}
-        {%- endif -%}
-
-        {%- for slot in (1..panel_count) -%}
-          {%- liquid
-            if slot == 1
-              assign box_suffix = s.box_one_label
-              assign colours_html = colours_one
-              assign card_name = 'properties[' | append: card_property | append: ']'
-              assign scent_name = scent_group_one
-            else
-              assign box_suffix = s.box_two_label
-              assign colours_html = colours_two
-              assign card_name = 'tss-gbx-' | append: uid | append: '-card-2'
-              assign scent_name = scent_group_two
-            endif
-          -%}
-          <div
-            class="tss-gbx__box"
-            id="tss-gbx-{{ uid }}-box-{{ slot }}"
-            data-box-panel="{{ slot }}"
-            {% if slot == 2 %}
-              hidden
-            {% endif %}
-          >
-            {%- if show_colours -%}
-              <fieldset class="tss-gbx__step">
-                <legend class="tss-gbx__legend">
-                  <span class="tss-gbx__num" aria-hidden="true">{{ step_colour | prepend: '0' }}</span>
-                  {{- s.colour_label | escape }}
-                  <span class="tss-gbx__optional" data-only-two hidden>· {{ box_suffix | escape }}</span>
-                </legend>
-                <div class="tss-gbx__options tss-gbx__options--colours" data-colours="{{ slot }}">{{ colours_html }}</div>
-                <p class="tss-gbx__mood" data-mood-out="{{ slot }}" {% if first_mood == blank %}hidden{% endif %}>
-                  {{- first_mood | escape -}}
-                </p>
-              </fieldset>
-            {%- else -%}
-              <div data-colours="{{ slot }}" hidden>{{ colours_html }}</div>
-            {%- endif -%}
-
-            {%- if card_options.size > 0 -%}
-              <fieldset class="tss-gbx__step">
-                <legend class="tss-gbx__legend">
-                  <span class="tss-gbx__num" aria-hidden="true">{{ step_card | prepend: '0' }}</span>
-                  {{- s.card_label | escape }}
-                  <span class="tss-gbx__optional" data-only-two hidden>· {{ box_suffix | escape }}</span>
-                </legend>
-                <div class="tss-gbx__options tss-gbx__options--two" data-cards="{{ slot }}">
-                  {%- for card in card_options -%}
-                    {%- assign card = card | strip -%}
-                    {%- if card != blank -%}
-                      {%- liquid
-                        # A box variant named like this card shows its image; a Card image
-                        # block with the same name overrides it.
-                        assign card_media = ''
-                        assign card_key = card | downcase
-                        for variant in box.variants
-                          assign variant_key = variant.title | strip | downcase
-                          if variant_key == card_key
-                            assign card_media = variant.featured_media.id
-                            break
-                          endif
-                        endfor
-                        for block in card_blocks
-                          assign block_key = block.settings.card | strip | downcase
-                          if block_key == card_key and block.settings.image != blank
-                            assign card_media = 'card-' | append: block.id
-                            break
-                          endif
-                        endfor
-                      -%}
-                      <label class="tss-gbx__tile">
-                        <input
-                          type="radio"
-                          name="{{ card_name | escape }}"
-                          value="{{ card | escape }}"
-                          {% if card_media != blank %}
-                            data-media="{{ card_media }}"
-                          {% endif %}
-                          {% if forloop.first %}
-                            checked
-                          {% endif %}
-                        >
-                        <span class="tss-gbx__mark" aria-hidden="true"></span>
-                        <span class="tss-gbx__tile-text">{{ card | escape }}</span>
-                      </label>
-                    {%- endif -%}
-                  {%- endfor -%}
-                </div>
-              </fieldset>
-            {%- endif -%}
-
-            {%- if s.name_label != blank -%}
-              <fieldset class="tss-gbx__step">
-                <legend class="tss-gbx__legend">
-                  <span class="tss-gbx__num" aria-hidden="true">{{ step_name | prepend: '0' }}</span>
-                  {{- s.name_label | escape }}
-                  <span class="tss-gbx__optional">{{ s.optional_label | escape }}</span>
-                  <span class="tss-gbx__optional" data-only-two hidden>· {{ box_suffix | escape }}</span>
-                </legend>
-                <input
-                  id="tss-gbx-{{ uid }}-name-{{ slot }}"
-                  class="tss-gbx__input"
-                  type="text"
-                  {% if slot == 1 %}
-                    name="properties[{{ name_property | escape }}]"
-                  {% endif %}
-                  placeholder="{{ s.name_placeholder | escape }}"
-                  maxlength="40"
-                  autocomplete="off"
-                  aria-label="{{ s.name_label | escape }}"
-                  {% if s.name_help != blank %}
-                    aria-describedby="tss-gbx-{{ uid }}-name-help-{{ slot }}"
-                  {% endif %}
-                  data-box-name="{{ slot }}"
-                >
-                {%- if s.name_help != blank -%}
-                  <p class="tss-gbx__help" id="tss-gbx-{{ uid }}-name-help-{{ slot }}">{{ s.name_help | escape }}</p>
-                {%- endif -%}
-              </fieldset>
-            {%- endif -%}
-
-            {%- comment -%} With two boxes each gets a free perfume; a choice shows only when there are several scents. {%- endcomment -%}
-            {%- if has_perfume and s.allow_two -%}
-              <div data-scent-group hidden>
-                <p class="tss-gbx__box-label" id="tss-gbx-{{ uid }}-scent-{{ slot }}">{{ box_suffix | escape }} · {{ s.scent_label | escape }}</p>
-                <div class="tss-gbx__options tss-gbx__options--two" role="radiogroup" aria-labelledby="tss-gbx-{{ uid }}-scent-{{ slot }}">
-                  {%- render 'tss-gift-box-scents',
-                    collection: perfume_collection,
-                    product: perfume,
-                    slot: slot,
-                    name: scent_name,
-                    image: perfume_image,
-                    label: perfume_label_text,
-                    note: s.free_label,
-                    show_price: false
+        {%- if show_colours or has_finish -%}
+          <div class="tss-gbx__band tss-gbx__band--bleed">
+            <h2 class="tss-gbx__heading tss-gbx__pad">
+              {{- s.colour_label | escape -}}
+              {%- if s.colour_note != blank %} <span class="tss-gbx__heading-note">{{ s.colour_note | escape }}</span>{% endif -%}
+            </h2>
+            {%- if panel_count > 1 -%}
+              <div class="tss-gbx__tabs" role="tablist" aria-label="{{ s.tabs_label | escape }}" data-only-many hidden>
+                {%- for slot in (1..panel_count) -%}
+                  {%- liquid
+                    case slot
+                      when 1
+                        assign tab_label = s.box_one_label
+                      when 2
+                        assign tab_label = s.box_two_label
+                      else
+                        assign tab_label = s.box_three_label
+                    endcase
                   -%}
-                </div>
+                  <button
+                    type="button"
+                    class="tss-gbx__tab"
+                    id="tss-gbx-{{ uid }}-tab-{{ slot }}"
+                    role="tab"
+                    aria-controls="tss-gbx-{{ uid }}-finish-{{ slot }}{% if has_card_band %} tss-gbx-{{ uid }}-card-{{ slot }}{% endif %}"
+                    aria-selected="{% if slot == 1 %}true{% else %}false{% endif %}"
+                    tabindex="{% if slot == 1 %}0{% else %}-1{% endif %}"
+                    data-tab="{{ slot }}"
+                  >
+                    {{- tab_label | escape -}}
+                  </button>
+                {%- endfor -%}
               </div>
             {%- endif -%}
-          </div>
-        {%- endfor -%}
 
-        {%- if has_perfume or miswak != blank or has_hijab -%}
-          <fieldset class="tss-gbx__step">
-            <legend class="tss-gbx__legend">
-              <span class="tss-gbx__num" aria-hidden="true">{{ step_extras | prepend: '0' }}</span>
-              {{- s.addons_label | escape }}
-              <span class="tss-gbx__optional">{{ s.optional_label | escape }}</span>
+            {%- for slot in (1..panel_count) -%}
+              {%- liquid
+                case slot
+                  when 1
+                    assign colour_name = ''
+                  when 2
+                    assign colour_name = 'tss-gbx-' | append: uid | append: '-colour-2'
+                  else
+                    assign colour_name = 'tss-gbx-' | append: uid | append: '-colour-3'
+                endcase
+              -%}
+              <div
+                class="tss-gbx__panel"
+                id="tss-gbx-{{ uid }}-finish-{{ slot }}"
+                data-box-panel="{{ slot }}"
+                {% if slot > 1 %}
+                  hidden
+                {% endif %}
+              >
+                {%- if has_finish -%}
+                  <div class="tss-gbx__finish" data-finish-slot="{{ slot }}">{{ finish_html }}</div>
+                {%- endif -%}
+                {%- capture colours_html -%}
+                  {%- render 'tss-gift-box-colours',
+                    box: box,
+                    current: current,
+                    colours: colour_blocks,
+                    slot: slot,
+                    name: colour_name,
+                    colour_property: colour_property,
+                    sold_out_label: s.sold_out_label
+                  -%}
+                {%- endcapture -%}
+                {%- if show_colours -%}
+                  <fieldset class="tss-gbx__colours">
+                    <legend class="tss-gbx__colour-line">
+                      {{- s.colour_line_label | escape }} ·
+                      <span class="tss-gbx__colour-name" data-colour-name="{{ slot }}">{{ first_colour_name | escape }}</span>
+                      <span class="tss-gbx__mood" data-mood-out="{{ slot }}">
+                        {%- if first_mood != blank %}— {{ first_mood | escape }}{% endif -%}
+                      </span>
+                    </legend>
+                    <div class="tss-gbx__swatch-row" data-colours="{{ slot }}">{{ colours_html }}</div>
+                  </fieldset>
+                {%- else -%}
+                  <div data-colours="{{ slot }}" hidden>{{ colours_html }}</div>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- else -%}
+          {%- comment -%} A box with a single variant and no colours still needs its hidden choice. {%- endcomment -%}
+          {%- for slot in (1..panel_count) -%}
+            {%- liquid
+              case slot
+                when 1
+                  assign colour_name = ''
+                when 2
+                  assign colour_name = 'tss-gbx-' | append: uid | append: '-colour-2'
+                else
+                  assign colour_name = 'tss-gbx-' | append: uid | append: '-colour-3'
+              endcase
+            -%}
+            <div data-colours="{{ slot }}" hidden>
+              {%- render 'tss-gift-box-colours',
+                box: box,
+                current: current,
+                colours: colour_blocks,
+                slot: slot,
+                name: colour_name,
+                colour_property: colour_property,
+                sold_out_label: s.sold_out_label
+              -%}
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+
+        {%- if has_card_band -%}
+          <div class="tss-gbx__band">
+            <h2 class="tss-gbx__heading">
+              {{- s.card_label | escape -}}
+              {%- if s.card_note != blank %} <span class="tss-gbx__heading-note">{{ s.card_note | escape }}</span>{% endif -%}
+            </h2>
+            {%- if panel_count > 1 -%}
+              <p class="tss-gbx__for" data-only-many data-active-box hidden></p>
+            {%- endif -%}
+
+            {%- for slot in (1..panel_count) -%}
+              {%- liquid
+                case slot
+                  when 1
+                    assign box_suffix = s.box_one_label
+                    assign card_name = 'properties[' | append: card_property | append: ']'
+                  when 2
+                    assign box_suffix = s.box_two_label
+                    assign card_name = 'tss-gbx-' | append: uid | append: '-card-2'
+                  else
+                    assign box_suffix = s.box_three_label
+                    assign card_name = 'tss-gbx-' | append: uid | append: '-card-3'
+                endcase
+                assign scent_name = scent_group | append: '-' | append: slot
+              -%}
+              <div
+                class="tss-gbx__panel"
+                id="tss-gbx-{{ uid }}-card-{{ slot }}"
+                data-box-panel="{{ slot }}"
+                {% if slot > 1 %}
+                  hidden
+                {% endif %}
+              >
+                {%- if card_options.size > 0 -%}
+                  <fieldset class="tss-gbx__set">
+                    <legend class="tss-gbx__sr">
+                      {{- s.card_label | escape -}}
+                      <span data-only-many hidden> · {{ box_suffix | escape }}</span>
+                    </legend>
+                    <div class="tss-gbx__cards" data-cards="{{ slot }}">
+                      {%- for card in card_options -%}
+                        {%- assign card = card | strip -%}
+                        {%- if card != blank -%}
+                          {%- liquid
+                            # A box variant named like this card shows its image; a Card image
+                            # block with the same name overrides it.
+                            assign card_media = ''
+                            assign card_key = card | downcase
+                            for variant in box.variants
+                              assign variant_key = variant.title | strip | downcase
+                              if variant_key == card_key
+                                assign card_media = variant.featured_media.id
+                                break
+                              endif
+                            endfor
+                            for block in card_blocks
+                              assign block_key = block.settings.card | strip | downcase
+                              if block_key == card_key and block.settings.image != blank
+                                assign card_media = 'card-' | append: block.id
+                                break
+                              endif
+                            endfor
+                          -%}
+                          <label class="tss-gbx__tile">
+                            <input
+                              type="radio"
+                              name="{{ card_name | escape }}"
+                              value="{{ card | escape }}"
+                              {% if card_media != blank %}
+                                data-media="{{ card_media }}"
+                              {% endif %}
+                              {% if forloop.first %}
+                                checked
+                              {% endif %}
+                            >
+                            <span class="tss-gbx__tile-text">{{ card | escape }}</span>
+                          </label>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </div>
+                  </fieldset>
+                {%- endif -%}
+
+                {%- if s.name_label != blank -%}
+                  <div class="tss-gbx__name">
+                    <label class="tss-gbx__name-label" for="tss-gbx-{{ uid }}-name-{{ slot }}">
+                      {{- s.name_label | escape -}}
+                      {%- if s.optional_label != blank %} <span>{{ s.optional_label | escape }}</span>{% endif -%}
+                      <span class="tss-gbx__sr" data-only-many hidden> · {{ box_suffix | escape }}</span>
+                    </label>
+                    <input
+                      id="tss-gbx-{{ uid }}-name-{{ slot }}"
+                      class="tss-gbx__input"
+                      type="text"
+                      {% if slot == 1 %}
+                        name="properties[{{ name_property | escape }}]"
+                      {% endif %}
+                      placeholder="{{ s.name_placeholder | escape }}"
+                      maxlength="40"
+                      autocomplete="off"
+                      {% if s.name_help != blank %}
+                        aria-describedby="tss-gbx-{{ uid }}-name-help-{{ slot }}"
+                      {% endif %}
+                      data-box-name="{{ slot }}"
+                    >
+                    {%- if s.name_help != blank -%}
+                      <p class="tss-gbx__help" id="tss-gbx-{{ uid }}-name-help-{{ slot }}">{{ s.name_help | escape }}</p>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+
+                {%- comment -%} With several boxes each gets a free perfume; a choice shows only when there are several scents. {%- endcomment -%}
+                {%- if has_perfume and panel_count > 1 -%}
+                  <div data-scent-group hidden>
+                    <p class="tss-gbx__box-label" id="tss-gbx-{{ uid }}-scent-{{ slot }}">{{ box_suffix | escape }} · {{ s.scent_label | escape }}</p>
+                    <div class="tss-gbx__scents" role="radiogroup" aria-labelledby="tss-gbx-{{ uid }}-scent-{{ slot }}">
+                      {%- render 'tss-gift-box-scents',
+                        collection: perfume_collection,
+                        product: perfume,
+                        slot: slot,
+                        name: scent_name,
+                        image: perfume_image,
+                        label: perfume_label_text,
+                        note: s.free_label,
+                        show_price: false
+                      -%}
+                    </div>
+                  </div>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- if has_dua -%}
+          <figure class="tss-gbx__dua tss-gbx__info">
+            {%- if s.dua_eyebrow != blank -%}
+              <p class="tss-gbx__dua-eyebrow">{{ s.dua_eyebrow | escape }}</p>
+            {%- endif -%}
+            {%- if s.dua_arabic != blank -%}
+              <p class="tss-gbx__dua-arabic" lang="ar" dir="rtl">{{ s.dua_arabic | escape }}</p>
+            {%- endif -%}
+            {%- if s.dua_translation != blank -%}
+              <blockquote class="tss-gbx__dua-translation">{{ s.dua_translation | escape }}</blockquote>
+            {%- endif -%}
+            {%- if s.dua_source != blank -%}
+              <figcaption class="tss-gbx__dua-source">{{ s.dua_source | escape }}</figcaption>
+            {%- endif -%}
+          </figure>
+        {%- endif -%}
+
+        {%- if inside_count > 0 -%}
+          <div class="tss-gbx__band tss-gbx__info tss-gbx__info--inside">
+            <h2 class="tss-gbx__heading">
+              {{- s.inside_label | escape -}}
+              {%- if s.inside_note != blank %} <span class="tss-gbx__heading-note">{{ s.inside_note | escape }}</span>{% endif -%}
+            </h2>
+            <ol class="tss-gbx__inside">
+              {%- assign inside_index = 0 -%}
+              {%- for block in inside_blocks -%}
+                {%- if block.settings.image != blank or block.settings.name != blank -%}
+                  {%- assign inside_index = inside_index | plus: 1 -%}
+                  {%- capture inside_body -%}
+                    <span class="tss-gbx__inside-num" aria-hidden="true">
+                      {%- if inside_index < 10 -%}0{%- endif -%}
+                      {{- inside_index -}}
+                    </span>
+                    <span class="tss-gbx__inside-text">
+                      <span class="tss-gbx__inside-name">{{ block.settings.name | escape }}</span>
+                      {%- if block.settings.note != blank -%}
+                        <span class="tss-gbx__inside-note">{{ block.settings.note | escape }}</span>
+                      {%- endif -%}
+                    </span>
+                  {%- endcapture -%}
+                  <li class="tss-gbx__inside-item" {{ block.shopify_attributes }}>
+                    {%- if block.settings.image != blank -%}
+                      {%- comment -%} A photo opens in the viewer; the row still reads as a list item. {%- endcomment -%}
+                      <button
+                        type="button"
+                        class="tss-gbx__inside-row"
+                        aria-haspopup="dialog"
+                        data-view="inside"
+                        data-src="{{ block.settings.image | image_url: width: 1600 }}"
+                        data-name="{{ block.settings.name | escape }}"
+                      >
+                        {{- inside_body -}}
+                        {{-
+                          block.settings.image
+                          | image_url: width: 132
+                          | image_tag: class: 'tss-gbx__inside-thumb', loading: 'lazy', widths: '44, 88, 132', sizes: '44px', alt: ''
+                        -}}
+                      </button>
+                    {%- else -%}
+                      <div class="tss-gbx__inside-row">{{ inside_body }}</div>
+                    {%- endif -%}
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ol>
+          </div>
+        {%- endif -%}
+
+        {%- if has_perfume or miswak != blank or has_hijab or has_addons -%}
+          <fieldset class="tss-gbx__band">
+            <legend class="tss-gbx__heading">
+              {{- s.addons_label | escape -}}
+              {%- if s.addons_note != blank %} <span class="tss-gbx__heading-note">{{ s.addons_note | escape }}</span>{% endif -%}
             </legend>
 
             <div class="tss-gbx__extras">
               {%- if has_perfume -%}
-                <div class="tss-gbx__extra">
+                <div class="tss-gbx__extra" data-perfume-card>
                   {%- if perfume_image != blank -%}
                     {{- perfume_image | image_url: width: 216 | image_tag: class: 'tss-gbx__extra-img', loading: 'lazy', widths: '72, 144, 216', sizes: '72px', alt: '' -}}
                   {%- endif -%}
@@ -2083,18 +2511,27 @@
                         + {{ perfume_price | money }}
                       {%- endif -%}
                     </span>
-                    {%- if s.perfume_free_text != blank -%}
-                      <span class="tss-gbx__extra-free" data-only-two hidden>{{ s.perfume_free_text | escape }}</span>
+                    {%- if s.perfume_free_text != blank and panel_count > 1 -%}
+                      <span
+                        class="tss-gbx__extra-free"
+                        data-only-many
+                        data-free-text="{{ s.perfume_free_text | escape }}"
+                        hidden
+                      >
+                        {{- s.perfume_free_text | replace: '[count]', '2' | escape -}}
+                      </span>
                     {%- endif -%}
                   </div>
                   <label class="tss-gbx__add" data-only-one>
                     <input type="checkbox" aria-label="{{ s.add_label | escape }} {{ perfume_label_text | escape }}" data-perfume-toggle>
                     <span class="tss-gbx__add-off" aria-hidden="true">{{ s.add_label | escape }}</span>
-                    <span class="tss-gbx__add-on" aria-hidden="true">✓ {{ s.added_label | escape }}</span>
+                    <span class="tss-gbx__add-on" aria-hidden="true">{{ s.added_label | escape }}</span>
                   </label>
-                  <span class="tss-gbx__included" data-only-two hidden>✓ {{ s.included_label | escape }}</span>
+                  {%- if panel_count > 1 -%}
+                    <span class="tss-gbx__included" data-only-many hidden>{{ s.included_label | escape }}</span>
+                  {%- endif -%}
                 </div>
-                <div class="tss-gbx__sub" role="radiogroup" aria-label="{{ s.scent_label | escape }}" data-perfume-scents hidden>
+                <div class="tss-gbx__sub tss-gbx__scents" role="radiogroup" aria-label="{{ s.scent_label | escape }}" data-perfume-scents hidden>
                   {%- render 'tss-gift-box-scents',
                     collection: perfume_collection,
                     product: perfume,
@@ -2130,14 +2567,15 @@
                       type="checkbox"
                       value="{{ miswak.selected_or_first_available_variant.id }}"
                       data-price="{{ miswak.price }}"
+                      data-title="{{ miswak_label_text | escape }}"
                       aria-label="{{ s.add_label | escape }} {{ miswak_label_text | escape }}"
-                      data-miswak
+                      data-addon
                       {% unless miswak.available %}
                         disabled
                       {% endunless %}
                     >
                     <span class="tss-gbx__add-off" aria-hidden="true">{{ s.add_label | escape }}</span>
-                    <span class="tss-gbx__add-on" aria-hidden="true">✓ {{ s.added_label | escape }}</span>
+                    <span class="tss-gbx__add-on" aria-hidden="true">{{ s.added_label | escape }}</span>
                   </label>
                 </div>
               {%- endif -%}
@@ -2344,14 +2782,91 @@
                   {%- endif -%}
                 </div>
               {%- endif -%}
+
+              {%- for block in addon_blocks -%}
+                {%- liquid
+                  assign addon = block.settings.product
+                  if addon == blank
+                    continue
+                  endif
+                  assign addon_label = block.settings.label | default: addon.title
+                  assign addon_image = block.settings.image | default: addon.featured_image
+                  assign addon_variant = addon.selected_or_first_available_variant
+                -%}
+                <div class="tss-gbx__extra" {{ block.shopify_attributes }}>
+                  {%- if addon_image != blank -%}
+                    {{- addon_image | image_url: width: 216 | image_tag: class: 'tss-gbx__extra-img', loading: 'lazy', widths: '72, 144, 216', sizes: '72px', alt: '' -}}
+                  {%- endif -%}
+                  <div class="tss-gbx__extra-text">
+                    <span class="tss-gbx__extra-name">{{ addon_label | escape }}</span>
+                    {%- if block.settings.text != blank -%}
+                      <span class="tss-gbx__extra-note">{{ block.settings.text | escape }}</span>
+                    {%- endif -%}
+                    <span class="tss-gbx__extra-price">
+                      {%- if addon.available -%}
+                        + {{ addon_variant.price | money }}
+                      {%- else -%}
+                        {{ s.sold_out_label | escape }}
+                      {%- endif -%}
+                    </span>
+                  </div>
+                  <label class="tss-gbx__add">
+                    <input
+                      type="checkbox"
+                      value="{{ addon_variant.id }}"
+                      data-price="{{ addon_variant.price }}"
+                      data-title="{{ addon_label | escape }}"
+                      aria-label="{{ s.add_label | escape }} {{ addon_label | escape }}"
+                      data-addon
+                      {% unless addon.available %}
+                        disabled
+                      {% endunless %}
+                    >
+                    <span class="tss-gbx__add-off" aria-hidden="true">{{ s.add_label | escape }}</span>
+                    <span class="tss-gbx__add-on" aria-hidden="true">{{ s.added_label | escape }}</span>
+                  </label>
+                </div>
+              {%- endfor -%}
             </div>
           </fieldset>
         {%- endif -%}
 
-        <div class="tss-gbx__summary">
+        {%- if s.delivery_rows != blank -%}
+          <div class="tss-gbx__band tss-gbx__info tss-gbx__info--delivery">
+            <h2 class="tss-gbx__heading">
+              {{- s.delivery_title | escape -}}
+              {%- if s.delivery_subtitle != blank %} <span class="tss-gbx__heading-note">{{ s.delivery_subtitle | escape }}</span>{% endif -%}
+            </h2>
+            <dl class="tss-gbx__delivery">
+              {%- for row in delivery_rows -%}
+                {%- assign parts = row | split: '|' -%}
+                {%- assign row_label = parts[0] | strip -%}
+                {%- if row_label != blank -%}
+                  <div>
+                    <dt>{{ row_label | escape }}</dt>
+                    {%- if parts[1] != blank -%}
+                      <dd>{{ parts[1] | strip | escape }}</dd>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            </dl>
+          </div>
+        {%- endif -%}
+
+        <div class="tss-gbx__summary" id="tss-gbx-{{ uid }}-summary">
+          {%- if s.summary_title != blank -%}
+            <h2 class="tss-gbx__heading tss-gbx__heading--large">
+              {{- s.summary_title | escape -}}
+              {%- if s.summary_note != blank %} <span class="tss-gbx__heading-note">{{ s.summary_note | escape }}</span>{% endif -%}
+            </h2>
+          {%- endif -%}
+          {%- if has_finish -%}
+            <div class="tss-gbx__finish tss-gbx__finish--summary" data-finish-slot="active">{{ finish_html }}</div>
+          {%- endif -%}
           <ul class="tss-gbx__lines" data-lines></ul>
           <div class="tss-gbx__total">
-            <span class="tss-gbx__total-label">{{ s.total_label | escape }}</span>
+            <span>{{ s.total_label | escape }}</span>
             <span class="tss-gbx__total-value" data-total>{{ current.price | money }}</span>
           </div>
           {%- if s.delivery_note != blank -%}
@@ -2359,19 +2874,58 @@
           {%- endif -%}
           <p class="tss-gbx__hint" role="status" data-hint></p>
           <button type="submit" class="tss-gbx__submit" data-submit>{{ s.button_label | escape }}</button>
+          {%- liquid
+            assign wa_number = s.whatsapp_number | remove: '+' | remove: ' ' | remove: '-'
+            assign wa_text = s.whatsapp_message | replace: '[title]', title
+          -%}
+          {%- if wa_number != blank and s.whatsapp_link_label != blank -%}
+            <a class="tss-gbx__ask" href="https://wa.me/{{ wa_number }}{% if wa_text != blank %}?text={{ wa_text | url_encode }}{% endif %}" target="_blank" rel="noopener">
+              {{- s.whatsapp_link_label | escape -}}
+            </a>
+          {%- endif -%}
           {%- if s.trust_line != blank -%}
             <p class="tss-gbx__trust">{{ s.trust_line | escape }}</p>
           {%- endif -%}
         </div>
-      </div>
-    </form>
+      </form>
+
+      <dialog class="tss-gbx__viewer" aria-labelledby="tss-gbx-{{ uid }}-viewer-name" data-viewer>
+        <button
+          type="button"
+          class="tss-gbx__viewer-close"
+          aria-label="{{ 'accessibility.close_dialog' | t }}"
+          data-viewer-close
+        >
+          {%- render 'tss-icon', icon: 'x', size: 20, stroke: 1.5 -%}
+        </button>
+        <img class="tss-gbx__viewer-img" alt="" width="1600" height="1600" data-viewer-img>
+        <div class="tss-gbx__viewer-bar">
+          <button
+            type="button"
+            class="tss-gbx__viewer-step"
+            aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+            data-viewer-step="-1"
+          >
+            {%- render 'tss-icon', icon: 'chevron-right', size: 18, stroke: 1.5 -%}
+          </button>
+          <p class="tss-gbx__viewer-name">
+            <span id="tss-gbx-{{ uid }}-viewer-name" data-viewer-name></span>
+            <span class="tss-gbx__viewer-count" data-viewer-count></span>
+          </p>
+          <button
+            type="button"
+            class="tss-gbx__viewer-step"
+            aria-label="{{ 'accessibility.slideshow_next' | t }}"
+            data-viewer-step="1"
+          >
+            {%- render 'tss-icon', icon: 'chevron-right', size: 18, stroke: 1.5 -%}
+          </button>
+        </div>
+      </dialog>
+    </div>
 
     <div class="tss-gbx__bar">
-      {%- if s.whatsapp_number != blank -%}
-        {%- liquid
-          assign wa_number = s.whatsapp_number | remove: '+' | remove: ' ' | remove: '-'
-          assign wa_text = s.whatsapp_message | replace: '[title]', title
-        -%}
+      {%- if wa_number != blank -%}
         <a
           class="tss-gbx__bar-wa"
           href="https://wa.me/{{ wa_number }}{% if wa_text != blank %}?text={{ wa_text | url_encode }}{% endif %}"
@@ -2379,7 +2933,7 @@
           rel="noopener"
           aria-label="{{ s.whatsapp_label | default: 'Chat on WhatsApp' | escape }}"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.63"/>
           </svg>
         </a>
@@ -2412,20 +2966,20 @@
       var NAME = {{ name_property | json }};
       var LINK = {{ s.link_property | default: 'For' | json }};
       var HAS_PERFUME = {{ has_perfume | json }};
+      var MAX = {{ panel_count }};
       var T = {
         adding: {{ s.adding_label | json }},
         error: {{ s.error_text | json }},
         free: {{ s.free_label | json }},
         box: {{ s.box_label | default: 'Box' | json }},
-        boxOne: {{ s.box_one_label | json }},
-        boxTwo: {{ s.box_two_label | json }},
-        two: {{ s.two_label | json }},
-        twoNote: {{ s.two_note | json }},
         perfume: {{ perfume_label_text | json }},
-        miswak: {{ miswak_label_text | json }},
         hijab: {{ hijab_label_text | json }},
         offer: {% if s.hijab_discount > 0 %}{{ s.hijab_badge | replace: '[percent]', s.hijab_discount | json }}{% else %}''{% endif %}
       };
+      // Indexed by box number (1–3).
+      var BOX = [null, {{ s.box_one_label | json }}, {{ s.box_two_label | json }}, {{ s.box_three_label | json }}];
+      var COUNT = [null, {{ s.one_label | json }}, {{ s.two_label | json }}, {{ s.three_label | json }}];
+      var COUNT_NOTE = [null, '', {{ s.two_note | json }}, {{ s.three_note | json }}];
       var OFFER = {{ s.hijab_offer_property | default: 'Offer' | json }};
 
       var form = root.querySelector('[data-form]');
@@ -2433,14 +2987,17 @@
       var dots = Array.prototype.slice.call(root.querySelectorAll('[data-dot]'));
       var submits = Array.prototype.slice.call(root.querySelectorAll('[data-submit]'));
       var tabs = Array.prototype.slice.call(root.querySelectorAll('[data-tab]'));
+      var panels = Array.prototype.slice.call(root.querySelectorAll('[data-box-panel]'));
       var totals = root.querySelectorAll('[data-total]');
       var price = root.querySelector('[data-price]');
       var hint = root.querySelector('[data-hint]');
       var lines = root.querySelector('[data-lines]');
       var barLine = root.querySelector('[data-bar-line]');
+      var activeBox = root.querySelector('[data-active-box]');
       var perfumeToggle = root.querySelector('[data-perfume-toggle]');
+      var perfumeCard = root.querySelector('[data-perfume-card]');
       var scents = root.querySelector('[data-perfume-scents]');
-      var miswak = root.querySelector('[data-miswak]');
+      var addons = Array.prototype.slice.call(root.querySelectorAll('[data-addon]'));
       var hijabCard = root.querySelector('[data-hijab]');
       var hijabSwatches = Array.prototype.slice.call(root.querySelectorAll('[data-hijab-swatch]'));
       var hijabImg = root.querySelector('[data-hijab-img]');
@@ -2488,20 +3045,21 @@
 
       function count() {
         var input = root.querySelector('[data-count]:checked');
-        return input ? parseInt(input.value, 10) : 1;
+        var n = input ? parseInt(input.value, 10) : 1;
+        return Math.min(Math.max(n || 1, 1), MAX);
       }
 
       function cents(input) {
         return input ? parseInt(input.getAttribute('data-price'), 10) || 0 : 0;
       }
 
-      function panel(slot) {
-        return root.querySelector('[data-box-panel="' + slot + '"]');
+      function colourOf(slot) {
+        return picked('[data-colours="' + slot + '"]');
       }
 
       // "Navy Floral, Nikah Dua" for one box.
       function describe(slot) {
-        var colour = picked('[data-colours="' + slot + '"]');
+        var colour = colourOf(slot);
         var card = picked('[data-cards="' + slot + '"]');
         var parts = [];
         if (colour) parts.push(colour.getAttribute('data-title'));
@@ -2510,18 +3068,21 @@
       }
 
       function state() {
-        var two = count() === 2;
-        var first = picked('[data-colours="1"]');
-        var second = two ? picked('[data-colours="2"]') : null;
-        var scent = !two && perfumeToggle && perfumeToggle.checked ? picked('[data-perfume-scents]') : null;
-        var addMiswak = !!(miswak && miswak.checked);
+        var n = count();
+        var first = colourOf(1);
+        var boxes = [];
+        for (var i = 1; i <= n; i++) boxes.push(colourOf(i) || first);
+        var scent = n === 1 && perfumeToggle && perfumeToggle.checked ? picked('[data-perfume-scents]') : null;
+        var extras = addons.filter(function (input) { return input.checked && !input.disabled; });
         // Every hijab colour with a count, in swatch order.
         var hijabs = hijabSwatches
           .map(function (el) { return { el: el, qty: hijabQty[el.getAttribute('data-variant')] || 0 }; })
           .filter(function (h) { return h.qty > 0; });
-        var hijabTotal = hijabs.reduce(function (sum, h) { return sum + cents(h.el) * h.qty; }, 0);
-        var total = cents(first) + cents(second) + cents(scent) + (addMiswak ? cents(miswak) : 0) + hijabTotal;
-        return { two: two, first: first, second: second, scent: scent, miswak: addMiswak, hijabs: hijabs, total: total };
+        var total = boxes.reduce(function (sum, input) { return sum + cents(input); }, 0);
+        total += cents(scent);
+        total += extras.reduce(function (sum, input) { return sum + cents(input); }, 0);
+        total += hijabs.reduce(function (sum, h) { return sum + cents(h.el) * h.qty; }, 0);
+        return { n: n, many: n > 1, first: first, boxes: boxes, scent: scent, extras: extras, hijabs: hijabs, total: total };
       }
 
       function addLine(label, value) {
@@ -2539,10 +3100,11 @@
       function renderLines(st) {
         if (!lines) return;
         lines.textContent = '';
-        if (st.two) {
-          addLine(T.boxOne + ': ' + describe(1), money(cents(st.first)));
-          addLine(T.boxTwo + ': ' + describe(2), money(cents(st.second || st.first)));
-          if (HAS_PERFUME) addLine('2 × ' + T.perfume, T.free);
+        if (st.many) {
+          st.boxes.forEach(function (input, i) {
+            addLine(BOX[i + 1] + ': ' + describe(i + 1), money(cents(input)));
+          });
+          if (HAS_PERFUME) addLine(st.n + ' × ' + T.perfume, T.free);
         } else {
           addLine(T.box + ': ' + describe(1), money(cents(st.first)));
           if (st.scent) {
@@ -2550,26 +3112,42 @@
             addLine(several ? T.perfume + ' – ' + st.scent.getAttribute('data-title') : T.perfume, money(cents(st.scent)));
           }
         }
-        if (st.miswak) addLine(T.miswak, money(cents(miswak)));
+        st.extras.forEach(function (input) {
+          addLine(input.getAttribute('data-title'), money(cents(input)));
+        });
         st.hijabs.forEach(function (h) {
           var label = hijabSwatches.length > 1 ? h.el.getAttribute('data-name') : T.hijab;
           addLine(label + (h.qty > 1 ? ' × ' + h.qty : ''), money(cents(h.el) * h.qty));
         });
       }
 
+      // Each Finish photo shows its box's colour; the summary follows the active box.
+      function paintFinish() {
+        root.querySelectorAll('[data-finish-slot]').forEach(function (frame) {
+          var value = frame.getAttribute('data-finish-slot');
+          var slot = value === 'active' ? active : parseInt(value, 10);
+          var colour = colourOf(slot);
+          var key = colour && colour.getAttribute('data-media');
+          var match = key ? frame.querySelector('[data-finish="' + key + '"]') : null;
+          if (!match) return;
+          Array.prototype.forEach.call(frame.querySelectorAll('[data-finish]'), function (item) {
+            item.hidden = item !== match;
+          });
+        });
+      }
+
       function render() {
         var st = state();
-        if (!st.two) active = 1;
+        if (active > st.n) active = 1;
 
-        root.querySelectorAll('[data-only-one]').forEach(function (el) { el.hidden = st.two; });
-        root.querySelectorAll('[data-only-two]').forEach(function (el) { el.hidden = !st.two; });
+        root.querySelectorAll('[data-only-one]').forEach(function (el) { el.hidden = st.many; });
+        root.querySelectorAll('[data-only-many]').forEach(function (el) { el.hidden = !st.many; });
 
-        // Two boxes turn the box panels into tabs; one box shows the first panel only.
-        [1, 2].forEach(function (slot) {
-          var el = panel(slot);
-          if (!el) return;
-          el.hidden = active !== slot;
-          if (st.two) {
+        // Several boxes turn the box panels into tabs; one box shows the first panel only.
+        panels.forEach(function (el) {
+          var slot = parseInt(el.getAttribute('data-box-panel'), 10);
+          el.hidden = slot !== active;
+          if (st.many) {
             el.setAttribute('role', 'tabpanel');
             el.setAttribute('aria-labelledby', 'tss-gbx-{{ uid }}-tab-' + slot);
           } else {
@@ -2579,26 +3157,34 @@
         });
         tabs.forEach(function (tab) {
           var slot = parseInt(tab.getAttribute('data-tab'), 10);
-          var colour = picked('[data-colours="' + slot + '"]');
-          var label = tab.querySelector('[data-tab-colour]');
+          tab.hidden = slot > st.n;
           tab.setAttribute('aria-selected', slot === active ? 'true' : 'false');
           tab.tabIndex = slot === active ? 0 : -1;
-          if (label) label.textContent = colour ? ' · ' + colour.getAttribute('data-title') : '';
         });
+        if (activeBox) activeBox.textContent = BOX[active] || '';
 
+        root.querySelectorAll('[data-colour-name]').forEach(function (el) {
+          var colour = colourOf(el.getAttribute('data-colour-name'));
+          if (colour) el.textContent = colour.getAttribute('data-title');
+        });
         root.querySelectorAll('[data-mood-out]').forEach(function (el) {
-          var colour = picked('[data-colours="' + el.getAttribute('data-mood-out') + '"]');
+          var colour = colourOf(el.getAttribute('data-mood-out'));
           var mood = (colour && colour.getAttribute('data-mood')) || '';
-          el.textContent = mood;
-          el.hidden = !mood;
+          el.textContent = mood ? '— ' + mood : '';
         });
 
         // A single scent needs no choice; it stays checked behind the scenes.
         root.querySelectorAll('[data-scent-group]').forEach(function (group) {
-          group.hidden = !st.two || group.querySelectorAll('input').length < 2;
+          group.hidden = !st.many || group.querySelectorAll('input').length < 2;
         });
         if (scents) {
-          scents.hidden = st.two || !(perfumeToggle && perfumeToggle.checked) || scents.querySelectorAll('input').length < 2;
+          scents.hidden = st.many || !(perfumeToggle && perfumeToggle.checked) || scents.querySelectorAll('input').length < 2;
+        }
+        root.querySelectorAll('[data-free-text]').forEach(function (el) {
+          el.textContent = el.getAttribute('data-free-text').replace(/\[count\]/g, st.n);
+        });
+        if (perfumeCard) {
+          perfumeCard.toggleAttribute('data-on', st.many || !!(perfumeToggle && perfumeToggle.checked));
         }
 
         // The hijab card shows the active colour: photo, name, prices and its count.
@@ -2633,23 +3219,25 @@
         }
 
         paintQuick();
+        paintFinish();
 
         var text = money(st.total);
         totals.forEach(function (el) { el.textContent = text; });
         if (price && st.first) price.textContent = money(cents(st.first));
 
-        var one = root.querySelector('[data-count-price="1"]');
-        var pair = root.querySelector('[data-count-price="2"]');
-        if (one && st.first) one.textContent = money(cents(st.first));
-        if (pair && st.first) {
-          var other = picked('[data-colours="2"]');
-          pair.textContent = money(cents(st.first) + cents(other || st.first));
+        // Each count row prices its boxes in the colours chosen so far.
+        for (var k = 1; k <= MAX; k++) {
+          var out = root.querySelector('[data-count-price="' + k + '"]');
+          if (!out || !st.first) continue;
+          var sum = 0;
+          for (var i = 1; i <= k; i++) sum += cents(colourOf(i) || st.first);
+          out.textContent = money(sum);
         }
 
         renderLines(st);
         if (barLine) {
-          barLine.textContent = st.two
-            ? [T.two, HAS_PERFUME ? T.twoNote : ''].filter(Boolean).join(' · ')
+          barLine.textContent = st.many
+            ? [COUNT[st.n], HAS_PERFUME ? COUNT_NOTE[st.n] : ''].filter(Boolean).join(' · ')
             : describe(1);
         }
 
@@ -2696,58 +3284,62 @@
           dot.setAttribute('aria-pressed', dot.__input.checked ? 'true' : 'false');
         });
       }
-      paintQuick();
 
-      /* ---------- in every box: larger view ---------- */
-      var insideDialog = root.querySelector('[data-inside-dialog]');
-      var insideOpeners = Array.prototype.slice.call(root.querySelectorAll('[data-inside-open]'));
-      var insideIndex = 0;
-      var insideReturn = null;
+      /* ---------- photo viewer: gallery and inside rows ---------- */
+      var viewer = root.querySelector('[data-viewer]');
+      var viewList = [];
+      var viewIndex = 0;
+      var viewReturn = null;
 
-      function showInside(index) {
-        var count = insideOpeners.length;
-        insideIndex = (index + count) % count;
-        var opener = insideOpeners[insideIndex];
-        var img = insideDialog.querySelector('[data-inside-img]');
-        var name = insideDialog.querySelector('[data-inside-name]');
-        var counter = insideDialog.querySelector('[data-inside-count]');
+      function showView(index) {
+        var count = viewList.length;
+        if (!count) return;
+        viewIndex = (index + count) % count;
+        var opener = viewList[viewIndex];
+        var img = viewer.querySelector('[data-viewer-img]');
+        var name = viewer.querySelector('[data-viewer-name]');
+        var counter = viewer.querySelector('[data-viewer-count]');
         img.src = opener.getAttribute('data-src');
         img.alt = opener.getAttribute('data-name') || '';
         name.textContent = opener.getAttribute('data-name') || '';
-        counter.textContent = count > 1 ? insideIndex + 1 + ' / ' + count : '';
-        insideDialog.querySelectorAll('[data-inside-step]').forEach(function (step) {
-          step.hidden = count < 2;
+        counter.textContent = count > 1 ? viewIndex + 1 + ' / ' + count : '';
+        viewer.querySelectorAll('[data-viewer-step]').forEach(function (step) {
+          step.toggleAttribute('data-off', count < 2);
+          step.disabled = count < 2;
         });
       }
 
-      if (insideDialog && insideOpeners.length && typeof insideDialog.showModal === 'function') {
-        insideOpeners.forEach(function (opener, i) {
-          opener.addEventListener('click', function () {
-            insideReturn = opener;
-            showInside(i);
-            insideDialog.showModal();
-          });
+      if (viewer && typeof viewer.showModal === 'function') {
+        root.addEventListener('click', function (event) {
+          var opener = event.target.closest('[data-view]');
+          if (!opener || !root.contains(opener)) return;
+          viewList = Array.prototype.slice.call(
+            root.querySelectorAll('[data-view="' + opener.getAttribute('data-view') + '"]')
+          );
+          viewReturn = opener;
+          showView(viewList.indexOf(opener));
+          viewer.showModal();
         });
 
-        insideDialog.addEventListener('click', function (event) {
+        viewer.addEventListener('click', function (event) {
           // A click on the backdrop lands on the dialog itself.
-          if (event.target === insideDialog || event.target.closest('[data-inside-close]')) {
-            insideDialog.close();
+          if (event.target === viewer || event.target.closest('[data-viewer-close]')) {
+            viewer.close();
             return;
           }
-          var step = event.target.closest('[data-inside-step]');
-          if (step) showInside(insideIndex + parseInt(step.getAttribute('data-inside-step'), 10));
+          var step = event.target.closest('[data-viewer-step]');
+          if (step) showView(viewIndex + parseInt(step.getAttribute('data-viewer-step'), 10));
         });
 
-        insideDialog.addEventListener('keydown', function (event) {
-          if (insideOpeners.length < 2) return;
-          var rtl = getComputedStyle(insideDialog).direction === 'rtl';
-          if (event.key === 'ArrowRight') showInside(insideIndex + (rtl ? -1 : 1));
-          else if (event.key === 'ArrowLeft') showInside(insideIndex + (rtl ? 1 : -1));
+        viewer.addEventListener('keydown', function (event) {
+          if (viewList.length < 2) return;
+          var rtl = getComputedStyle(viewer).direction === 'rtl';
+          if (event.key === 'ArrowRight') showView(viewIndex + (rtl ? -1 : 1));
+          else if (event.key === 'ArrowLeft') showView(viewIndex + (rtl ? 1 : -1));
         });
 
-        insideDialog.addEventListener('close', function () {
-          if (insideReturn) insideReturn.focus();
+        viewer.addEventListener('close', function () {
+          if (viewReturn) viewReturn.focus();
         });
       }
 
@@ -2755,6 +3347,7 @@
       function selectTab(slot, focus) {
         active = slot;
         render();
+        showVariantMedia(colourOf(slot));
         if (focus) {
           var tab = root.querySelector('[data-tab="' + slot + '"]');
           if (tab) tab.focus();
@@ -2769,7 +3362,13 @@
           var keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];
           if (keys.indexOf(event.key) === -1) return;
           event.preventDefault();
-          var next = event.key === 'Home' ? 1 : event.key === 'End' ? 2 : active === 1 ? 2 : 1;
+          var n = count();
+          var rtl = getComputedStyle(tab).direction === 'rtl';
+          var forward = (event.key === 'ArrowRight') !== rtl;
+          var next;
+          if (event.key === 'Home') next = 1;
+          else if (event.key === 'End') next = n;
+          else next = forward ? (active % n) + 1 : ((active + n - 2) % n) + 1;
           selectTab(next, true);
         });
       });
@@ -2892,18 +3491,19 @@
         if (busy || !st.first) return;
 
         var items = [];
-        if (st.two) {
-          items.push(boxLine(st.first, picked('[data-cards="1"]'), root.querySelector('[data-scent="1"]:checked'), 1));
-          items.push(boxLine(st.second || st.first, picked('[data-cards="2"]'), root.querySelector('[data-scent="2"]:checked'), 2));
-        } else {
-          items.push(boxLine(st.first, picked('[data-cards="1"]'), null, 1));
-          if (st.scent) {
-            var link = {};
-            link[LINK] = st.first.getAttribute('data-title');
-            items.push({ id: parseInt(st.scent.value, 10), quantity: 1, properties: link });
-          }
+        st.boxes.forEach(function (colour, i) {
+          var slot = i + 1;
+          var scent = st.many ? root.querySelector('[data-scent="' + slot + '"]:checked') : null;
+          items.push(boxLine(colour, picked('[data-cards="' + slot + '"]'), scent, slot));
+        });
+        if (st.scent) {
+          var link = {};
+          link[LINK] = st.first.getAttribute('data-title');
+          items.push({ id: parseInt(st.scent.value, 10), quantity: 1, properties: link });
         }
-        if (st.miswak) items.push({ id: parseInt(miswak.value, 10), quantity: 1 });
+        st.extras.forEach(function (input) {
+          items.push({ id: parseInt(input.value, 10), quantity: 1 });
+        });
         st.hijabs.forEach(function (h) {
           var hijabProps = {};
           hijabProps[LINK] = st.first.getAttribute('data-title');
@@ -2933,6 +3533,9 @@
             hint.setAttribute('data-error', 'true');
             hint.textContent = (error && error.message) || T.error;
             render();
+            // The bar's button may have sent it; bring the message into view.
+            var box = hint.getBoundingClientRect();
+            if (box.top < 0 || box.bottom > window.innerHeight) hint.scrollIntoView({ block: 'center' });
           });
       });
 
@@ -2943,7 +3546,16 @@
         render();
       });
 
-      matchHijab(root.querySelector('[data-colours="1"] input:checked'));
+      // One Order now on screen at a time: the bar steps away over the summary.
+      var bar = root.querySelector('.tss-gbx__bar');
+      var summary = root.querySelector('.tss-gbx__summary');
+      if (bar && summary && 'IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          bar.toggleAttribute('data-away', entries[0].isIntersecting);
+        }, { threshold: 0.2 }).observe(summary);
+      }
+
+      matchHijab(colourOf(1));
       render();
     })();
   </script>
@@ -2966,7 +3578,7 @@
       "type": "product",
       "id": "perfume_product",
       "label": "Perfume product",
-      "info": "Each variant is one scent. Sold as an add-on with one box; included free with two."
+      "info": "Each variant is one scent. Sold as an add-on with one box; included free in each box when there are more."
     },
     {
       "type": "collection",
@@ -3039,9 +3651,22 @@
       "default": 50,
       "info": "Shown on the page and in the total. Charge it with a matching automatic discount (Buy X get Y) in Shopify admin."
     },
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "range",
+      "id": "column_width",
+      "label": "Column width on phones and tablets",
+      "min": 400,
+      "max": 720,
+      "step": 20,
+      "unit": "px",
+      "default": 480,
+      "info": "Phones and tablets show one centred column. From 990px wide the page is full width, with the photos beside the choices. Use the same width in TSS — Gift box story."
+    },
     { "type": "header", "content": "Introduction" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Wedding season" },
     { "type": "text", "id": "title", "label": "Title", "info": "Leave empty to use the product title." },
+    { "type": "text", "id": "title_emphasis", "label": "Italic end of title", "info": "Follows the title in italics, e.g. actually use." },
     { "type": "text", "id": "subtitle", "label": "Subtitle", "info": "Italic line under the title." },
     {
       "type": "textarea",
@@ -3049,10 +3674,11 @@
       "label": "Introduction",
       "default": "For him, for her, or for both. Gift-ready in 24 hours in Dhaka."
     },
-    { "type": "text", "id": "proof", "label": "Proof line", "default": "290+ gifted since 2024" },
+    { "type": "text", "id": "price_prefix", "label": "Price prefix", "default": "From", "info": "Before the price, e.g. From. Leave empty to hide." },
+    { "type": "text", "id": "proof", "label": "Proof line", "default": "290+ gifted" },
     { "type": "text", "id": "worth_text", "label": "Value line", "info": "Small line under the price, e.g. Worth ৳3,100 if bought separately. Leave empty to hide." },
-    { "type": "text", "id": "dispatch_title", "label": "Delivery headline", "info": "Bold line in the note under the price. Leave both delivery fields empty to hide the note." },
-    { "type": "text", "id": "dispatch_text", "label": "Delivery details" },
+    { "type": "text", "id": "dispatch_title", "label": "Delivery headline", "info": "Line under the price. Leave empty to hide." },
+    { "type": "text", "id": "dispatch_text", "label": "Delivery details", "info": "Small line under the price, e.g. Cash on delivery · Next day in Dhaka." },
     {
       "type": "select",
       "id": "image_ratio",
@@ -3075,30 +3701,58 @@
       "default": "colours",
       "info": "Box colour images only falls back to every photo while no colour has an image."
     },
-    { "type": "header", "content": "In every box" },
-    { "type": "paragraph", "content": "Add In the box blocks to show a strip under the price." },
-    { "type": "text", "id": "inside_label", "label": "Strip label", "default": "In every box" },
-    { "type": "text", "id": "inside_link_label", "label": "Link label", "default": "See inside ↓" },
-    { "type": "text", "id": "inside_anchor", "label": "Link target", "default": "inside", "info": "Matches the anchor on the Contents block of TSS — Gift box story." },
-    { "type": "header", "content": "Steps" },
-    { "type": "text", "id": "colour_label", "label": "Colour step", "default": "Box colour" },
-    { "type": "checkbox", "id": "photo_swatches", "label": "Show colour dots on the photo", "info": "A tap picks that box colour and shows its photo.", "default": true },
-    { "type": "text", "id": "card_label", "label": "Card step", "default": "Card" },
-    { "type": "text", "id": "name_label", "label": "Box name step", "default": "Name on box", "info": "Also the cart line property. Leave empty to hide the step." },
-    { "type": "text", "id": "name_placeholder", "label": "Box name placeholder", "default": "e.g. Aisha & Yusuf" },
-    { "type": "text", "id": "name_help", "label": "Box name help", "default": "Leave it blank if you’d rather not." },
+    { "type": "header", "content": "Quantity" },
+    { "type": "checkbox", "id": "allow_two", "label": "Offer more than one box", "default": true },
+    { "type": "checkbox", "id": "allow_three", "label": "Offer three boxes", "default": true, "visible_if": "{{ section.settings.allow_two }}" },
+    { "type": "text", "id": "count_label", "label": "Heading", "default": "Quantity." },
+    { "type": "text", "id": "count_note", "label": "Heading note", "default": "How many weddings this season?", "info": "Follows the heading in a lighter colour." },
+    { "type": "text", "id": "one_label", "label": "One box", "default": "One box" },
+    { "type": "text", "id": "one_hint", "label": "One box note", "default": "For one wedding.", "info": "Small line under the title. Leave empty to hide." },
+    { "type": "text", "id": "two_label", "label": "Two boxes", "default": "Two boxes" },
+    { "type": "text", "id": "two_hint", "label": "Two boxes note", "default": "Two spray perfumes, free — one in each box." },
+    { "type": "text", "id": "two_note", "label": "Two boxes bar note", "default": "2 perfumes free", "info": "Joins the bar line as \"Two boxes · 2 perfumes free\" when a perfume is set." },
+    { "type": "text", "id": "three_label", "label": "Three boxes", "default": "Three boxes", "visible_if": "{{ section.settings.allow_three }}" },
+    { "type": "text", "id": "three_hint", "label": "Three boxes note", "default": "Three spray perfumes, free. For the family’s weddings.", "visible_if": "{{ section.settings.allow_three }}" },
+    { "type": "text", "id": "three_note", "label": "Three boxes bar note", "default": "3 perfumes free", "visible_if": "{{ section.settings.allow_three }}" },
+    { "type": "text", "id": "box_label", "label": "Single box label", "default": "Box", "info": "Starts the box line in the order summary." },
+    { "type": "text", "id": "box_one_label", "label": "First box label", "default": "Box 1" },
+    { "type": "text", "id": "box_two_label", "label": "Second box label", "default": "Box 2" },
+    { "type": "text", "id": "box_three_label", "label": "Third box label", "default": "Box 3", "visible_if": "{{ section.settings.allow_three }}" },
+    { "type": "text", "id": "tabs_label", "label": "Box tabs label for screen readers", "default": "Choose which box to style" },
+    { "type": "header", "content": "Finish" },
+    { "type": "text", "id": "colour_label", "label": "Heading", "default": "Finish." },
+    { "type": "text", "id": "colour_note", "label": "Heading note", "default": "Pick each box." },
+    { "type": "text", "id": "colour_line_label", "label": "Colour label", "default": "Colour", "info": "Starts the line above the swatches, e.g. Colour · Navy Floral — the classic." },
+    { "type": "checkbox", "id": "photo_swatches", "label": "Show colour dots on the top photo", "info": "A tap picks that box colour.", "default": false },
+    { "type": "header", "content": "Card" },
+    { "type": "text", "id": "card_label", "label": "Heading", "default": "The card." },
+    { "type": "text", "id": "card_note", "label": "Heading note", "default": "Which du’a opens the gift?" },
     {
       "type": "textarea",
       "id": "card_options",
       "label": "Cards",
-      "info": "One card per line. Leave empty to hide the step.",
+      "info": "One card per line. Leave empty to hide the choice.",
       "default": "Nikah Dua\nUmrah Mubarak\nFor Husband\nFor Wife\nFor Loved ones\nFor someone who needs Dua"
     },
-    { "type": "text", "id": "addons_label", "label": "Add-ons step", "default": "Add-ons" },
-    { "type": "text", "id": "optional_label", "label": "Optional label", "default": "(optional)" },
+    { "type": "text", "id": "name_label", "label": "Name on card label", "default": "Name on the card", "info": "Also the cart line property. Leave empty to hide the field." },
+    { "type": "text", "id": "optional_label", "label": "Name note", "default": "· optional, free" },
+    { "type": "text", "id": "name_placeholder", "label": "Name placeholder", "default": "e.g. Ayesha & Rafi" },
+    { "type": "text", "id": "name_help", "label": "Name help", "info": "Small line under the field. Leave empty to hide." },
+    { "type": "header", "content": "On the Nikah card" },
+    { "type": "text", "id": "dua_eyebrow", "label": "Eyebrow", "default": "On the Nikah card" },
+    { "type": "textarea", "id": "dua_arabic", "label": "Arabic", "default": "بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ" },
+    { "type": "textarea", "id": "dua_translation", "label": "Translation", "default": "“May Allah bless you, shower His blessings upon you, and join you together in goodness.”" },
+    { "type": "text", "id": "dua_source", "label": "Source", "default": "The Prophet ﷺ to a newly married couple · Abū Dāwūd 2130" },
+    { "type": "header", "content": "Inside" },
+    { "type": "paragraph", "content": "Add In the box blocks to list what is inside. A block with an image opens it in the photo viewer." },
+    { "type": "text", "id": "inside_label", "label": "Heading", "default": "Inside." },
+    { "type": "text", "id": "inside_note", "label": "Heading note", "default": "Five things, used every day." },
+    { "type": "header", "content": "Complete the gift" },
+    { "type": "text", "id": "addons_label", "label": "Heading", "default": "Complete the gift." },
+    { "type": "text", "id": "addons_note", "label": "Heading note", "default": "Packed inside the box." },
     { "type": "text", "id": "perfume_label", "label": "Perfume name", "info": "Leave empty to use the product title.", "default": "Spray perfume" },
-    { "type": "text", "id": "perfume_text", "label": "Perfume description", "default": "Packed inside the box." },
-    { "type": "text", "id": "perfume_free_text", "label": "Perfume note with two boxes", "default": "Free with 2 boxes, one in each" },
+    { "type": "text", "id": "perfume_text", "label": "Perfume description", "default": "By Horsemen, one per box" },
+    { "type": "text", "id": "perfume_free_text", "label": "Perfume note with several boxes", "default": "Free with [count] boxes", "info": "[count] becomes the number of boxes." },
     { "type": "text", "id": "scent_label", "label": "Scent label", "default": "Perfume" },
     { "type": "text", "id": "miswak_label", "label": "Miswak name", "info": "Leave empty to use the product title.", "default": "Miswak" },
     { "type": "text", "id": "miswak_text", "label": "Miswak description", "default": "A Sunnah to carry." },
@@ -3112,27 +3766,30 @@
     { "type": "text", "id": "add_label", "label": "Add button", "default": "Add" },
     { "type": "text", "id": "added_label", "label": "Added button", "default": "Added" },
     { "type": "text", "id": "included_label", "label": "Included label", "default": "Included" },
-    { "type": "checkbox", "id": "allow_two", "label": "Offer two boxes", "default": true },
-    { "type": "text", "id": "count_label", "label": "Box count step", "default": "How many boxes?" },
-    { "type": "text", "id": "one_label", "label": "One box", "default": "1 box" },
-    { "type": "text", "id": "two_label", "label": "Two boxes", "default": "2 boxes" },
-    { "type": "text", "id": "two_note", "label": "Two boxes note", "default": "2 perfumes free", "info": "Joins the title as \"2 boxes + 2 perfumes free\" when a perfume is set." },
-    { "type": "text", "id": "one_hint", "label": "One box hint", "default": "Add a perfume below if you like", "info": "Small line under the title. Leave empty to hide." },
-    { "type": "text", "id": "two_hint", "label": "Two boxes hint", "default": "One spray perfume packed in each box", "info": "Small line under the title. Leave empty to hide." },
-    { "type": "text", "id": "box_label", "label": "Single box label", "default": "Box", "info": "Starts the box line in the order summary." },
-    { "type": "text", "id": "box_one_label", "label": "First box label", "default": "Box one" },
-    { "type": "text", "id": "box_two_label", "label": "Second box label", "default": "Box two" },
-    { "type": "header", "content": "Order" },
+    { "type": "header", "content": "Delivery" },
+    { "type": "text", "id": "delivery_title", "label": "Heading", "default": "Delivery." },
+    { "type": "text", "id": "delivery_subtitle", "label": "Heading note", "default": "Gift-ready, on time." },
+    {
+      "type": "textarea",
+      "id": "delivery_rows",
+      "label": "Rows",
+      "info": "One per line, as Label | value. Shown two to a row. Leave empty to hide.",
+      "default": "Inside Dhaka | Next day\nOutside Dhaka | 2–4 days\nPayment | Cash on delivery, bKash or card\nSend it direct | Use their address. No price inside."
+    },
+    { "type": "header", "content": "Your gift" },
+    { "type": "text", "id": "summary_title", "label": "Heading", "default": "Your gift." },
+    { "type": "text", "id": "summary_note", "label": "Heading note", "default": "Just as you chose it." },
     { "type": "text", "id": "total_label", "label": "Total label", "default": "Total" },
     { "type": "text", "id": "delivery_note", "label": "Delivery note", "default": "Delivery added at checkout." },
     { "type": "text", "id": "button_label", "label": "Button label", "default": "Order now" },
     {
       "type": "text",
       "id": "whatsapp_number",
-      "label": "WhatsApp number in the phone bar",
-      "info": "With country code, e.g. 8801911242132. Shows a WhatsApp button beside Order now on phones, in place of the floating one. Leave empty to hide.",
+      "label": "WhatsApp number",
+      "info": "With country code, e.g. 8801911242132. Adds a WhatsApp button to the bar, in place of the floating one, and the link under Order now. Leave empty to hide both.",
       "default": "8801911242132"
     },
+    { "type": "text", "id": "whatsapp_link_label", "label": "WhatsApp link under Order now", "default": "Rather ask first? Order on WhatsApp", "info": "Leave empty to hide the link." },
     {
       "type": "text",
       "id": "whatsapp_message",
@@ -3141,7 +3798,7 @@
       "default": "Assalamu alaikum, I'd like to ask about [title]."
     },
     { "type": "text", "id": "whatsapp_label", "label": "WhatsApp button label for screen readers", "default": "Chat on WhatsApp" },
-    { "type": "text", "id": "trust_line", "label": "Trust line", "default": "Cash on delivery across Bangladesh." },
+    { "type": "text", "id": "trust_line", "label": "Trust line", "info": "Small line at the end of the summary. Leave empty to hide." },
     {
       "type": "select",
       "id": "after_add",
@@ -3158,9 +3815,9 @@
     { "type": "text", "id": "perfume_property", "label": "Free perfume property", "default": "Perfume" },
     { "type": "text", "id": "link_property", "label": "Add-on link property", "default": "For" },
     { "type": "header", "content": "Messages" },
-    { "type": "text", "id": "free_label", "label": "Free label", "default": "free" },
+    { "type": "text", "id": "free_label", "label": "Free label", "default": "Free" },
     { "type": "text", "id": "sold_out_label", "label": "Sold out label", "default": "Sold out" },
-    { "type": "text", "id": "image_label", "label": "Image dot label", "default": "Image" },
+    { "type": "text", "id": "image_label", "label": "Image dot label", "default": "Photo" },
     { "type": "text", "id": "adding_label", "label": "Adding label", "default": "Adding…" },
     { "type": "text", "id": "error_text", "label": "Error message", "default": "We couldn’t add this to your bag. Please try again." },
     { "type": "text", "id": "empty_text", "label": "Empty message", "default": "Choose a box product for this section." },
@@ -3173,8 +3830,8 @@
       "settings": [
         { "type": "text", "id": "name", "label": "Name", "default": "Navy Floral" },
         { "type": "color", "id": "swatch", "label": "Swatch" },
-        { "type": "image_picker", "id": "image", "label": "Image", "info": "Added to the gallery and shown when this colour is chosen." },
-        { "type": "text", "id": "mood", "label": "Mood line", "info": "Shown under the colours when this one is chosen." },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Shown in Finish and the summary when this colour is chosen, and added to the gallery." },
+        { "type": "text", "id": "mood", "label": "Short description", "info": "Follows the colour name, e.g. the classic." },
         { "type": "text", "id": "hijab_match", "label": "Matching hijab colour", "info": "Picking this box colour picks the hijab whose name contains this, e.g. Royal Blue. Leave empty to use the colour name." },
         { "type": "checkbox", "id": "sold_out", "label": "Sold out", "default": false }
       ]
@@ -3191,8 +3848,19 @@
       "type": "inside",
       "name": "In the box",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "name", "label": "Name", "default": "Hafezi Qur’an" }
+        { "type": "text", "id": "name", "label": "Name", "default": "Hafezi Qur’an" },
+        { "type": "text", "id": "note", "label": "Note", "info": "Small line under the name." },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Opens in the photo viewer when the row is tapped." }
+      ]
+    },
+    {
+      "type": "addon",
+      "name": "Add-on product",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product", "info": "Added as its own cart line with its first available variant." },
+        { "type": "text", "id": "label", "label": "Name", "info": "Leave empty to use the product title." },
+        { "type": "text", "id": "text", "label": "Description" },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Leave empty to use the product image." }
       ]
     }
   ],
@@ -3200,9 +3868,9 @@
     {
       "name": "TSS — Gift box",
       "blocks": [
-        { "type": "colour", "settings": { "name": "Navy Floral", "swatch": "#1f2a44" } },
-        { "type": "colour", "settings": { "name": "Black", "swatch": "#1c1c1a" } },
-        { "type": "colour", "settings": { "name": "Red", "swatch": "#6b1f22" } }
+        { "type": "colour", "settings": { "name": "Navy Floral", "swatch": "#22304f", "mood": "the classic" } },
+        { "type": "colour", "settings": { "name": "Black", "swatch": "#1e1b19", "mood": "understated" } },
+        { "type": "colour", "settings": { "name": "Red", "swatch": "#8e2a24", "mood": "festive" } }
       ]
     }
   ]

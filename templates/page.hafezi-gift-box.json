@@ -18,7 +18,7 @@
             "name": "Navy Floral",
             "swatch": "#1f2a44",
             "image": "shopify://shop_images/33edb3e6-wedding-package-turkish-DSC06448-jpg.webp",
-            "mood": "Quiet and classic, with a soft floral pattern.",
+            "mood": "the classic",
             "hijab_match": "Royal Blue",
             "sold_out": false
           }
@@ -29,7 +29,7 @@
             "name": "Black",
             "swatch": "#1c1c1a",
             "image": "shopify://shop_images/Umrah_Mubarak_gift_box.jpg",
-            "mood": "Understated, for the one who likes things simple.",
+            "mood": "understated",
             "hijab_match": "Black",
             "sold_out": false
           }
@@ -40,7 +40,7 @@
             "name": "Red",
             "swatch": "#6b1f22",
             "image": "shopify://shop_images/For_Wife_gift_box.jpg",
-            "mood": "Deep and warm, the wedding-season favourite.",
+            "mood": "festive",
             "hijab_match": "Blood Red",
             "sold_out": false
           }
@@ -85,42 +85,56 @@
           "type": "inside",
           "settings": {
             "image": "shopify://shop_images/in-box-hafezi-quran.jpg",
-            "name": "Hafezi Qur’an"
+            "name": "Hafezi Qur’an",
+            "note": "Saudi Hafezi, with a Qur’an clip to keep their page"
           }
         },
         "inside_mat": {
           "type": "inside",
           "settings": {
             "image": "shopify://shop_images/in-box-prayer-mat.jpg",
-            "name": "Prayer mat"
+            "name": "Prayer mat",
+            "note": "Soft-touch, travel size"
           }
         },
         "inside_tasbih": {
           "type": "inside",
           "settings": {
             "image": "shopify://shop_images/in-box-tasbih.jpg",
-            "name": "Tasbih"
+            "name": "Tasbih",
+            "note": "33 beads"
           }
         },
         "inside_card": {
           "type": "inside",
           "settings": {
             "image": "shopify://shop_images/in-box-dua-card.jpg",
-            "name": "Du’a card"
+            "name": "Du’a card",
+            "note": "The one you choose above"
           }
         },
         "inside_box": {
           "type": "inside",
           "settings": {
             "image": "shopify://shop_images/in-box-gift-box.jpg",
-            "name": "Gift box"
+            "name": "Gift box",
+            "note": "Gold-foiled, hand-wrapped, satin ribbon. No price inside."
           }
         },
         "inside_clip": {
           "type": "inside",
           "settings": {
             "image": "shopify://shop_images/de847dc1-Clip_-1x1Qur_an-clip-10-of-14-scaled-1-jpg.webp",
-            "name": "Quran Clip"
+            "name": "Quran Clip",
+            "note": "Keeps their page"
+          }
+        },
+        "addon_wallet": {
+          "type": "addon",
+          "settings": {
+            "product": "derby-2-0-horsemen-wallet-espresso-brown",
+            "label": "Horsemen cardholder",
+            "text": "Derby 2.0, leather. For him."
           }
         }
       },
@@ -139,7 +153,8 @@
         "inside_tasbih",
         "inside_card",
         "inside_box",
-        "inside_clip"
+        "inside_clip",
+        "addon_wallet"
       ],
       "settings": {
         "product": "the-sunnah-classic-wedding-gift-box",
@@ -158,30 +173,28 @@
         "hijab_swatch_colours_2": "Cherry Red: #c82b3f\nWine Dark Purple: #583142\nWatermelon Pink: #e47172\nBottle Green: #0a4245\nBlue: #0f2842\nJapanese Violet: #6a4759\nBlack: #1f1f1f\nDark Wine: #431822\nGrape Purple: #7a3351\nMint: #96a675\nMint Green: #9db8a4",
         "hijab_discount": 50,
         "eyebrow": "Wedding season",
-        "title": "The Sunnah Classic",
-        "subtitle": "Wedding gift box",
-        "lede": "For him, for her, or for both. Gift-ready in 24 hours in Dhaka.",
-        "proof": "290+ people bought",
-        "worth_text": "Worth ৳2,340 if bought separately",
-        "dispatch_title": "Order by 6 pm, delivered tomorrow in Dhaka",
-        "dispatch_text": "Outside Dhaka 2–4 days · Cash on delivery, card or bKash",
+        "title": "The wedding gift they’ll",
+        "subtitle": "",
+        "lede": "A Saudi Hafezi Qur’an, a prayer mat, a tasbih and a du’a card, gift-wrapped. For him, for her, or both.",
+        "proof": "290+ gifted",
+        "worth_text": "",
+        "dispatch_title": "",
+        "dispatch_text": "Cash on delivery · Next day in Dhaka · bKash or card",
         "image_ratio": "1 / 1",
         "gallery": "colours",
-        "inside_label": "In every box",
-        "inside_link_label": "See inside ↓",
-        "inside_anchor": "inside",
-        "colour_label": "Box colour",
-        "photo_swatches": true,
-        "card_label": "Card",
-        "name_label": "Name on the Card",
-        "name_placeholder": "e.g. Aisha & Yusuf",
-        "name_help": "Leave it blank if you’d rather not.",
+        "inside_label": "Inside.",
+        "colour_label": "Finish.",
+        "photo_swatches": false,
+        "card_label": "The card.",
+        "name_label": "Name on the card",
+        "name_placeholder": "e.g. Ayesha & Rafi",
+        "name_help": "",
         "card_options": "Nikah Dua\nUmrah Mubarak\nFor Husband\nFor Wife\nFor Loved Ones\nSomeone Who Needs Dua",
-        "addons_label": "Complete the gift",
-        "optional_label": "Optional",
+        "addons_label": "Complete the gift.",
+        "optional_label": "· optional, free",
         "perfume_label": "Spray perfume",
-        "perfume_text": "By Horsemen, packed inside the box.",
-        "perfume_free_text": "Free with 2 boxes, one in each",
+        "perfume_text": "By Horsemen, one per box",
+        "perfume_free_text": "Free with [count] boxes",
         "scent_label": "Perfume",
         "miswak_label": "Miswak with Cover",
         "miswak_text": "Dark chocolate leather. A Sunnah to carry.",
@@ -196,34 +209,59 @@
         "added_label": "Added",
         "included_label": "Included",
         "allow_two": true,
-        "count_label": "How many boxes?",
-        "one_label": "1 box",
-        "two_label": "2 boxes",
+        "count_label": "Quantity.",
+        "one_label": "One box",
+        "two_label": "Two boxes",
         "two_note": "2 perfumes free",
-        "one_hint": "Add a perfume below if you like",
-        "two_hint": "One spray perfume packed in each box",
+        "one_hint": "For one wedding.",
+        "two_hint": "Two spray perfumes, free — one in each box.",
         "box_label": "Box",
-        "box_one_label": "Box one",
-        "box_two_label": "Box two",
+        "box_one_label": "Box 1",
+        "box_two_label": "Box 2",
         "total_label": "Total",
-        "delivery_note": "Delivery added at checkout: ৳100 inside Dhaka.",
+        "delivery_note": "Plus delivery: ৳100 inside Dhaka. Pay when it arrives.",
         "button_label": "Order now",
         "whatsapp_number": "8801911242132",
         "whatsapp_message": "Assalamu alaikum, I'd like to ask about [title].",
         "whatsapp_label": "Chat on WhatsApp",
-        "trust_line": "Pay on delivery, by bKash or by card.",
+        "trust_line": "",
         "after_add": "checkout",
         "colour_property": "Box colour",
         "card_property": "Card",
         "perfume_property": "Perfume",
         "link_property": "For",
-        "free_label": "free",
+        "free_label": "Free",
         "sold_out_label": "Sold out",
-        "image_label": "Image",
+        "image_label": "Photo",
         "adding_label": "Adding…",
         "error_text": "We couldn’t add this to your bag. Please try again.",
         "empty_text": "Choose a box product for this section.",
-        "padding_bottom": 0
+        "padding_bottom": 0,
+        "column_width": 480,
+        "title_emphasis": "actually use.",
+        "price_prefix": "From",
+        "allow_three": true,
+        "count_note": "How many weddings this season?",
+        "three_label": "Three boxes",
+        "three_hint": "Three spray perfumes, free. For the family’s weddings.",
+        "three_note": "3 perfumes free",
+        "box_three_label": "Box 3",
+        "tabs_label": "Choose which box to style",
+        "colour_note": "Pick each box.",
+        "colour_line_label": "Colour",
+        "card_note": "Which du’a opens the gift?",
+        "dua_eyebrow": "On the Nikah card",
+        "dua_arabic": "بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ",
+        "dua_translation": "“May Allah bless you, shower His blessings upon you, and join you together in goodness.”",
+        "dua_source": "The Prophet ﷺ to a newly married couple · Abū Dāwūd 2130",
+        "inside_note": "Used every day.",
+        "addons_note": "Packed inside the box.",
+        "delivery_title": "Delivery.",
+        "delivery_subtitle": "Gift-ready, on time.",
+        "delivery_rows": "Inside Dhaka | Next day · ৳100\nOutside Dhaka | 2–4 days\nPayment | Cash on delivery, bKash or card\nSend it direct | Use their address. No price inside.",
+        "summary_title": "Your gift.",
+        "summary_note": "Just as you chose it.",
+        "whatsapp_link_label": "Rather ask first? Order on WhatsApp"
       }
     },
     "story": {
@@ -267,7 +305,8 @@
             "item_3_image": "shopify://shop_images/in-box-tasbih.jpg",
             "item_4_image": "shopify://shop_images/in-box-dua-card.jpg",
             "item_5_image": "shopify://shop_images/in-box-gift-box.jpg"
-          }
+          },
+          "disabled": true
         },
         "dua": {
           "type": "dua",
@@ -277,7 +316,8 @@
             "arabic": "بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ",
             "translation": "“May Allah bless you, shower His blessings upon you, and join you together in goodness.”",
             "source": "Abu Dawud 2130"
-          }
+          },
+          "disabled": true
         },
         "delivery": {
           "type": "delivery",
@@ -286,7 +326,8 @@
             "title": "Gift-ready, on time",
             "text": "",
             "rows": "Inside Dhaka | Within 24 hours\nOutside Dhaka | 2–4 days\nPayment | Cash on deliver/ Card/ bKash"
-          }
+          },
+          "disabled": true
         },
         "bulk": {
           "type": "bulk",
@@ -296,7 +337,8 @@
             "text": "Ten boxes or more, with your own card wording. Tell us what you need.",
             "button_label": "Ask on WhatsApp",
             "button_link": "https://wa.me/8801796263735?text=Assalamu%20alaikum%2C%20I%27d%20like%20to%20ask%20about%20bulk%20gift%20box%20orders."
-          }
+          },
+          "disabled": true
         },
         "faq_1": {
           "type": "faq",
@@ -308,8 +350,8 @@
         "faq_2": {
           "type": "faq",
           "settings": {
-            "question": "Are the two perfumes really free with two boxes?",
-            "answer": "<p>Yes. Choose a scent for each box and both are included at no extra cost.</p>"
+            "question": "Are the perfumes really free with two or three boxes?",
+            "answer": "<p>Yes. One spray perfume goes inside each box, at no extra cost.</p>"
           }
         },
         "faq_3": {
@@ -346,30 +388,48 @@
             "colour_3_image": "shopify://shop_images/For_Wife_gift_box.jpg",
             "colour_3_text": "Deep and warm, the wedding-season favourite."
           }
+        },
+        "others": {
+          "type": "others",
+          "settings": {
+            "collection": "all-gifts",
+            "title": "Other gift boxes.",
+            "link_label": "View all",
+            "exclude": "the-sunnah-classic-wedding-gift-box",
+            "limit": 6,
+            "products": [
+              "faithful-focus-budget-friendly-premium-gift-box",
+              "pray-moment-budget-friendly-premium-gift-box",
+              "dua-gift-box",
+              "the-forever-family-gift-package"
+            ]
+          }
         }
       },
       "block_order": [
         "review_1",
         "review_2",
         "review_3",
-        "contents",
-        "dua",
-        "delivery",
-        "bulk",
+        "others",
         "faq_1",
         "faq_2",
         "faq_3",
         "faq_MJLxz3",
+        "contents",
+        "dua",
+        "delivery",
+        "bulk",
         "colours"
       ],
       "settings": {
-        "reviews_eyebrow": "Kind words",
+        "reviews_eyebrow": "Kind words.",
         "reviews_title": "Opened, and then kept.",
-        "faq_eyebrow": "Questions",
-        "faq_title": "Before you order",
+        "faq_eyebrow": "Questions.",
+        "faq_title": "",
         "footer_mark": "",
-        "padding_top": 32,
-        "padding_bottom": 32
+        "padding_top": 40,
+        "padding_bottom": 32,
+        "column_width": 480
       }
     }
   },

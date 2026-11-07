@@ -1,18 +1,19 @@
 {% comment %}
   TSS — Gift box story
-  The quiet reading half of a gift box page, under TSS — Gift box. Every block
-  is one band in a 1100px, left-aligned column split by gold hairlines:
+  The reading half of a gift box page, under TSS — Gift box, in the same
+  centred column. Each block is one band split by hairlines; its heading is
+  the eyebrow followed by the title in a lighter colour ("Kind words.
+  Opened, and then kept."):
 
-    contents · what is inside, numbered, one line each ("Name | note"); an
-               optional photo carries the same numbers ("Name | note | x y",
-               as percentages from the top-left corner); item images turn
-               the list into a numbered photo grid
+    review   · consecutive reviews share one heading and stack as quotes
+    others   · a sideways row of products from a collection, e.g. other boxes
+    faq      · consecutive questions share one heading, each a <details>
+    contents · what is inside, numbered, one line each ("Name | note"); item
+               images turn the list into a numbered photo grid
     colours  · up to three colours with a swatch and a short story
     dua      · an Arabic du'a card in Amiri with its translation
-    review   · consecutive reviews share one heading and a scrolling rail
     delivery · label and value rows ("Label | value")
     bulk     · a call for bulk or corporate orders with an outline link
-    faq      · consecutive questions share one heading, each a <details>
 
   @example
   <!-- templates/page.hafezi-gift-box.json, directly after the tss-gift-box section -->
@@ -31,202 +32,208 @@
   endfor
 -%}
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&display=swap">
 {%- if has_dua -%}
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap">
 {%- endif -%}
 
 <style>
   #tss-gbs-{{ uid }} {
-    background: var(--tss-ivory);
-    padding-block: {{ s.padding_top }}px {{ s.padding_bottom }}px;
+    --gbs-page: #efe9e1;
+    --gbs-bg: #faf7f2;
+    --gbs-ink: #2b2320;
+    --gbs-ink-2: #4a423c;
+    --gbs-muted: #6f675f;
+    --gbs-soft: #8a8178;
+    --gbs-line: #e6dfd5;
+    --gbs-green: #1b4332;
+    --gbs-tint: #f2ece3;
+    --gbs-gold: #c9a86a;
+    --gbs-sans: 'Outfit', system-ui, -apple-system, sans-serif;
+    --gbs-serif: 'Cormorant Garamond', Georgia, serif;
+    --gbs-pad: 24px;
+
+    background: var(--gbs-page);
+    font-family: var(--gbs-sans);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.5;
+    color: var(--gbs-ink);
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__inner {
+    max-width: {{ s.column_width }}px;
     margin-inline: auto;
-    max-width: calc(1100px + var(--tss-gutter) * 2);
-    padding-inline: var(--tss-gutter);
+    padding-block: {{ s.padding_top }}px {{ s.padding_bottom }}px;
+    background: var(--gbs-bg);
+  }
+
+  #tss-gbs-{{ uid }} a {
+    color: var(--gbs-green);
+  }
+
+  #tss-gbs-{{ uid }} a:hover {
+    color: var(--gbs-ink);
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__band {
-    padding-block: 64px;
-    border-top: 1px solid rgb(184 134 11 / 0.45);
+    padding: 32px var(--gbs-pad);
+    border-top: 1px solid var(--gbs-line);
   }
 
-  /* The section's top padding sets the space above the first band. */
   #tss-gbs-{{ uid }} .tss-gbs__band:first-child {
-    padding-block-start: 0;
+    padding-top: 8px;
     border-top: 0;
   }
 
+  #tss-gbs-{{ uid }} .tss-gbs__band--bleed {
+    padding-inline: 0;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__band--bleed > .tss-gbs__head,
+  #tss-gbs-{{ uid }} .tss-gbs__band--bleed > .tss-gbs__title {
+    padding-inline: var(--gbs-pad);
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__head .tss-gbs__title {
+    margin: 0;
+  }
+
   #tss-gbs-{{ uid }} .tss-gbs__title {
-    margin-top: 12px;
-    max-width: 22ch;
-    font-family: var(--tss-serif);
-    font-size: 34px;
+    margin: 0 0 20px;
+    font-family: var(--gbs-serif);
+    font-size: 28px;
     font-weight: 400;
-    line-height: 1.1;
-    color: var(--tss-ink);
-    text-wrap: balance;
+    line-height: 1.2;
+    color: var(--gbs-ink);
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__title-note {
+    color: var(--gbs-soft);
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__more {
+    flex: none;
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 13px;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__text {
-    margin-top: 16px;
-    max-width: 56ch;
-    font-size: 15px;
-    font-weight: 300;
-    line-height: 1.7;
-    color: rgb(28 28 26 / 0.7);
+    margin: -8px 0 20px;
+    color: var(--gbs-ink-2);
   }
 
   /* ---------- lists ---------- */
   #tss-gbs-{{ uid }} .tss-gbs__list {
-    margin-top: 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__row {
     display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 4px 24px;
-    padding-block: 16px;
-    border-bottom: 1px solid rgb(28 28 26 / 0.1);
+    gap: 16px;
+    padding: 14px 0;
+    border-top: 1px solid var(--gbs-line);
   }
 
-  #tss-gbs-{{ uid }} .tss-gbs__row-name {
-    min-width: 0;
-    font-family: var(--tss-serif);
-    font-size: 20px;
-    overflow-wrap: anywhere;
-  }
-
-  #tss-gbs-{{ uid }} .tss-gbs__row-note {
-    font-size: 13px;
-    color: rgb(28 28 26 / 0.6);
-  }
-
-  /* ---------- contents ---------- */
-  #tss-gbs-{{ uid }} .tss-gbs__band[id] {
-    scroll-margin-top: 24px;
-  }
-
-  #tss-gbs-{{ uid }} .tss-gbs__photo {
-    position: relative;
-    margin-top: 32px;
-  }
-
-  #tss-gbs-{{ uid }} .tss-gbs__photo-img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  #tss-gbs-{{ uid }} .tss-gbs__pin,
-  #tss-gbs-{{ uid }} .tss-gbs__num {
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    background: var(--tss-green);
-    font-family: var(--tss-sans);
-    font-weight: 500;
-    color: var(--tss-ivory);
-  }
-
-  #tss-gbs-{{ uid }} .tss-gbs__pin {
-    position: absolute;
-    inset-inline-start: var(--x);
-    inset-block-start: var(--y);
-    width: 28px;
-    height: 28px;
-    font-size: 13px;
-    box-shadow: 0 0 0 2px var(--tss-ivory), 0 2px 6px rgb(0 0 0 / 0.35);
-    transform: translate(-50%, -50%);
-  }
-
-  [dir='rtl'] #tss-gbs-{{ uid }} .tss-gbs__pin {
-    transform: translate(50%, -50%);
-  }
-
-  #tss-gbs-{{ uid }} .tss-gbs__row-name--numbered {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  #tss-gbs-{{ uid }} .tss-gbs__row:last-child {
+    border-bottom: 1px solid var(--gbs-line);
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__num {
     flex: none;
-    width: 22px;
-    height: 22px;
-    font-size: 11px;
+    width: 24px;
+    font-size: 13px;
+    color: var(--gbs-muted);
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__row-body {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__row-name {
+    display: block;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__row-note {
+    display: block;
+    margin: 0;
+    font-size: 13px;
+    color: var(--gbs-muted);
+  }
+
+  /* ---------- contents with photos ---------- */
+  #tss-gbs-{{ uid }} .tss-gbs__photo {
+    margin-bottom: 20px;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__photo img,
+  #tss-gbs-{{ uid }} .tss-gbs__item-img {
+    display: block;
+    width: 100%;
+    height: auto;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__items {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px 12px;
-    margin-top: 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__item {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
     min-width: 0;
-  }
-
-  /* An odd last item fills the row as a wide photo. */
-  #tss-gbs-{{ uid }} .tss-gbs__item--wide {
-    grid-column: 1 / -1;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__item-img,
   #tss-gbs-{{ uid }} .tss-gbs__item-blank {
-    display: block;
-    width: 100%;
-    height: auto;
     aspect-ratio: 1;
+    border-radius: 10px;
     object-fit: cover;
   }
 
-  #tss-gbs-{{ uid }} .tss-gbs__item--wide .tss-gbs__item-img,
-  #tss-gbs-{{ uid }} .tss-gbs__item--wide .tss-gbs__item-blank {
-    aspect-ratio: 2 / 1;
-  }
-
   #tss-gbs-{{ uid }} .tss-gbs__item-blank {
-    background: var(--tss-ivory-2);
+    display: block;
+    background: var(--gbs-tint);
   }
 
-  #tss-gbs-{{ uid }} .tss-gbs__item-name {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    font-family: var(--tss-serif);
-    font-size: 20px;
-    line-height: 1.1;
-    overflow-wrap: anywhere;
-  }
-
-  #tss-gbs-{{ uid }} .tss-gbs__item-note {
-    margin-top: -4px;
-    padding-inline-start: 30px;
-    font-size: 13px;
-    line-height: 1.45;
-    color: rgb(28 28 26 / 0.6);
+  #tss-gbs-{{ uid }} .tss-gbs__item .tss-gbs__row-name {
+    margin-top: 10px;
   }
 
   /* ---------- colours ---------- */
   #tss-gbs-{{ uid }} .tss-gbs__colours {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-    gap: 32px;
-    margin-top: 40px;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__colour-chip {
     aspect-ratio: 4 / 3;
     overflow: hidden;
+    border-radius: 12px;
     background: var(--chip);
   }
 
@@ -238,131 +245,168 @@
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__colour-name {
-    margin-top: 16px;
-    font-family: var(--tss-serif);
-    font-size: 22px;
+    margin: 12px 0 0;
+    font-size: 15px;
+    font-weight: 400;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__colour-text {
-    margin-top: 6px;
-    font-size: 14px;
-    font-weight: 300;
-    line-height: 1.6;
-    color: rgb(28 28 26 / 0.7);
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--gbs-muted);
   }
 
   /* ---------- du'a ---------- */
   #tss-gbs-{{ uid }} .tss-gbs__card {
-    margin-top: 32px;
-    padding: 48px 32px;
-    border: 1px solid var(--tss-gold);
-    background: var(--tss-ivory-2);
+    margin: 0;
+    padding: 40px var(--gbs-pad);
+    border-radius: 12px;
+    background: #14110e;
+    color: #ede6dc;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__arabic {
+    margin: 0;
     font-family: 'Amiri', serif;
     font-size: 30px;
     line-height: 1.9;
-    color: var(--tss-green);
+    text-align: center;
+    color: var(--gbs-gold);
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__translation {
-    margin-top: 20px;
-    max-width: 52ch;
-    font-family: var(--tss-serif);
+    margin: 24px 0 0;
+    font-family: var(--gbs-serif);
     font-size: 20px;
     font-style: italic;
-    line-height: 1.5;
+    line-height: 1.35;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__source {
-    margin-top: 16px;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: rgb(28 28 26 / 0.55);
+    margin-top: 12px;
+    font-size: 12px;
+    color: #c4beb6;
   }
 
   /* ---------- reviews ---------- */
   #tss-gbs-{{ uid }} .tss-gbs__reviews {
-    display: flex;
-    gap: 16px;
-    margin-top: 32px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: thin;
-    padding-bottom: 8px;
+    margin: -12px 0 0;
+    padding: 0;
+    list-style: none;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__review {
-    flex: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 24px;
-    width: min(85%, 340px);
-    padding: 28px;
-    border: 1px solid rgb(28 28 26 / 0.12);
-    scroll-snap-align: start;
+    margin: 0;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--gbs-line);
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__quote {
-    font-family: var(--tss-serif);
-    font-size: 19px;
-    line-height: 1.5;
+    margin: 0;
+    font-family: var(--gbs-serif);
+    font-size: 20px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__who {
-    font-size: 12px;
-    color: rgb(28 28 26 / 0.6);
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--gbs-muted);
   }
 
-  #tss-gbs-{{ uid }} .tss-gbs__reviews:focus-visible {
-    outline: 2px solid var(--tss-green);
-    outline-offset: 4px;
+  /* ---------- other products ---------- */
+  #tss-gbs-{{ uid }} .tss-gbs__rail {
+    display: flex;
+    gap: 12px;
+    margin: 0;
+    padding: 0 var(--gbs-pad);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gbs-pad);
+    scrollbar-width: none;
+    list-style: none;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__rail:focus-visible {
+    outline: 2px solid var(--gbs-green);
+    outline-offset: -2px;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__product {
+    flex: 0 0 62%;
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__product a {
+    display: block;
+    color: var(--gbs-ink);
+    text-decoration: none;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__product a:focus-visible {
+    outline: 2px solid var(--gbs-green);
+    outline-offset: 2px;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__product-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    object-fit: cover;
+    background: var(--gbs-tint);
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__product-name {
+    display: block;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 400;
+    overflow-wrap: anywhere;
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__product-price {
+    display: block;
+    font-size: 13px;
+    color: var(--gbs-muted);
   }
 
   /* ---------- bulk ---------- */
   #tss-gbs-{{ uid }} .tss-gbs__panel {
-    padding: 32px 24px;
-    background: var(--tss-ivory-2);
+    padding: 28px var(--gbs-pad);
+    border-radius: 12px;
+    background: var(--gbs-tint);
   }
 
-  #tss-gbs-{{ uid }} .tss-gbs__panel .tss-gbs__title {
-    margin-top: 8px;
-  }
   #tss-gbs-{{ uid }} .tss-gbs__outline {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 48px;
-    margin-top: 28px;
-    padding: 12px 28px;
-    border: 1px solid var(--tss-green);
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--tss-green);
+    padding: 0 24px;
+    border: 1px solid var(--gbs-green);
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--gbs-green);
     text-decoration: none;
-    transition: background-color 0.3s var(--tss-ease);
-  }
-
-  #tss-gbs-{{ uid }} .tss-gbs__outline:hover {
-    background: var(--tss-ivory-2);
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__outline:focus-visible {
-    outline: 2px solid var(--tss-gold);
+    outline: 2px solid var(--gbs-green);
     outline-offset: 2px;
   }
 
   /* ---------- faq ---------- */
-  #tss-gbs-{{ uid }} .tss-gbs__faq {
-    margin-top: 24px;
-  }
-
   #tss-gbs-{{ uid }} .tss-gbs__faq details {
-    border-bottom: 1px solid rgb(28 28 26 / 0.12);
+    border-bottom: 1px solid var(--gbs-line);
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__faq summary {
@@ -370,10 +414,9 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    min-height: 56px;
-    padding-block: 14px;
-    font-family: var(--tss-serif);
-    font-size: 20px;
+    min-height: 52px;
+    padding: 16px 0;
+    font-weight: 400;
     cursor: pointer;
     list-style: none;
   }
@@ -385,11 +428,10 @@
   #tss-gbs-{{ uid }} .tss-gbs__faq summary::after {
     content: '+';
     flex: none;
-    font-family: var(--tss-sans);
     font-size: 18px;
     font-weight: 300;
-    color: var(--tss-gold);
-    transition: transform 0.3s var(--tss-ease);
+    color: var(--gbs-soft);
+    transition: transform 0.2s ease;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__faq details[open] summary::after {
@@ -397,17 +439,17 @@
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__faq summary:focus-visible {
-    outline: 2px solid var(--tss-green);
+    outline: 2px solid var(--gbs-green);
     outline-offset: 2px;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__answer {
-    padding-bottom: 20px;
-    max-width: 64ch;
-    font-size: 14px;
-    font-weight: 300;
-    line-height: 1.7;
-    color: rgb(28 28 26 / 0.75);
+    padding-bottom: 16px;
+    color: var(--gbs-ink-2);
+  }
+
+  #tss-gbs-{{ uid }} .tss-gbs__answer p {
+    margin: 0;
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__answer p + p {
@@ -415,22 +457,84 @@
   }
 
   #tss-gbs-{{ uid }} .tss-gbs__mark {
-    padding-block: 48px 8px;
-    font-family: var(--tss-serif);
+    margin: 0;
+    padding: 24px var(--gbs-pad) 8px;
+    font-family: var(--gbs-serif);
     font-size: 15px;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.32em;
-    color: var(--tss-ink);
   }
 
+  /* Desktop: full width, as wide as the gift box above it. */
   @media (min-width: 990px) {
+    #tss-gbs-{{ uid }} {
+      --gbs-pad: 0px;
+      background: var(--gbs-bg);
+    }
+
+    /* Same measure as the TSS header and the gift box above. */
+    #tss-gbs-{{ uid }} .tss-gbs__inner {
+      max-width: calc(var(--tss-max) + 2 * var(--tss-gutter));
+      padding-inline: var(--tss-gutter);
+      background: transparent;
+    }
+
     #tss-gbs-{{ uid }} .tss-gbs__band {
-      padding-block: 96px;
+      padding-block: 56px;
+    }
+
+    #tss-gbs-{{ uid }} .tss-gbs__band:first-child {
+      padding-top: 16px;
     }
 
     #tss-gbs-{{ uid }} .tss-gbs__title {
-      font-size: 44px;
+      margin-bottom: 28px;
+      font-size: 36px;
+    }
+
+    #tss-gbs-{{ uid }} .tss-gbs__head {
+      margin-bottom: 24px;
+    }
+
+    #tss-gbs-{{ uid }} .tss-gbs__reviews {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 32px;
+      margin-top: 0;
+    }
+
+    #tss-gbs-{{ uid }} .tss-gbs__review {
+      height: 100%;
+      padding: 24px 0 0;
+      border-top: 1px solid var(--gbs-line);
+      border-bottom: 0;
+    }
+
+    #tss-gbs-{{ uid }} .tss-gbs__quote {
+      font-size: 22px;
+    }
+
+    #tss-gbs-{{ uid }} .tss-gbs__rail {
+      gap: 24px;
+      scroll-padding-inline: 0;
+    }
+
+    #tss-gbs-{{ uid }} .tss-gbs__product {
+      flex-basis: calc((100% - 72px) / 4);
+    }
+
+    #tss-gbs-{{ uid }} .tss-gbs__product a:hover .tss-gbs__product-name {
+      text-decoration: underline;
+    }
+
+    /* Questions run the full width; the answer keeps a readable line length. */
+    #tss-gbs-{{ uid }} .tss-gbs__answer {
+      max-width: 72ch;
+    }
+
+    #tss-gbs-{{ uid }} .tss-gbs__faq summary {
+      font-size: 17px;
     }
 
     #tss-gbs-{{ uid }} .tss-gbs__items {
@@ -438,33 +542,25 @@
       gap: 28px 20px;
     }
 
-    #tss-gbs-{{ uid }} .tss-gbs__item--wide {
-      grid-column: auto;
-    }
-
-    #tss-gbs-{{ uid }} .tss-gbs__item--wide .tss-gbs__item-img,
-    #tss-gbs-{{ uid }} .tss-gbs__item--wide .tss-gbs__item-blank {
-      aspect-ratio: 1;
+    #tss-gbs-{{ uid }} .tss-gbs__colours {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 32px;
     }
 
     #tss-gbs-{{ uid }} .tss-gbs__card,
     #tss-gbs-{{ uid }} .tss-gbs__panel {
-      padding: 64px;
-    }
-
-    #tss-gbs-{{ uid }} .tss-gbs__arabic {
-      font-size: 38px;
+      padding: 56px 64px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    #tss-gbs-{{ uid }} .tss-gbs__outline,
     #tss-gbs-{{ uid }} .tss-gbs__faq summary::after {
       transition: none;
     }
   }
 </style>
 
+{%- comment -%} Heading for a band: the eyebrow, then the title in a lighter colour. {%- endcomment -%}
 <section id="tss-gbs-{{ uid }}" class="tss-section tss-gbs">
   <div class="tss-gbs__inner">
     {%- for block in section.blocks -%}
@@ -476,7 +572,29 @@
           assign prev_type = section.blocks[prev_index].type
         endif
         assign next_type = section.blocks[forloop.index].type
+
+        assign head_main = b.eyebrow
+        assign head_note = b.title
+        if block.type == 'review'
+          assign head_main = s.reviews_eyebrow
+          assign head_note = s.reviews_title
+        elsif block.type == 'faq'
+          assign head_main = s.faq_eyebrow
+          assign head_note = s.faq_title
+        endif
+        if head_main == blank
+          assign head_main = head_note
+          assign head_note = ''
+        endif
       -%}
+      {%- capture heading -%}
+        {%- if head_main != blank -%}
+          <h2 class="tss-gbs__title">
+            {{- head_main | escape -}}
+            {%- if head_note != blank %} <span class="tss-gbs__title-note">{{ head_note | escape }}</span>{% endif -%}
+          </h2>
+        {%- endif -%}
+      {%- endcapture -%}
 
       {%- case block.type -%}
         {%- when 'contents' -%}
@@ -488,37 +606,24 @@
             {% endif %}
             {{ block.shopify_attributes }}
           >
-            {%- if b.eyebrow != blank -%}<p class="tss-eyebrow">{{ b.eyebrow | escape }}</p>{%- endif -%}
-            {%- if b.title != blank -%}<h2 class="tss-gbs__title">{{ b.title | escape }}</h2>{%- endif -%}
+            {{ heading }}
             {%- if b.text != blank -%}<p class="tss-gbs__text">{{ b.text | escape }}</p>{%- endif -%}
             {%- if b.image != blank -%}
               <div class="tss-gbs__photo">
                 {{-
                   b.image
-                  | image_url: width: 2000
+                  | image_url: width: 1440
                   | image_tag:
-                    class: 'tss-gbs__photo-img',
                     loading: 'lazy',
-                    widths: '480, 720, 960, 1280, 1600, 2000',
-                    sizes: '(min-width: 1140px) 1100px, calc(100vw - 40px)',
+                    widths: '480, 720, 960, 1440',
+                    sizes: '(min-width: 720px) 480px, 100vw',
                     alt: b.image.alt
                 -}}
-                {%- assign pin = 0 -%}
-                {%- for row in rows -%}
-                  {%- assign parts = row | strip | split: '|' -%}
-                  {%- if parts[0] != blank -%}
-                    {%- assign pin = pin | plus: 1 -%}
-                    {%- assign spot = parts[2] | strip | split: ' ' -%}
-                    {%- if spot.size == 2 -%}
-                      <span class="tss-gbs__pin" style="--x: {{ spot[0] | plus: 0 }}%; --y: {{ spot[1] | plus: 0 }}%" aria-hidden="true">{{ pin }}</span>
-                    {%- endif -%}
-                  {%- endif -%}
-                {%- endfor -%}
               </div>
             {%- endif -%}
             {%- liquid
-              assign item_total = 0
               assign has_item_images = false
+              assign item_total = 0
               for row in rows
                 assign parts = row | strip | split: '|'
                 if parts[0] != blank
@@ -529,104 +634,79 @@
                   endif
                 endif
               endfor
-              assign wide_index = 0
-              assign odd = item_total | modulo: 2
-              if odd == 1 and item_total > 1
-                assign wide_index = item_total
-              endif
             -%}
-            {%- if has_item_images -%}
-              <ol class="tss-gbs__items">
-                {%- assign pin = 0 -%}
-                {%- for row in rows -%}
-                  {%- assign parts = row | strip | split: '|' -%}
-                  {%- if parts[0] != blank -%}
-                    {%- liquid
-                      assign pin = pin | plus: 1
-                      assign image_key = 'item_' | append: pin | append: '_image'
-                      assign item_image = b[image_key]
-                      assign item_name = parts[0] | strip
-                    -%}
-                    <li class="tss-gbs__item{% if pin == wide_index %} tss-gbs__item--wide{% endif %}">
+            <ol class="{% if has_item_images %}tss-gbs__items{% else %}tss-gbs__list{% endif %}">
+              {%- assign pin = 0 -%}
+              {%- for row in rows -%}
+                {%- assign parts = row | strip | split: '|' -%}
+                {%- if parts[0] != blank -%}
+                  {%- liquid
+                    assign pin = pin | plus: 1
+                    assign image_key = 'item_' | append: pin | append: '_image'
+                    assign item_image = b[image_key]
+                  -%}
+                  {%- if has_item_images -%}
+                    <li class="tss-gbs__item">
                       {%- if item_image != blank -%}
-                        {%- if pin == wide_index -%}
-                          {%- assign item_sizes = '(min-width: 990px) 220px, calc(100vw - 40px)' -%}
-                        {%- else -%}
-                          {%- assign item_sizes = '(min-width: 990px) 220px, calc(50vw - 26px)' -%}
-                        {%- endif -%}
                         {{-
                           item_image
-                          | image_url: width: 900
+                          | image_url: width: 600
                           | image_tag:
                             class: 'tss-gbs__item-img',
                             loading: 'lazy',
-                            widths: '240, 360, 480, 720, 900',
-                            sizes: item_sizes,
+                            widths: '240, 360, 480, 600',
+                            sizes: '(min-width: 720px) 230px, 50vw',
                             alt: ''
                         -}}
                       {%- else -%}
                         <span class="tss-gbs__item-blank" aria-hidden="true"></span>
                       {%- endif -%}
-                      <p class="tss-gbs__item-name">
-                        <span class="tss-gbs__num" aria-hidden="true">{{ pin }}</span>
-                        {{- item_name | escape -}}
-                      </p>
-                      {%- if parts[1] != blank -%}
-                        <p class="tss-gbs__item-note">{{ parts[1] | strip | escape }}</p>
-                      {%- endif -%}
-                    </li>
-                  {%- endif -%}
-                {%- endfor -%}
-              </ol>
-            {%- elsif rows.size > 0 -%}
-              <ol class="tss-gbs__list">
-                {%- assign pin = 0 -%}
-                {%- for row in rows -%}
-                  {%- assign parts = row | strip | split: '|' -%}
-                  {%- if parts[0] != blank -%}
-                    {%- assign pin = pin | plus: 1 -%}
-                    <li class="tss-gbs__row">
-                      <span class="tss-gbs__row-name tss-gbs__row-name--numbered">
-                        <span class="tss-gbs__num" aria-hidden="true">{{ pin }}</span>
-                        {{- parts[0] | strip | escape -}}
-                      </span>
+                      <span class="tss-gbs__row-name">{{ parts[0] | strip | escape }}</span>
                       {%- if parts[1] != blank -%}
                         <span class="tss-gbs__row-note">{{ parts[1] | strip | escape }}</span>
                       {%- endif -%}
                     </li>
+                  {%- else -%}
+                    <li class="tss-gbs__row">
+                      <span class="tss-gbs__num" aria-hidden="true">{% if pin < 10 %}0{% endif %}{{ pin }}</span>
+                      <span class="tss-gbs__row-body">
+                        <span class="tss-gbs__row-name">{{ parts[0] | strip | escape }}</span>
+                        {%- if parts[1] != blank -%}
+                          <span class="tss-gbs__row-note">{{ parts[1] | strip | escape }}</span>
+                        {%- endif -%}
+                      </span>
+                    </li>
                   {%- endif -%}
-                {%- endfor -%}
-              </ol>
-            {%- endif -%}
+                {%- endif -%}
+              {%- endfor -%}
+            </ol>
           </div>
 
         {%- when 'delivery' -%}
           <div class="tss-gbs__band" {{ block.shopify_attributes }}>
-            {%- if b.eyebrow != blank -%}<p class="tss-eyebrow">{{ b.eyebrow | escape }}</p>{%- endif -%}
-            {%- if b.title != blank -%}<h2 class="tss-gbs__title">{{ b.title | escape }}</h2>{%- endif -%}
+            {{ heading }}
             {%- if b.text != blank -%}<p class="tss-gbs__text">{{ b.text | escape }}</p>{%- endif -%}
             {%- assign rows = b.rows | newline_to_br | split: '<br />' -%}
-            {%- if rows.size > 0 -%}
-              <dl class="tss-gbs__list">
-                {%- for row in rows -%}
-                  {%- assign parts = row | strip | split: '|' -%}
-                  {%- if parts.size > 0 -%}
-                    <div class="tss-gbs__row">
+            <dl class="tss-gbs__list">
+              {%- for row in rows -%}
+                {%- assign parts = row | strip | split: '|' -%}
+                {%- if parts[0] != blank -%}
+                  <div class="tss-gbs__row">
+                    <div class="tss-gbs__row-body">
                       <dt class="tss-gbs__row-name">{{ parts[0] | strip | escape }}</dt>
                       {%- if parts[1] != blank -%}
                         <dd class="tss-gbs__row-note">{{ parts[1] | strip | escape }}</dd>
                       {%- endif -%}
                     </div>
-                  {%- endif -%}
-                {%- endfor -%}
-              </dl>
-            {%- endif -%}
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            </dl>
           </div>
 
         {%- when 'colours' -%}
           <div class="tss-gbs__band" {{ block.shopify_attributes }}>
-            {%- if b.eyebrow != blank -%}<p class="tss-eyebrow">{{ b.eyebrow | escape }}</p>{%- endif -%}
-            {%- if b.title != blank -%}<h2 class="tss-gbs__title">{{ b.title | escape }}</h2>{%- endif -%}
+            {{ heading }}
             {%- if b.text != blank -%}<p class="tss-gbs__text">{{ b.text | escape }}</p>{%- endif -%}
             <ul class="tss-gbs__colours">
               {%- for i in (1..3) -%}
@@ -647,7 +727,7 @@
                             class: 'tss-gbs__colour-img',
                             loading: 'lazy',
                             widths: '400, 600, 800, 1200',
-                            sizes: '(min-width: 990px) 33vw, 100vw',
+                            sizes: '(min-width: 720px) 430px, 100vw',
                             alt: b[name_key]
                         -}}
                       {%- endif -%}
@@ -664,8 +744,7 @@
 
         {%- when 'dua' -%}
           <div class="tss-gbs__band" {{ block.shopify_attributes }}>
-            {%- if b.eyebrow != blank -%}<p class="tss-eyebrow">{{ b.eyebrow | escape }}</p>{%- endif -%}
-            {%- if b.title != blank -%}<h2 class="tss-gbs__title">{{ b.title | escape }}</h2>{%- endif -%}
+            {{ heading }}
             <figure class="tss-gbs__card">
               {%- if b.arabic != blank -%}
                 <p class="tss-gbs__arabic" lang="ar" dir="rtl">{{ b.arabic | escape }}</p>
@@ -682,50 +761,103 @@
         {%- when 'review' -%}
           {%- if prev_type != 'review' -%}
             <div class="tss-gbs__band">
-              {%- if s.reviews_eyebrow != blank -%}<p class="tss-eyebrow">{{ s.reviews_eyebrow | escape }}</p>{%- endif -%}
-              {%- if s.reviews_title != blank -%}<h2 class="tss-gbs__title">{{ s.reviews_title | escape }}</h2>{%- endif -%}
-              <ul
-                class="tss-gbs__reviews"
-                tabindex="0"
-                role="region"
-                aria-label="{{ s.reviews_title | default: s.reviews_eyebrow | escape }}"
-              >
+              {{ heading }}
+              <ul class="tss-gbs__reviews">
           {%- endif -%}
-          <li class="tss-gbs__review" {{ block.shopify_attributes }}>
-            <blockquote class="tss-gbs__quote">{{ b.quote | escape }}</blockquote>
-            <p class="tss-gbs__who">
-              {{- b.name | escape -}}
-              {%- if b.place != blank %} · {{ b.place | escape }}{% endif -%}
-            </p>
+          <li {{ block.shopify_attributes }}>
+            <figure class="tss-gbs__review">
+              <blockquote class="tss-gbs__quote">{{ b.quote | escape }}</blockquote>
+              <figcaption class="tss-gbs__who">
+                {{- b.name | escape -}}
+                {%- if b.place != blank %} · {{ b.place | escape }}{% endif -%}
+              </figcaption>
+            </figure>
           </li>
           {%- if next_type != 'review' -%}
               </ul>
             </div>
           {%- endif -%}
 
+        {%- when 'others' -%}
+          {%- liquid
+            # Picked products win; otherwise the collection's own.
+            assign others = b.collection
+            assign skip = b.exclude
+            assign items = b.products
+            if items == blank or items.size == 0
+              assign items = others.products
+            endif
+            assign more_url = b.link | default: others.url
+          -%}
+          {%- if items != blank and items.size > 0 -%}
+            <div class="tss-gbs__band tss-gbs__band--bleed" {{ block.shopify_attributes }}>
+              <div class="tss-gbs__head">
+                {%- assign heading_main = b.title | default: others.title -%}
+                <h2 class="tss-gbs__title">{{ heading_main | escape }}</h2>
+                {%- if b.link_label != blank and more_url != blank -%}
+                  <a class="tss-gbs__more" href="{{ more_url }}">{{ b.link_label | escape }}</a>
+                {%- endif -%}
+              </div>
+              <ul class="tss-gbs__rail" tabindex="0" role="region" aria-label="{{ heading_main | escape }}">
+                {%- assign shown = 0 -%}
+                {%- for product in items limit: 24 -%}
+                  {%- liquid
+                    if skip != blank and product.id == skip.id
+                      continue
+                    endif
+                    if shown >= b.limit
+                      break
+                    endif
+                    assign shown = shown | plus: 1
+                  -%}
+                  <li class="tss-gbs__product">
+                    <a href="{{ product.url }}">
+                      {%- if product.featured_image -%}
+                        {{-
+                          product.featured_image
+                          | image_url: width: 720
+                          | image_tag:
+                            class: 'tss-gbs__product-img',
+                            loading: 'lazy',
+                            widths: '240, 360, 480, 720',
+                            sizes: '(min-width: 720px) 280px, 62vw',
+                            alt: ''
+                        -}}
+                      {%- else -%}
+                        <span class="tss-gbs__product-img" aria-hidden="true"></span>
+                      {%- endif -%}
+                      <span class="tss-gbs__product-name">{{ product.title | escape }}</span>
+                      <span class="tss-gbs__product-price">{{ product.price | money }}</span>
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+
         {%- when 'bulk' -%}
           <div class="tss-gbs__band" {{ block.shopify_attributes }}>
-           <div class="tss-gbs__panel">
-            {%- if b.eyebrow != blank -%}<p class="tss-eyebrow">{{ b.eyebrow | escape }}</p>{%- endif -%}
-            {%- if b.title != blank -%}<h2 class="tss-gbs__title">{{ b.title | escape }}</h2>{%- endif -%}
-            {%- if b.text != blank -%}<p class="tss-gbs__text">{{ b.text | escape }}</p>{%- endif -%}
-            {%- if b.button_label != blank and b.button_link != blank -%}
-              <a
-                class="tss-gbs__outline"
-                href="{{ b.button_link }}"
-                {% if b.button_link contains '://' %}target="_blank" rel="noopener"{% endif %}
-              >
-                {{- b.button_label | escape -}}
-              </a>
-            {%- endif -%}
-           </div>
+            <div class="tss-gbs__panel">
+              {{ heading }}
+              {%- if b.text != blank -%}<p class="tss-gbs__text">{{ b.text | escape }}</p>{%- endif -%}
+              {%- if b.button_label != blank and b.button_link != blank -%}
+                <a
+                  class="tss-gbs__outline"
+                  href="{{ b.button_link }}"
+                  {% if b.button_link contains '://' %}
+                    target="_blank" rel="noopener"
+                  {% endif %}
+                >
+                  {{- b.button_label | escape -}}
+                </a>
+              {%- endif -%}
+            </div>
           </div>
 
         {%- when 'faq' -%}
           {%- if prev_type != 'faq' -%}
             <div class="tss-gbs__band">
-              {%- if s.faq_eyebrow != blank -%}<p class="tss-eyebrow">{{ s.faq_eyebrow | escape }}</p>{%- endif -%}
-              {%- if s.faq_title != blank -%}<h2 class="tss-gbs__title">{{ s.faq_title | escape }}</h2>{%- endif -%}
+              {{ heading }}
               <div class="tss-gbs__faq">
           {%- endif -%}
           <details {{ block.shopify_attributes }}>
@@ -751,32 +883,43 @@
   "tag": "div",
   "class": "tss-gift-box-story-section",
   "settings": [
+    {
+      "type": "range",
+      "id": "column_width",
+      "label": "Column width on phones and tablets",
+      "min": 400,
+      "max": 720,
+      "step": 20,
+      "unit": "px",
+      "default": 480,
+      "info": "Match TSS — Gift box. From 990px wide the section is full width."
+    },
     { "type": "header", "content": "Reviews" },
-    { "type": "text", "id": "reviews_eyebrow", "label": "Eyebrow", "default": "Kind words" },
-    { "type": "text", "id": "reviews_title", "label": "Title", "default": "Opened, and then kept." },
+    { "type": "text", "id": "reviews_eyebrow", "label": "Heading", "default": "Kind words." },
+    { "type": "text", "id": "reviews_title", "label": "Heading note", "default": "Opened, and then kept." },
     { "type": "header", "content": "Questions" },
-    { "type": "text", "id": "faq_eyebrow", "label": "Eyebrow", "default": "Questions" },
-    { "type": "text", "id": "faq_title", "label": "Title", "default": "Before you order" },
+    { "type": "text", "id": "faq_eyebrow", "label": "Heading", "default": "Questions." },
+    { "type": "text", "id": "faq_title", "label": "Heading note" },
     { "type": "header", "content": "Footer" },
-    { "type": "text", "id": "footer_mark", "label": "Closing mark", "default": "Hafezi" },
+    { "type": "text", "id": "footer_mark", "label": "Closing mark" },
     { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 32 },
-    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 64 }
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 32 }
   ],
   "blocks": [
     {
       "type": "contents",
       "name": "Contents",
       "settings": [
-        { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Inside the box" },
-        { "type": "text", "id": "title", "label": "Title", "default": "Everything they’ll unwrap" },
+        { "type": "text", "id": "eyebrow", "label": "Heading", "default": "Inside." },
+        { "type": "text", "id": "title", "label": "Heading note", "default": "Everything they’ll unwrap." },
         { "type": "textarea", "id": "text", "label": "Text" },
-        { "type": "image_picker", "id": "image", "label": "Photo", "info": "The open box. Numbers sit on it where an item gives a position." },
-        { "type": "text", "id": "anchor", "label": "Anchor", "default": "inside", "info": "Target of the See inside link in TSS — Gift box." },
+        { "type": "image_picker", "id": "image", "label": "Photo" },
+        { "type": "text", "id": "anchor", "label": "Anchor", "default": "inside", "info": "Lets a link jump here, e.g. #inside." },
         {
           "type": "textarea",
           "id": "rows",
           "label": "Items",
-          "info": "One per line, as Name | note. Add | x y (percent from the top-left) to place its number on the photo, e.g. Tasbih | 33 beads | 72 63.",
+          "info": "One per line, as Name | note.",
           "default": "Hafezi Qur’an | Colour-coded tajweed\nPrayer mat | Soft-touch, travel size\nTasbih | 33 beads\nDu’a card | Your choice of four\nGift box | Hand-wrapped, ribbon closed"
         },
         { "type": "header", "content": "Item photos" },
@@ -790,11 +933,24 @@
       ]
     },
     {
+      "type": "others",
+      "name": "Other products",
+      "settings": [
+        { "type": "product_list", "id": "products", "label": "Products", "limit": 12, "info": "Shown in this order. Leave empty to use the collection." },
+        { "type": "collection", "id": "collection", "label": "Collection", "info": "Used when no products are picked, and as the View all link." },
+        { "type": "text", "id": "title", "label": "Heading", "default": "Other gift boxes.", "info": "Leave empty to use the collection title." },
+        { "type": "text", "id": "link_label", "label": "Link label", "default": "View all", "info": "Leave empty to hide." },
+        { "type": "url", "id": "link", "label": "Link", "info": "Leave empty to link to the collection." },
+        { "type": "product", "id": "exclude", "label": "Leave out", "info": "Usually the box on this page." },
+        { "type": "range", "id": "limit", "label": "Products shown", "min": 2, "max": 12, "step": 1, "default": 6 }
+      ]
+    },
+    {
       "type": "colours",
       "name": "Colour story",
       "settings": [
-        { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The colours" },
-        { "type": "text", "id": "title", "label": "Title", "default": "Three boxes, three moods" },
+        { "type": "text", "id": "eyebrow", "label": "Heading", "default": "The colours." },
+        { "type": "text", "id": "title", "label": "Heading note", "default": "Three boxes, three moods." },
         { "type": "textarea", "id": "text", "label": "Text" },
         { "type": "text", "id": "colour_1_name", "label": "Colour 1 name", "default": "Navy Floral" },
         { "type": "color", "id": "colour_1_hex", "label": "Colour 1", "default": "#1f2a44" },
@@ -814,8 +970,8 @@
       "type": "dua",
       "name": "Du’a card",
       "settings": [
-        { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The card" },
-        { "type": "text", "id": "title", "label": "Title", "default": "A du’a, written in" },
+        { "type": "text", "id": "eyebrow", "label": "Heading", "default": "The card." },
+        { "type": "text", "id": "title", "label": "Heading note", "default": "A du’a, written in." },
         { "type": "textarea", "id": "arabic", "label": "Arabic", "default": "بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ" },
         { "type": "textarea", "id": "translation", "label": "Translation", "default": "“May Allah bless you, shower His blessings upon you, and join you together in goodness.”" },
         { "type": "text", "id": "source", "label": "Source", "default": "Abu Dawud 2130" }
@@ -834,8 +990,8 @@
       "type": "delivery",
       "name": "Delivery",
       "settings": [
-        { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Delivery" },
-        { "type": "text", "id": "title", "label": "Title", "default": "Gift-ready, on time" },
+        { "type": "text", "id": "eyebrow", "label": "Heading", "default": "Delivery." },
+        { "type": "text", "id": "title", "label": "Heading note", "default": "Gift-ready, on time." },
         { "type": "textarea", "id": "text", "label": "Text" },
         {
           "type": "textarea",
@@ -850,8 +1006,8 @@
       "type": "bulk",
       "name": "Bulk orders",
       "settings": [
-        { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Bulk orders" },
-        { "type": "text", "id": "title", "label": "Title", "default": "Gifting for a wedding party or an office?" },
+        { "type": "text", "id": "eyebrow", "label": "Heading", "default": "Bulk orders." },
+        { "type": "text", "id": "title", "label": "Heading note", "default": "Gifting for a wedding party or an office?" },
         { "type": "textarea", "id": "text", "label": "Text", "default": "Ten boxes or more, with your own card wording. Tell us what you need." },
         { "type": "text", "id": "button_label", "label": "Button label", "default": "Ask about bulk orders" },
         { "type": "url", "id": "button_link", "label": "Button link" }
@@ -870,13 +1026,9 @@
     {
       "name": "TSS — Gift box story",
       "blocks": [
-        { "type": "contents" },
-        { "type": "colours" },
-        { "type": "dua" },
         { "type": "review" },
         { "type": "review" },
-        { "type": "delivery" },
-        { "type": "bulk" },
+        { "type": "others" },
         { "type": "faq" }
       ]
     }
