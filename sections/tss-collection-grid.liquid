@@ -190,6 +190,9 @@
       linear-gradient(to right, transparent, #000 3%, #000 97%, transparent),
       linear-gradient(to bottom, transparent, #000 3%, #000 97%, transparent);
     mask-composite: intersect;
+    /* Multiply drops a white studio backdrop into the page ivory behind it, so
+       product shots on pure white match the ones already shot on ivory. */
+    mix-blend-mode: multiply;
     transition: clip-path 1.2s var(--tss-ease), transform 1.2s var(--tss-ease);
   }
 

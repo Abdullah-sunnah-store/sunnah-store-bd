@@ -22,6 +22,11 @@
 {%- liquid
   assign s = section.settings
   assign uid = section.id
+  # Saved data from before this setting existed has no key, so only an explicit false turns images off.
+  assign text_only = false
+  if s.show_images == false
+    assign text_only = true
+  endif
   assign here = request.path
 
   comment
@@ -241,6 +246,52 @@
     color: var(--tss-ivory);
   }
 
+  /* Text only: the tiles become a row of outlined chips, the current one filled. */
+  #tss-crail-{{ uid }}.tss-crail--text .tss-rail > * {
+    width: auto;
+    flex: none;
+  }
+
+  #tss-crail-{{ uid }}.tss-crail--text .tss-crail__tile {
+    display: inline-flex;
+    align-items: center;
+    height: auto;
+    padding: 10px 20px;
+    border: 1px solid rgb(8 41 30 / 0.2);
+    border-radius: 999px;
+    background: transparent;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+
+  #tss-crail-{{ uid }}.tss-crail--text .tss-crail__tile:hover {
+    border-color: var(--tss-green);
+  }
+
+  #tss-crail-{{ uid }}.tss-crail--text .tss-crail__tile.is-active {
+    border-color: var(--tss-green);
+    background: var(--tss-green);
+    box-shadow: none;
+  }
+
+  #tss-crail-{{ uid }}.tss-crail--text .tss-crail__label {
+    position: static;
+    padding: 0;
+    font-family: inherit;
+    font-size: 14px;
+    white-space: nowrap;
+    color: var(--tss-green);
+  }
+
+  #tss-crail-{{ uid }}.tss-crail--text .tss-crail__tile.is-active .tss-crail__label {
+    color: var(--tss-ivory);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #tss-crail-{{ uid }}.tss-crail--text .tss-crail__tile {
+      transition: none;
+    }
+  }
+
   #tss-crail-{{ uid }} .tss-progress {
     margin-top: 0;
     height: 1px;
@@ -292,13 +343,18 @@
         if t_url != blank and t_path == here
           assign t_active = true
         endif
+        assign t_asset = b.settings.image_asset
+        if text_only
+          assign t_image = blank
+          assign t_asset = blank
+        endif
       -%}
       {%- if t_label != blank -%}
         {% render 'tss-collection-tile',
           url: t_url,
           label: t_label,
           image: t_image,
-          asset: b.settings.image_asset,
+          asset: t_asset,
           active: t_active,
           attributes: b.shopify_attributes
         %}
@@ -322,6 +378,9 @@
         if t_path == here
           assign t_active = true
         endif
+        if text_only
+          assign t_image = blank
+        endif
       -%}
       {% render 'tss-collection-tile',
         url: t_url,
@@ -342,10 +401,13 @@
     unless tiles contains 'is-active'
       assign all_active = true
     endunless
+    if text_only
+      assign all_image = blank
+    endif
   -%}
   <section
     id="tss-crail-{{ uid }}"
-    class="tss-section"
+    class="tss-section{% if text_only %} tss-crail--text{% endif %}"
     aria-label="{{ s.aria_label | default: 'Browse this collection' | escape }}"
     {{ section.shopify_attributes }}
   >
@@ -394,6 +456,13 @@
       "id": "hide_on_menu_parents",
       "label": "Hide on collections with a submenu",
       "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_images",
+      "label": "Show images",
+      "info": "Turn off to show the categories as text chips.",
+      "default": true
     },
     { "type": "header", "content": "\"All\" tile" },
     { "type": "checkbox", "id": "show_all", "label": "Show an \"All\" tile first", "default": true },

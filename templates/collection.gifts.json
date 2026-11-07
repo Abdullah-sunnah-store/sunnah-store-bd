@@ -26,7 +26,7 @@
           "settings": {
             "label": "The occasion",
             "kind": "tag",
-            "options": "Nikah | nikah\nAqiqah | aqiqah\nHajj & Umrah | hajj-umrah\nEid | eid\nHousewarming | housewarming\nGraduation | graduation\nJust because | just-because",
+            "options": "Nikah | nikah\nAqiqah | aqiqah\nHajj & Umrah | hajj-umrah\nEid | eid\nHousewarming | housewarming\nGraduation | graduation\nJust because | - | just because",
             "default": ""
           }
         },
@@ -46,9 +46,15 @@
         "question_3"
       ],
       "settings": {
+        "collection": "",
         "title": "Find the gift",
         "lede": "Tell us who it’s for and what it’s for. We’ll show you what we’d give, wrapped by hand.",
+        "crumb": "",
+        "home_label": "The House",
+        "crumbs_label": "Breadcrumb",
         "shortcuts_label": "Or go straight to",
+        "shortcuts": "",
+        "panel_label": "Gift finder",
         "button_lead": "Show gifts",
         "all_label": "Show all gifts"
       }
@@ -57,13 +63,17 @@
       "type": "tss-house-rail",
       "settings": {
         "layout": "row",
+        "eyebrow": "",
         "heading": "Ready to send",
         "text": "Already chosen and boxed. Nothing to put together.",
         "collection": "ready-to-send",
+        "products": [],
         "limit": 4,
         "link_label": "See all [count]",
+        "link": "",
         "ratio": "4 / 5",
         "min_width": 230,
+        "large_names": false,
         "padding_top": 64,
         "padding_bottom": 0
       }
@@ -75,38 +85,48 @@
           "type": "tile",
           "settings": {
             "collection": "nikah",
-            "text": "",
-            "show_count": true,
+            "title": "",
+            "link": "",
             "eyebrow": "Wedding season",
-            "accent": true
+            "accent": true,
+            "text": "",
+            "show_count": true
           }
         },
         "tile_2": {
           "type": "tile",
           "settings": {
             "collection": "aqiqah",
+            "title": "",
+            "link": "",
+            "eyebrow": "New baby",
+            "accent": false,
             "text": "",
-            "show_count": true,
-            "eyebrow": "New baby"
+            "show_count": true
           }
         },
         "tile_3": {
           "type": "tile",
           "settings": {
             "collection": "hajj-umrah",
-            "text": "",
-            "show_count": true,
+            "title": "Hajj & Umrah",
+            "link": "",
             "eyebrow": "For the journey",
-            "title": "Hajj & Umrah"
+            "accent": false,
+            "text": "",
+            "show_count": true
           }
         },
         "tile_4": {
           "type": "tile",
           "settings": {
             "collection": "eid",
+            "title": "",
+            "link": "",
+            "eyebrow": "Twice a year",
+            "accent": false,
             "text": "",
-            "show_count": true,
-            "eyebrow": "Twice a year"
+            "show_count": true
           }
         }
       },
@@ -117,16 +137,18 @@
         "tile_4"
       ],
       "settings": {
+        "heading": "By occasion",
+        "text": "",
+        "link_label": "Housewarming, graduation and more",
+        "link": "",
+        "link_collection": "shop-by-occasion",
+        "accessible_label": "Shop by category",
         "ratio": "4 / 5",
         "min_width": 230,
         "large_names": true,
         "count_label": "[count] gifts",
         "padding_top": 72,
-        "padding_bottom": 0,
-        "accessible_label": "Shop by category",
-        "heading": "By occasion",
-        "link_label": "Housewarming, graduation and more",
-        "link_collection": "shop-by-occasion"
+        "padding_bottom": 0
       }
     },
     "parents": {
@@ -137,10 +159,13 @@
         "heading": "For your mother and father",
         "text": "Packages made to say thank you to the two who gave you everything.",
         "collection": "for-parents",
+        "products": [],
         "limit": 3,
         "link_label": "",
+        "link": "",
         "ratio": "1",
         "min_width": 160,
+        "large_names": false,
         "padding_top": 72,
         "padding_bottom": 0
       }
@@ -148,8 +173,11 @@
     "box": {
       "type": "tss-house-feature",
       "settings": {
-        "tone": "paper",
+        "collection": "",
+        "image": "shopify://shop_images/Turkish_Wedding_Package.jpg",
         "image_fit": "contain",
+        "image_side": "start",
+        "tone": "paper",
         "eyebrow": "Our signature",
         "title": "Build your own box",
         "text": "Choose the pieces yourself. We’ll size the box, wrap it by hand, and send it as one considered whole.",
@@ -165,6 +193,7 @@
       "type": "tss-house-strip",
       "settings": {
         "tone": "sand",
+        "product": "",
         "title": "Gifting for a team or your clients?",
         "text": "Corporate and bulk orders, put together by our gifting desk.",
         "button_label": "Corporate & bulk gifts",
@@ -178,9 +207,16 @@
       "settings": {
         "heading": "Every gift",
         "show_sort": true,
+        "sort_label": "Sort",
+        "sort_button": "Apply",
+        "menu": "",
+        "all_label": "All",
+        "chips_label": "Filter by category",
         "per_page": 16,
         "ratio": "4 / 5",
-        "min_width": 230
+        "min_width": 230,
+        "empty_text": "Nothing here yet. Try another category.",
+        "padding_bottom": 80
       }
     }
   },

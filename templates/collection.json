@@ -56,6 +56,7 @@
         "title": "",
         "title_size": 40,
         "lede": "",
+        "show_image": false,
         "image_asset": "",
         "scrim": 85,
         "height": 52,
@@ -69,6 +70,7 @@
       "settings": {
         "menu": "main-menu-2-horizon",
         "hide_on_menu_parents": true,
+        "show_images": false,
         "show_all": true,
         "all_label": "All",
         "all_link": "",

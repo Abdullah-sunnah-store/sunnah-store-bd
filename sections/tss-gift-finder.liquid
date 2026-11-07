@@ -24,6 +24,9 @@
   assign uid = section.id
   assign source = s.collection | default: collection
   assign base_url = source.url | default: routes.all_products_collection_url
+  # Answers search this wider collection (default: every product), so a tag that is rare inside the
+  # Gifts collection still finds results; "Show all gifts" with no answers keeps base_url.
+  assign filter_url = s.filter_collection.url | default: routes.all_products_collection_url
   assign title = s.title | default: source.title
 -%}
 
@@ -35,6 +38,22 @@
     gap: 32px 56px;
     padding-block: 32px 40px;
     border-bottom: 1px solid var(--th-line);
+  }
+
+  #th-finder-{{ uid }} .th-finder__note:empty {
+    display: none;
+  }
+
+  #th-finder-{{ uid }} .th-finder__note {
+    margin-top: 12px;
+    font-size: 14px;
+    text-align: end;
+    color: var(--th-muted);
+  }
+
+  #th-finder-{{ uid }} .th-finder__go[aria-busy='true'] {
+    opacity: 0.6;
+    cursor: progress;
   }
 
   #th-finder-{{ uid }} .th-finder__intro {
@@ -196,6 +215,7 @@
         {%- endfor -%}
 
         <a class="th-btn th-finder__go" href="{{ base_url }}" data-go>{{ s.all_label | escape }}</a>
+        <p class="th-finder__note" role="status" aria-live="polite" data-note></p>
       </div>
     </div>
   </div>
@@ -208,6 +228,7 @@
     root.setAttribute('data-ready', '');
 
     var BASE = {{ base_url | json }};
+    var FILTER_BASE = {{ filter_url | json }};
     var LEAD = {{ s.button_lead | json }};
     var ALL = {{ s.all_label | json }};
     var questions = Array.from(root.querySelectorAll('[data-question]'));
@@ -217,29 +238,113 @@
       return value.toLowerCase().trim().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
     }
 
-    function render() {
-      var tags = [];
-      var phrases = [];
-      var url = new URL(BASE, window.location.origin);
+    var note = root.querySelector('[data-note]');
+    var RESULTS_SECTION = {{ s.results_section | default: 'tss_grid' | json }};
+    var NO_MATCH = {{ s.no_match_label | default: 'No exact match, showing gifts for' | json }};
+    var checking = null;
 
+    // The pressed answers, in question order. "-" answers (e.g. "Just because") only shape the label.
+    function answers() {
+      var list = [];
       for (var q of questions) {
         var on = q.querySelector('[aria-pressed="true"]');
         if (!on) continue;
         var value = on.getAttribute('data-value');
-        phrases.push(on.getAttribute('data-phrase'));
-        if (q.getAttribute('data-question') === 'price') {
-          var range = value.replace(/[^\d-]/g, '').split('-');
+        var kind = q.getAttribute('data-question') === 'price' ? 'price' : 'tag';
+        list.push({ kind: kind, value: value, phrase: on.getAttribute('data-phrase'), narrows: value !== '-' });
+      }
+      return list;
+    }
+
+    function buildUrl(list) {
+      var narrowing = list.filter(function (a) { return a.narrows; });
+      var url = new URL(list.length ? FILTER_BASE : BASE, window.location.origin);
+      var tags = [];
+      for (var a of narrowing) {
+        if (a.kind === 'price') {
+          var range = a.value.replace(/[^\d-]/g, '').split('-');
           if (range[0]) url.searchParams.set('filter.v.price.gte', range[0]);
           if (range[1]) url.searchParams.set('filter.v.price.lte', range[1]);
         } else {
-          tags.push(handle(value));
+          tags.push(handle(a.value));
         }
       }
-
       if (tags.length) url.pathname = url.pathname.replace(/\/$/, '') + '/' + tags.map(encodeURIComponent).join('+');
-      go.href = url.pathname + url.search;
-      go.textContent = phrases.length ? LEAD + ' ' + phrases.join(' · ') : ALL;
+      return url.pathname + url.search;
     }
+
+    function label(list) {
+      return list.length ? LEAD + ' ' + list.map(function (a) { return a.phrase; }).join(' · ') : ALL;
+    }
+
+    // Exact match first, then drop the budget, then the occasion, then keep single answers.
+    function candidates(list) {
+      var out = [list];
+      var price = list.filter(function (a) { return a.kind !== 'price'; });
+      if (price.length !== list.length) out.push(price);
+      var tagAnswers = list.filter(function (a) { return a.kind === 'tag' && a.narrows; });
+      for (var t of tagAnswers) {
+        out.push([t].concat(list.filter(function (a) { return a.kind === 'price'; })));
+        out.push([t]);
+      }
+      var seen = {};
+      return out.filter(function (c) {
+        var key = buildUrl(c);
+        if (seen[key] || !c.some(function (a) { return a.narrows; })) return false;
+        seen[key] = true;
+        return true;
+      });
+    }
+
+    async function hasResults(path, signal) {
+      var sep = path.indexOf('?') === -1 ? '?' : '&';
+      var response = await fetch(path + sep + 'sections=' + encodeURIComponent(RESULTS_SECTION), { signal: signal });
+      if (!response.ok) throw new Error('status ' + response.status);
+      var data = await response.json();
+      var html = data[RESULTS_SECTION];
+      if (typeof html !== 'string') throw new Error('missing section');
+      return /tss-cgrid__card/.test(html);
+    }
+
+    function render() {
+      var list = answers();
+      go.href = buildUrl(list);
+      go.textContent = label(list);
+      if (note) note.textContent = '';
+    }
+
+    // Before leaving, make sure the page has products; otherwise open the closest match that does.
+    go.addEventListener('click', async function (event) {
+      var list = answers();
+      if (!list.some(function (a) { return a.narrows; }) || event.metaKey || event.ctrlKey || event.shiftKey) return;
+      event.preventDefault();
+      if (checking) return;
+      checking = new AbortController();
+      var timer = setTimeout(function () { checking.abort(); }, 6000);
+      var exact = buildUrl(list);
+      go.setAttribute('aria-busy', 'true');
+      try {
+        for (var c of candidates(list)) {
+          var path = buildUrl(c);
+          if (await hasResults(path, checking.signal)) {
+            if (path !== exact && note) {
+              note.textContent = NO_MATCH + ' ' + c.map(function (a) { return a.phrase; }).join(' · ');
+              await new Promise(function (resolve) { setTimeout(resolve, 1200); });
+            }
+            window.location.href = path;
+            return;
+          }
+        }
+        window.location.href = BASE;
+      } catch (error) {
+        // A failed or slow check should never block the shopper: go to the exact answer.
+        window.location.href = exact;
+      } finally {
+        clearTimeout(timer);
+        go.removeAttribute('aria-busy');
+        checking = null;
+      }
+    });
 
     root.addEventListener('click', function (event) {
       var chip = event.target.closest('[data-question] .th-chip');
@@ -264,6 +369,9 @@
   "max_blocks": 4,
   "settings": [
     { "type": "collection", "id": "collection", "label": "Collection to search", "info": "Leave empty to use this page’s collection." },
+    { "type": "text", "id": "no_match_label", "label": "No exact match message", "default": "No exact match, showing gifts for" },
+    { "type": "text", "id": "results_section", "label": "Results section ID", "info": "Section ID of the product grid on the filtered page. Used to check for results before opening it.", "default": "tss_grid" },
+    { "type": "collection", "id": "filter_collection", "label": "Collection to filter answers in", "info": "Leave empty to search every product. Products need tags matching the answers (e.g. parents, nikah)." },
     { "type": "text", "id": "title", "label": "Title", "default": "Find the gift" },
     {
       "type": "textarea",

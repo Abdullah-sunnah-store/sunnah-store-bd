@@ -1,0 +1,179 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "header": {
+      "type": "tss-house-header",
+      "settings": {
+        "title": "Gifts for every budget",
+        "lede": "A thoughtful gift isn’t measured by its price. Choose what feels right, and we’ll wrap it by hand.",
+        "link_label": "Shop all [title]",
+        "link": "#all",
+        "show_crumbs": true,
+        "home_label": "The House",
+        "show_rule": true
+      }
+    },
+    "prices": {
+      "type": "tss-house-tiles",
+      "blocks": {
+        "tile_1": {
+          "type": "tile",
+          "settings": {
+            "collection": "under-1-500",
+            "eyebrow": "Little gifts",
+            "title": "Under ৳1,500",
+            "text": "Mugs, cards, bookmarks and tasbeeh",
+            "show_count": true
+          }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": {
+            "collection": "1-500-5-000",
+            "eyebrow": "Most loved",
+            "accent": true,
+            "title": "৳1,500–৳5,000",
+            "text": "Frames, journals and gift boxes",
+            "show_count": true
+          }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": {
+            "collection": "5-000-15-000",
+            "eyebrow": "For the big moments",
+            "title": "৳5,000–৳15,000",
+            "text": "Premium packages and hampers",
+            "show_count": true
+          }
+        },
+        "tile_4": {
+          "type": "tile",
+          "settings": {
+            "collection": "luxury-15-000",
+            "eyebrow": "Once in a lifetime",
+            "title": "Luxury (৳15,000+)",
+            "text": "Our most complete gifts",
+            "show_count": true
+          }
+        }
+      },
+      "block_order": [
+        "tile_1",
+        "tile_2",
+        "tile_3",
+        "tile_4"
+      ],
+      "settings": {
+        "heading": "Choose your budget",
+        "ratio": "4 / 5",
+        "min_width": 220,
+        "large_names": true,
+        "count_label": "[count] gifts",
+        "padding_top": 40,
+        "padding_bottom": 0,
+        "accessible_label": "Shop by budget"
+      }
+    },
+    "small": {
+      "type": "tss-house-rail",
+      "settings": {
+        "layout": "row",
+        "eyebrow": "Under ৳1,500",
+        "heading": "Small gifts, big barakah",
+        "text": "“Give gifts to one another, and you will love one another.”",
+        "collection": "under-1-500",
+        "limit": 5,
+        "link_label": "All [count] under ৳1,500",
+        "ratio": "4 / 5",
+        "min_width": 180,
+        "padding_top": 72,
+        "padding_bottom": 0
+      }
+    },
+    "middle": {
+      "type": "tss-house-rail",
+      "settings": {
+        "layout": "row",
+        "eyebrow": "৳1,500–৳5,000",
+        "heading": "The sweet spot",
+        "text": "Where most of our gifts are chosen: meaningful, boxed and ready to give.",
+        "collection": "1-500-5-000",
+        "limit": 4,
+        "link_label": "See all [count]",
+        "ratio": "4 / 5",
+        "min_width": 220,
+        "padding_top": 72,
+        "padding_bottom": 0
+      }
+    },
+    "premium": {
+      "type": "tss-house-rail",
+      "settings": {
+        "layout": "band",
+        "eyebrow": "৳5,000 and above",
+        "heading": "When it matters most",
+        "text": "Nikah, Hajj, a new home. Our fullest packages for the moments you’ll both remember.",
+        "collection": "5-000-15-000",
+        "limit": 3,
+        "link_label": "",
+        "ratio": "1",
+        "min_width": 160,
+        "padding_top": 72,
+        "padding_bottom": 0
+      }
+    },
+    "custom": {
+      "type": "tss-house-strip",
+      "settings": {
+        "tone": "paper",
+        "title": "Have a budget in mind?",
+        "text": "Build your own box. Pick the pieces, we’ll size it, wrap it and send it.",
+        "button_label": "Build your own box",
+        "link": "/pages/custom-gift-box",
+        "padding_top": 48,
+        "padding_bottom": 0
+      }
+    },
+    "bulk": {
+      "type": "tss-house-strip",
+      "settings": {
+        "tone": "sand",
+        "title": "Buying for a team?",
+        "text": "Corporate and bulk orders, put together by our gifting desk.",
+        "button_label": "Corporate & bulk gifts",
+        "link": "/collections/corporate",
+        "padding_top": 16,
+        "padding_bottom": 0
+      }
+    },
+    "all": {
+      "type": "tss-house-products",
+      "settings": {
+        "heading": "All gifts, every budget",
+        "show_sort": true,
+        "per_page": 16,
+        "ratio": "4 / 5",
+        "min_width": 230
+      }
+    }
+  },
+  "order": [
+    "header",
+    "prices",
+    "small",
+    "middle",
+    "premium",
+    "custom",
+    "bulk",
+    "all"
+  ]
+}

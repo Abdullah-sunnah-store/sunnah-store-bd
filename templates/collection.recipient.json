@@ -1,0 +1,219 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "header": {
+      "type": "tss-house-header",
+      "settings": {
+        "title": "Gifts by who they’re for",
+        "lede": "Start with the person. We’ll help with the rest, and wrap it by hand.",
+        "link_label": "Shop all [title]",
+        "link": "#all",
+        "show_crumbs": true,
+        "home_label": "The House",
+        "show_rule": true
+      }
+    },
+    "people": {
+      "type": "tss-house-tiles",
+      "blocks": {
+        "tile_1": {
+          "type": "tile",
+          "settings": {
+            "collection": "for-parents",
+            "eyebrow": "Birr al-walidayn",
+            "accent": true,
+            "title": "Parents",
+            "text": "For the two who gave you everything",
+            "show_count": true
+          }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": {
+            "collection": "for-him",
+            "eyebrow": "Husband, father, brother",
+            "title": "For Him",
+            "text": "Leather, oud and the thobe",
+            "show_count": true
+          }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": {
+            "collection": "for-her",
+            "eyebrow": "Wife, mother, sister",
+            "title": "For Her",
+            "text": "Hijabs, scent and keepsakes",
+            "show_count": true
+          }
+        },
+        "tile_4": {
+          "type": "tile",
+          "settings": {
+            "collection": "for-kids",
+            "eyebrow": "Little ones",
+            "title": "For Kids",
+            "text": "First books, first letters, first frames",
+            "show_count": true
+          }
+        },
+        "tile_5": {
+          "type": "tile",
+          "settings": {
+            "collection": "for-friends",
+            "eyebrow": "Brothers and sisters in deen",
+            "title": "Friends",
+            "text": "Small gifts that say a lot",
+            "show_count": true
+          }
+        },
+        "tile_6": {
+          "type": "tile",
+          "settings": {
+            "collection": "colleague",
+            "eyebrow": "At work",
+            "title": "Colleagues",
+            "text": "For the desk, the team and the boss",
+            "show_count": true
+          }
+        }
+      },
+      "block_order": [
+        "tile_1",
+        "tile_2",
+        "tile_3",
+        "tile_4",
+        "tile_5",
+        "tile_6"
+      ],
+      "settings": {
+        "heading": "Who are you giving to?",
+        "ratio": "4 / 5",
+        "min_width": 200,
+        "large_names": true,
+        "count_label": "[count] gifts",
+        "padding_top": 40,
+        "padding_bottom": 0,
+        "accessible_label": "Shop by recipient"
+      }
+    },
+    "him": {
+      "type": "tss-house-rail",
+      "settings": {
+        "layout": "row",
+        "eyebrow": "For him",
+        "heading": "What he’ll actually use",
+        "text": "Wallets, attar and thobes, made to be carried every day.",
+        "collection": "for-him",
+        "limit": 4,
+        "link_label": "All [count] gifts for him",
+        "ratio": "4 / 5",
+        "min_width": 220,
+        "padding_top": 72,
+        "padding_bottom": 0
+      }
+    },
+    "her": {
+      "type": "tss-house-rail",
+      "settings": {
+        "layout": "band",
+        "eyebrow": "For her",
+        "heading": "Chosen with her in mind",
+        "text": "Soft hijabs, gentle scents and something to keep.",
+        "collection": "for-her",
+        "limit": 3,
+        "link_label": "",
+        "ratio": "1",
+        "min_width": 160,
+        "padding_top": 72,
+        "padding_bottom": 0
+      }
+    },
+    "little": {
+      "type": "tss-house-tiles",
+      "blocks": {
+        "tile_1": {
+          "type": "tile",
+          "settings": {
+            "collection": "new-baby",
+            "title": "New Baby",
+            "text": "",
+            "show_count": true
+          }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": {
+            "collection": "children-books",
+            "title": "Children’s Books",
+            "text": "",
+            "show_count": true
+          }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": {
+            "collection": "kids-frames",
+            "title": "Kids Frames",
+            "text": "",
+            "show_count": true
+          }
+        }
+      },
+      "block_order": [
+        "tile_1",
+        "tile_2",
+        "tile_3"
+      ],
+      "settings": {
+        "heading": "For the little ones",
+        "ratio": "1",
+        "min_width": 220,
+        "large_names": false,
+        "count_label": "[count]",
+        "padding_top": 72,
+        "padding_bottom": 0,
+        "accessible_label": "Gifts for children"
+      }
+    },
+    "finder": {
+      "type": "tss-house-strip",
+      "settings": {
+        "tone": "sand",
+        "title": "Still not sure what to give?",
+        "text": "Tell us who it’s for, the occasion and your budget. We’ll do the choosing.",
+        "button_label": "Use the gift finder",
+        "link": "/collections/gifts",
+        "padding_top": 48,
+        "padding_bottom": 0
+      }
+    },
+    "all": {
+      "type": "tss-house-products",
+      "settings": {
+        "heading": "All [title]",
+        "show_sort": true,
+        "per_page": 16,
+        "ratio": "4 / 5",
+        "min_width": 230
+      }
+    }
+  },
+  "order": [
+    "header",
+    "people",
+    "him",
+    "her",
+    "little",
+    "finder",
+    "all"
+  ]
+}

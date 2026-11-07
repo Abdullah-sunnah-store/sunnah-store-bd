@@ -36,6 +36,13 @@
     assign bg_image = collection.image
   endif
 
+  # Saved data from before this setting existed has no key, so only an explicit false hides the image.
+  assign text_only = false
+  if s.show_image == false
+    assign text_only = true
+    assign bg_image = blank
+  endif
+
   assign lede = s.lede
   if lede == blank
     assign lede = collection.description | strip_html | strip
@@ -100,6 +107,12 @@
     padding: 96px var(--tss-gutter) {{ s.padding_bottom | default: 40 }}px;
     overflow: hidden;
     background: linear-gradient(to bottom, var(--tss-green), var(--tss-green-dark));
+  }
+
+  /* Text only: no photograph, so the band only needs room for its words. */
+  #tss-cheader-{{ uid }}.tss-cheader--text {
+    min-height: 0;
+    padding-top: 56px;
   }
 
   #tss-cheader-{{ uid }} .tss-cheader__img {
@@ -189,6 +202,10 @@
       padding-block: 128px {{ s.padding_bottom | default: 40 | plus: 24 }}px;
     }
 
+    #tss-cheader-{{ uid }}.tss-cheader--text {
+      padding-top: 72px;
+    }
+
     #tss-cheader-{{ uid }} .tss-cheader__inner {
       max-width: var(--tss-max);
       margin-inline: auto;
@@ -207,8 +224,9 @@
   }
 </style>
 
-<section id="tss-cheader-{{ uid }}" class="tss-section" {{ section.shopify_attributes }}>
-  {%- if bg_image != blank or s.image_asset != blank -%}
+<section id="tss-cheader-{{ uid }}" class="tss-section{% if text_only %} tss-cheader--text{% endif %}" {{ section.shopify_attributes }}>
+  {%- comment -%} bg_image is already blank in text-only mode; the asset still needs the guard. {%- endcomment -%}
+  {%- if bg_image != blank or s.image_asset != blank and text_only == false -%}
     {% render 'tss-image',
       image: bg_image,
       asset: s.image_asset,
@@ -317,6 +335,13 @@
       "info": "Leave empty to use the collection description."
     },
     { "type": "header", "content": "Background" },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "Show image",
+      "info": "Turn off for a text-only header on an emerald band.",
+      "default": true
+    },
     {
       "type": "image_picker",
       "id": "image",
