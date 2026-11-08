@@ -1169,6 +1169,11 @@
     color: var(--gbx-bg);
   }
 
+  #tss-gbx-{{ uid }} .tss-gbx__extra-text > .tss-gbx__extra-badge {
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+
   #tss-gbx-{{ uid }} .tss-gbx__add,
   #tss-gbx-{{ uid }} .tss-gbx__included {
     position: relative;
@@ -2792,6 +2797,14 @@
                   assign addon_label = block.settings.label | default: addon.title
                   assign addon_image = block.settings.image | default: addon.featured_image
                   assign addon_variant = addon.selected_or_first_available_variant
+                  # Optional "with the box" discount. The page shows the reduced price;
+                  # a matching automatic discount (Buy X get Y) in Shopify admin charges it.
+                  assign addon_discount = block.settings.discount | default: 0
+                  assign addon_price = addon_variant.price
+                  if addon_discount > 0
+                    assign addon_keep = 100 | minus: addon_discount
+                    assign addon_price = addon_variant.price | times: addon_keep | divided_by: 100
+                  endif
                 -%}
                 <div class="tss-gbx__extra" {{ block.shopify_attributes }}>
                   {%- if addon_image != blank -%}
@@ -2804,18 +2817,25 @@
                     {%- endif -%}
                     <span class="tss-gbx__extra-price">
                       {%- if addon.available -%}
-                        + {{ addon_variant.price | money }}
+                        + {{ addon_price | money }}
+                        {%- if addon_discount > 0 %} <s>{{ addon_variant.price | money }}</s>{% endif -%}
                       {%- else -%}
                         {{ s.sold_out_label | escape }}
                       {%- endif -%}
                     </span>
+                    {%- if addon_discount > 0 and addon.available and s.hijab_badge != blank -%}
+                      <span class="tss-gbx__extra-badge">
+                        {{- s.hijab_badge | replace: '[percent]', addon_discount | escape -}}
+                      </span>
+                    {%- endif -%}
                   </div>
                   <label class="tss-gbx__add">
                     <input
                       type="checkbox"
                       value="{{ addon_variant.id }}"
-                      data-price="{{ addon_variant.price }}"
+                      data-price="{{ addon_price }}"
                       data-title="{{ addon_label | escape }}"
+                      {% if addon_discount > 0 %}data-offer="{{ s.hijab_badge | replace: '[percent]', addon_discount | escape }}"{% endif %}
                       aria-label="{{ s.add_label | escape }} {{ addon_label | escape }}"
                       data-addon
                       {% unless addon.available %}
@@ -3502,7 +3522,13 @@
           items.push({ id: parseInt(st.scent.value, 10), quantity: 1, properties: link });
         }
         st.extras.forEach(function (input) {
-          items.push({ id: parseInt(input.value, 10), quantity: 1 });
+          var extra = { id: parseInt(input.value, 10), quantity: 1 };
+          if (input.hasAttribute('data-offer')) {
+            extra.properties = {};
+            extra.properties[LINK] = st.first.getAttribute('data-title');
+            extra.properties[OFFER] = input.getAttribute('data-offer');
+          }
+          items.push(extra);
         });
         st.hijabs.forEach(function (h) {
           var hijabProps = {};
@@ -3860,7 +3886,8 @@
         { "type": "product", "id": "product", "label": "Product", "info": "Added as its own cart line with its first available variant." },
         { "type": "text", "id": "label", "label": "Name", "info": "Leave empty to use the product title." },
         { "type": "text", "id": "text", "label": "Description" },
-        { "type": "image_picker", "id": "image", "label": "Image", "info": "Leave empty to use the product image." }
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Leave empty to use the product image." },
+        { "type": "range", "id": "discount", "label": "Discount with the box", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 0, "info": "Shown on the page and in the total. Charge it with a matching automatic discount (Buy X get Y) in Shopify admin." }
       ]
     }
   ],

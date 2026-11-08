@@ -134,7 +134,8 @@
           "settings": {
             "product": "derby-2-0-horsemen-wallet-espresso-brown",
             "label": "Horsemen cardholder",
-            "text": "Derby 2.0, leather. For him."
+            "text": "Derby 2.0, leather. For him.",
+            "discount": 50
           }
         },
         "addon_candle": {
