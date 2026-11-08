@@ -240,7 +240,7 @@
 
     var note = root.querySelector('[data-note]');
     var RESULTS_SECTION = {{ s.results_section | default: 'tss_grid' | json }};
-    var NO_MATCH = {{ s.no_match_label | default: 'No exact match, showing gifts for' | json }};
+    var NO_MATCH = {{ s.no_match_label | default: 'No exact match. Showing gifts' | json }};
     var checking = null;
 
     // The pressed answers, in question order. "-" answers (e.g. "Just because") only shape the label.
@@ -256,12 +256,23 @@
       return list;
     }
 
+    // A budget answer is either a collection handle (e.g. "under-1-500": that collection is opened and
+    // the other answers narrow it by tag) or a price range ("1500-5000": Shopify's price filter).
+    function isCollection(value) {
+      return /[a-z]/i.test(value);
+    }
+
     function buildUrl(list) {
       var narrowing = list.filter(function (a) { return a.narrows; });
-      var url = new URL(list.length ? FILTER_BASE : BASE, window.location.origin);
+      var base = list.length ? FILTER_BASE : BASE;
+      narrowing.forEach(function (a) {
+        if (a.kind === 'price' && isCollection(a.value)) base = '/collections/' + handle(a.value);
+      });
+      var url = new URL(base, window.location.origin);
       var tags = [];
       for (var a of narrowing) {
         if (a.kind === 'price') {
+          if (isCollection(a.value)) continue;
           var range = a.value.replace(/[^\d-]/g, '').split('-');
           if (range[0]) url.searchParams.set('filter.v.price.gte', range[0]);
           if (range[1]) url.searchParams.set('filter.v.price.lte', range[1]);
@@ -277,33 +288,34 @@
       return list.length ? LEAD + ' ' + list.map(function (a) { return a.phrase; }).join(' · ') : ALL;
     }
 
-    // Exact match first, then drop the budget, then the occasion, then keep single answers.
+    // The budget is kept as long as possible: every answer, then the budget with the recipient, then the
+    // budget with the occasion, then the budget alone. Only then are the answers tried without the budget.
     function candidates(list) {
-      var out = [list];
-      var price = list.filter(function (a) { return a.kind !== 'price'; });
-      if (price.length !== list.length) out.push(price);
-      var tagAnswers = list.filter(function (a) { return a.kind === 'tag' && a.narrows; });
-      for (var t of tagAnswers) {
-        out.push([t].concat(list.filter(function (a) { return a.kind === 'price'; })));
-        out.push([t]);
-      }
+      var tags = list.filter(function (a) { return a.kind === 'tag' && a.narrows; });
+      var budget = list.filter(function (a) { return a.kind === 'price' && a.narrows; });
+      var sets = [tags];
+      tags.forEach(function (t) { sets.push([t]); });
+      sets.push([]);
+      var out = [];
+      if (budget.length) sets.forEach(function (s) { out.push(s.concat(budget)); });
+      sets.forEach(function (s) { if (s.length) out.push(s); });
       var seen = {};
       return out.filter(function (c) {
         var key = buildUrl(c);
-        if (seen[key] || !c.some(function (a) { return a.narrows; })) return false;
+        if (seen[key] || !c.length) return false;
         seen[key] = true;
         return true;
       });
     }
 
+    // Loads the filtered page and counts its product cards. (The Section Rendering API needs the
+    // full template section id, e.g. "template--123__tss_grid", so the whole page is read instead.)
     async function hasResults(path, signal) {
-      var sep = path.indexOf('?') === -1 ? '?' : '&';
-      var response = await fetch(path + sep + 'sections=' + encodeURIComponent(RESULTS_SECTION), { signal: signal });
-      if (!response.ok) throw new Error('status ' + response.status);
-      var data = await response.json();
-      var html = data[RESULTS_SECTION];
-      if (typeof html !== 'string') throw new Error('missing section');
-      return /tss-cgrid__card/.test(html);
+      var response = await fetch(path, { signal: signal, credentials: 'same-origin' });
+      if (!response.ok) return false;
+      var doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+      var grid = doc.querySelector('[id$="__' + RESULTS_SECTION + '"]') || doc;
+      return grid.querySelector('.tss-cgrid__card') !== null;
     }
 
     function render() {
@@ -320,22 +332,27 @@
       event.preventDefault();
       if (checking) return;
       checking = new AbortController();
-      var timer = setTimeout(function () { checking.abort(); }, 6000);
+      var timer = setTimeout(function () { checking.abort(); }, 8000);
       var exact = buildUrl(list);
       go.setAttribute('aria-busy', 'true');
       try {
-        for (var c of candidates(list)) {
-          var path = buildUrl(c);
-          if (await hasResults(path, checking.signal)) {
-            if (path !== exact && note) {
-              note.textContent = NO_MATCH + ' ' + c.map(function (a) { return a.phrase; }).join(' · ');
-              await new Promise(function (resolve) { setTimeout(resolve, 1200); });
-            }
-            window.location.href = path;
-            return;
+        // Check every fallback at once, then open the first (closest) one that has products.
+        var options = candidates(list);
+        var found = await Promise.all(options.map(function (c) {
+          return hasResults(buildUrl(c), checking.signal).catch(function () { return false; });
+        }));
+        for (var i = 0; i < options.length; i++) {
+          if (!found[i]) continue;
+          var path = buildUrl(options[i]);
+          if (path !== exact && note) {
+            note.textContent = NO_MATCH + ' ' + options[i].map(function (a) { return a.phrase; }).join(' · ');
+            await new Promise(function (resolve) { setTimeout(resolve, 1500); });
           }
+          window.location.href = path;
+          return;
         }
-        window.location.href = BASE;
+        // Nothing matched, or the checks timed out: timed out → exact answer, none → whole collection.
+        window.location.href = checking.signal.aborted ? exact : BASE;
       } catch (error) {
         // A failed or slow check should never block the shopper: go to the exact answer.
         window.location.href = exact;
@@ -369,7 +386,7 @@
   "max_blocks": 4,
   "settings": [
     { "type": "collection", "id": "collection", "label": "Collection to search", "info": "Leave empty to use this page’s collection." },
-    { "type": "text", "id": "no_match_label", "label": "No exact match message", "default": "No exact match, showing gifts for" },
+    { "type": "text", "id": "no_match_label", "label": "No exact match message", "default": "No exact match. Showing gifts" },
     { "type": "text", "id": "results_section", "label": "Results section ID", "info": "Section ID of the product grid on the filtered page. Used to check for results before opening it.", "default": "tss_grid" },
     { "type": "collection", "id": "filter_collection", "label": "Collection to filter answers in", "info": "Leave empty to search every product. Products need tags matching the answers (e.g. parents, nikah)." },
     { "type": "text", "id": "title", "label": "Title", "default": "Find the gift" },
