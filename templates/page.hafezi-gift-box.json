@@ -136,6 +136,14 @@
             "label": "Horsemen cardholder",
             "text": "Derby 2.0, leather. For him."
           }
+        },
+        "addon_candle": {
+          "type": "addon",
+          "settings": {
+            "product": "see-beach-scented-candle",
+            "label": "See Beach Scented Candle",
+            "text": "A calm, fresh scent for the new home."
+          }
         }
       },
       "block_order": [
@@ -154,7 +162,8 @@
         "inside_card",
         "inside_box",
         "inside_clip",
-        "addon_wallet"
+        "addon_wallet",
+        "addon_candle"
       ],
       "settings": {
         "product": "the-sunnah-classic-wedding-gift-box",
