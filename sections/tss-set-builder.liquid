@@ -1992,6 +1992,10 @@
     var REQUIRE_ANSWERS = {{ s.require_answers | json }};
     var AFTER_ADD = {{ s.after_add | default: 'checkout' | json }};
     var DISCOUNT_CODE = {{ s.discount_code | strip | json }};
+    // Free delivery: this code is sent to checkout only when the set reaches the
+    // second milestone (mugs and hijabs; lids and coasters do not count).
+    var FREE_DELIVERY_CODE = {{ s.free_delivery_code | strip | json }};
+    var FREE_DELIVERY_AT = {{ s.milestone_2_count | default: 0 }};
     var OFFER_NAME = {{ s.offer_property | strip | json }};
     var T = {
       chosenOf: {{ s.chosen_of_label | default: '[count] of [min] chosen' | json }},
@@ -2813,11 +2817,15 @@
           });
         })
         .then(function () {
+          var codes = [];
+          if (DISCOUNT_CODE) codes.push(DISCOUNT_CODE);
+          if (FREE_DELIVERY_CODE && FREE_DELIVERY_AT > 0 && totalCount() >= FREE_DELIVERY_AT) codes.push(FREE_DELIVERY_CODE);
+          var codeParam = codes.map(encodeURIComponent).join(',');
           if (AFTER_ADD === 'cart') {
-            window.location.href = CART_URL;
+            window.location.href = codeParam ? '/discount/' + codeParam + '?redirect=' + encodeURIComponent(CART_URL) : CART_URL;
             return;
           }
-          window.location.href = '/checkout' + (DISCOUNT_CODE ? '?discount=' + encodeURIComponent(DISCOUNT_CODE) : '');
+          window.location.href = '/checkout' + (codeParam ? '?discount=' + codeParam : '');
         })
         .catch(function (error) {
           state.busy = false;
@@ -2922,6 +2930,12 @@
       "id": "discount_code",
       "label": "Discount code",
       "info": "Applied at checkout. Leave empty if the discount is automatic."
+    },
+    {
+      "type": "text",
+      "id": "free_delivery_code",
+      "label": "Free delivery discount code",
+      "info": "A free shipping discount code. Sent to checkout only when the set reaches the second milestone."
     },
     {
       "type": "text",
