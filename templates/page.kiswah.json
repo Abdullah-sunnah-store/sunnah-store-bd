@@ -1,105 +1,296 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
-    "builder": {
-      "type": "tss-kiswah-set",
+    "main": {
+      "type": "tss-kiswah-edition",
       "blocks": {
-        "wrapping": {
-          "type": "step",
+        "slide_1": {
+          "type": "slide",
           "settings": {
-            "label": "Wrapping",
-            "question": "Included with every frame.",
-            "property": "Wrapping",
-            "note": "Our gift to you, and to them.",
-            "a_name": "Wrapped by hand",
-            "a_detail": "Ivory paper, twine and a wax seal",
-            "a_price_label": "Included",
-            "b_name": "No wrapping",
-            "b_detail": "Sent in protective packaging only",
-            "extra": "none"
+            "image": "shopify://shop_images/kiswah-hero-ya-hayyu-living-room.jpg",
+            "caption": "Ya Hayyu, Ya Qayyum · the living room"
           }
         },
-        "message": {
-          "type": "step",
+        "slide_2": {
+          "type": "slide",
           "settings": {
-            "label": "A message",
-            "question": "A few words, written by hand.",
-            "property": "Card",
-            "note": "Written in English or Bangla — tell us which in your message.",
-            "a_name": "Hand-calligraphed card",
-            "a_detail": "Your message, written by our calligrapher on heavy cotton card",
-            "b_name": "No message",
-            "extra": "message",
-            "extra_on": "a",
-            "message_property": "Card message",
-            "message_placeholder": "What would you like it to say?",
-            "message_max": 120
+            "image": "shopify://shop_images/kiswah-hero-takbir-family-room.jpg",
+            "caption": "Takbir · the family room"
           }
         },
-        "hanging": {
-          "type": "step",
+        "slide_3": {
+          "type": "slide",
           "settings": {
-            "label": "Hanging",
-            "question": "Shall we hang it for you?",
-            "property": "Hanging",
-            "note": "Hanging fee is non-refundable once installed.",
-            "a_name": "Hung & cared for",
-            "a_badge": "Dhaka city only",
-            "a_points": "We come to you and hang it, level and secure\nFor a full year, we'll replace cracked glass or re-hang it\nChoose a visit time that suits your household",
-            "b_name": "I'll hang it myself",
-            "extra": "slots",
-            "extra_on": "a",
-            "slot_property": "Hanging visit",
-            "slots": "Morning\nAfternoon\nEvening",
-            "a_product": "hanging-service"
+            "image": "shopify://shop_images/kiswah-hero-shahadah-entrance.jpg",
+            "caption": "Shahadah · the entrance"
+          }
+        },
+        "slide_4": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/kiswah-hero-asma-staircase.jpg",
+            "caption": "Asma ul Husna · the staircase"
+          }
+        },
+        "slide_5": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/kiswah-qarib-drawing-room.jpg",
+            "caption": "Qarib · above the sofa"
+          }
+        },
+        "craft": {
+          "type": "craft",
+          "settings": {
+            "image": "shopify://shop_images/kiswah-craft-closeup.jpg",
+            "eyebrow": "The craft",
+            "heading": "In the language of the kiswah.",
+            "text": "<p>Every year the Ka'ba is dressed in a new kiswah: black silk, embroidered in gold with the words of Allah. Each frame is made in that language: the calligraphy embroidered in golden silk thread, then framed and finished by hand in Dhaka. Made <em>after</em> the kiswah, never from it.</p>",
+            "facts": "Golden silk | raised, so it catches the light\nBlack velvet | deep, like the kiswah itself\nFramed by hand | finished in Dhaka"
+          }
+        },
+        "rooms": {
+          "type": "rooms",
+          "settings": {
+            "eyebrow": "Where each one belongs",
+            "heading": "Five frames, five rooms"
+          }
+        },
+        "frame_shahadah": {
+          "type": "frame",
+          "settings": {
+            "product": "shahadah-embroidery-frame-gold-on-black-velvet",
+            "short_name": "Shahadah",
+            "meaning": "The declaration of faith, in flowing gold.",
+            "size": "20 × 16 in",
+            "room_image": "shopify://shop_images/kiswah-room-shahadah-entrance.jpg",
+            "room_label": "The entrance",
+            "room_line": "The first words a guest reads."
+          }
+        },
+        "frame_asma": {
+          "type": "frame",
+          "settings": {
+            "product": "asma-ul-husna-embroidery-frame-gold-on-black-velvet",
+            "short_name": "Asma ul Husna",
+            "meaning": "The names of Allah, circling His name.",
+            "size": "20 × 20 in",
+            "room_image": "shopify://shop_images/kiswah-room-asma-living-room.jpg",
+            "room_label": "The living room",
+            "room_line": "A centrepiece where the family gathers."
+          }
+        },
+        "frame_yahayyu": {
+          "type": "frame",
+          "settings": {
+            "product": "kiswatul-kaba-frame-yaa-haiyu-yaa-kaiyum",
+            "short_name": "Ya Hayyu, Ya Qayyum",
+            "meaning": "O Ever-Living, O Sustainer. The original Kiswatul Ka'ba design.",
+            "size": "20 × 16 in",
+            "room_image": "shopify://shop_images/kiswah-room-ya-hayyu-prayer-corner.jpg",
+            "room_label": "The prayer corner",
+            "room_line": "The call for help on hard days."
+          }
+        },
+        "frame_takbir": {
+          "type": "frame",
+          "settings": {
+            "product": "takbir-embroidery-frame-allahu-akbar",
+            "short_name": "Takbir",
+            "meaning": "Allahu Akbar. A quiet return to what is greater.",
+            "size": "20 × 16 in",
+            "room_image": "shopify://shop_images/kiswah-room-takbir-study.jpg",
+            "room_label": "The study",
+            "room_line": "A reminder of what is greater."
+          }
+        },
+        "frame_qarib": {
+          "type": "frame",
+          "settings": {
+            "product": "qarib-embroidery-frame-surah-aal-e-imran-3-31",
+            "short_name": "Qarib",
+            "meaning": "Aal-e-Imran 3:31. What it means to love Allah.",
+            "size": "22 × 14 in",
+            "room_image": "shopify://shop_images/kiswah-qarib-drawing-room.jpg",
+            "room_label": "The drawing room",
+            "room_line": "Long and low, where guests sit."
+          }
+        },
+        "complete": {
+          "type": "complete",
+          "settings": {
+            "eyebrow": "For the whole home",
+            "heading": "The Complete Edition",
+            "text": "All five designs, carrying the same edition number. Each with an engraved brass plaque, and hung in your home by our team.",
+            "note": "Hanging included",
+            "button": "Choose all five"
+          }
+        },
+        "perk_p1": {
+          "type": "perk",
+          "settings": {
+            "unlock": "first",
+            "label": "1 frame:",
+            "text": "wrapped, with a card and a signed certificate.",
+            "nudge": "Choose a frame to begin."
+          }
+        },
+        "perk_p2": {
+          "type": "perk",
+          "settings": {
+            "unlock": "plaque",
+            "label": "2 frames:",
+            "text": "an engraved brass plaque for each.",
+            "nudge": "Add 1 more and we engrave a brass plaque for each."
+          }
+        },
+        "perk_p3": {
+          "type": "perk",
+          "settings": {
+            "unlock": "hang",
+            "label": "3 frames:",
+            "text": "we hang them for you, free (worth ৳800).",
+            "nudge": "Add 1 more and we hang them for you, free."
+          }
+        },
+        "perk_p4": {
+          "type": "perk",
+          "settings": {
+            "unlock": "all",
+            "label": "All five designs:",
+            "text": "matching edition numbers.",
+            "nudge": "Choose all five designs for matching edition numbers."
+          }
+        },
+        "addon_mat": {
+          "type": "addon",
+          "settings": {
+            "product": "velvet-premium-prayer-mat",
+            "title": "Velvet premium prayer mat",
+            "text": "Cream velvet, woven in gold."
+          }
+        },
+        "addon_quran": {
+          "type": "addon",
+          "settings": {
+            "product": "leather-covered-holy-quran-color-coded-tajweed-rules",
+            "title": "Leather-covered Qur'an",
+            "text": "Colour-coded tajweed."
+          }
+        },
+        "viewing": {
+          "type": "viewing",
+          "settings": {
+            "image": "shopify://shop_images/kiswah-room-asma-living-room.jpg",
+            "eyebrow": "Dhaka city",
+            "heading": "See them on your wall first",
+            "text": "We bring up to three frames to your home. Hold them up, choose the wall, and keep only what you love. A ৳1,000 bKash deposit books the visit, and it comes off your order.",
+            "button": "Book a home viewing",
+            "whatsapp_number": "8801911242132",
+            "whatsapp_message": "Assalamu alaikum. I'd like to book a home viewing for the Kiswah Edition frames. My area in Dhaka:"
+          }
+        },
+        "faq_1": {
+          "type": "faq",
+          "settings": {
+            "question": "Is it made from the real kiswah?",
+            "answer": "<p>No. It is made after the kiswah, in its style: embroidered in golden silk thread, then framed and finished by hand in Dhaka. We will never claim otherwise.</p>"
+          }
+        },
+        "faq_2": {
+          "type": "faq",
+          "settings": {
+            "question": "What does the edition number mean?",
+            "answer": "<p>Every frame in this first edition is numbered and comes with a signed certificate. Choose all five designs and they carry the same edition number.</p>"
+          }
+        },
+        "faq_3": {
+          "type": "faq",
+          "settings": {
+            "question": "How big is each frame?",
+            "answer": "<p>Ya Hayyu, Takbir and Shahadah are 20 × 16 in. Asma ul Husna is 20 × 20 in. Qarib is 22 × 14 in.</p>"
+          }
+        },
+        "faq_4": {
+          "type": "faq",
+          "settings": {
+            "question": "How do I care for the velvet?",
+            "answer": "<p>Keep the frame out of direct sunlight and away from damp walls. Dust the glass and frame with a soft, dry cloth; the velvet sits behind glass and needs nothing else.</p>"
+          }
+        },
+        "faq_5": {
+          "type": "faq",
+          "settings": {
+            "question": "What if it arrives damaged?",
+            "answer": "<p>Tell us within 14 days, with a photo, and we will replace it or refund you in full.</p>"
           }
         }
       },
       "block_order": [
-        "wrapping",
-        "message",
-        "hanging"
+        "slide_1",
+        "slide_2",
+        "slide_3",
+        "slide_4",
+        "slide_5",
+        "craft",
+        "rooms",
+        "frame_shahadah",
+        "frame_asma",
+        "frame_yahayyu",
+        "frame_takbir",
+        "frame_qarib",
+        "complete",
+        "perk_p1",
+        "perk_p2",
+        "perk_p3",
+        "perk_p4",
+        "addon_mat",
+        "addon_quran",
+        "viewing",
+        "faq_1",
+        "faq_2",
+        "faq_3",
+        "faq_4",
+        "faq_5"
       ],
       "settings": {
-        "collection": "the-kiswah-edition",
-        "eyebrow": "Kiswatul Kaaba",
+        "eyebrow": "Kiswatul Ka'ba · First Edition",
         "title": "The Kiswah Edition",
-        "lede": "Embroidered by hand in gold on black velvet, after the cloth that covers the Kaaba. Made in Bangladesh. Choose one for a home, or several for the people you love.",
-        "show_from": true,
         "from_label": "From",
-        "image_ratio": "1 / 1",
-        "design_label": "Design",
-        "design_question": "Which ones will they treasure?",
-        "design_note": "Each is embroidered by hand, so no two are quite identical.",
-        "summary_title": "Your frames,",
-        "summary_subtitle": "ready to give.",
-        "ready_text": "Your offer is applied at checkout.",
-        "trust_line": "Cash on Delivery · bKash · 14-day returns",
+        "hero_note": "Numbered, with a signed certificate",
+        "hero_cta": "Choose your frame",
+        "hero_link": "Or see them on your wall first →",
+        "choose_eyebrow": "Choose your frames",
+        "choose_heading": "Which will they treasure?",
+        "notsure_heading": "Not sure which wall?",
+        "notsure_text": "In Dhaka, we bring up to three frames to your home first.",
+        "notsure_link": "Book a home viewing →",
+        "ready_heading": "Ready to give, ready to hang",
+        "wrap_title": "Wrapped by hand",
+        "wrap_text": "Ivory paper, twine and a wax seal.",
+        "card_title": "Hand-calligraphed card",
+        "card_text": "Your message, written by our calligrapher.",
+        "card_placeholder": "e.g. For your new home, with love",
+        "hanging_product": "hanging-service",
+        "hang_title": "Hung & cared for",
+        "hang_text": "We hang it, level and secure. For a year we re-hang it or replace cracked glass. Dhaka city.",
+        "hang_free_text": "free with [n] frames",
+        "plaque_at": 2,
+        "hang_free_at": 3,
+        "addons_eyebrow": "Optional",
+        "addons_heading": "Complete the prayer corner",
+        "perks_title": "The more you choose, the more we add",
+        "perks_done": "The Complete Edition: one number, across all five.",
+        "summary_empty": "Choose a frame to begin.",
+        "delivery_note": "Delivery charge added at checkout.",
+        "order_label": "Order now",
+        "pay_note": "Pay on delivery, by bKash or by card · 14-day returns",
         "after_add": "checkout",
-        "offer_title": "The Kiswah offer",
-        "offer_tiers": "2 | 10\n3 | 15\n4 | 20",
-        "free_delivery_at": 5,
-        "free_delivery_code": "KISWAH5FREE",
-        "free_delivery_label": "Free delivery",
-        "tier_count_label": "[n] frames",
-        "tier_value_label": "[percent]% off",
-        "offer_start_text": "Choose two frames and save 10% on both.",
-        "offer_next_text": "Add [n] more for [offer].",
-        "offer_done_text": "20% off every frame, and delivery is on us.",
-        "offer_property": "Kiswah Edition",
-        "next_label": "Continue"
+        "faq_eyebrow": "Questions",
+        "faq_heading": "Before you choose"
       }
     }
   },
   "order": [
-    "builder"
+    "main"
   ]
 }
