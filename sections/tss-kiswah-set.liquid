@@ -85,6 +85,56 @@
     min-width: 0;
   }
 
+  #tss-gb-{{ uid }} .tss-gb__stage {
+    position: relative;
+  }
+
+  /* Image arrows: desktop only (phones swipe). At the last image of a frame
+     they move on to the next frame, so every frame can be browsed from here. */
+  #tss-gb-{{ uid }} .tss-gb__nav {
+    display: none;
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-top: -24px;
+    padding: 0;
+    border: 1px solid rgb(26 74 58 / 0.18);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.92);
+    color: var(--tss-ink);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 0.08);
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, transform 0.2s;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__nav:hover {
+    background: var(--tss-green-mid);
+    color: #ffffff;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__nav:focus-visible {
+    outline: 2px solid var(--tss-green-mid);
+    outline-offset: 2px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__nav--prev {
+    inset-inline-start: 16px;
+  }
+
+  #tss-gb-{{ uid }} .tss-gb__nav--next {
+    inset-inline-end: 16px;
+  }
+
+  @media (min-width: 768px) {
+    #tss-gb-{{ uid }} .tss-gb__nav {
+      display: inline-flex;
+    }
+  }
+
   #tss-gb-{{ uid }} .tss-gb__rail {
     display: flex;
     overflow-x: auto;
@@ -836,6 +886,7 @@
               hidden
             {% endunless %}
           >
+            <div class="tss-gb__stage">
             <div
               class="tss-gb__rail"
               tabindex="0"
@@ -872,6 +923,15 @@
                   {{ 'product-1' | placeholder_svg_tag }}
                 </div>
               {%- endfor -%}
+            </div>
+              {%- if design_count > 1 or product.media.size > 1 -%}
+                <button type="button" class="tss-gb__nav tss-gb__nav--prev" data-gallery-nav="-1" aria-label="{{ s.prev_label | default: 'Previous image' | escape }}">
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                </button>
+                <button type="button" class="tss-gb__nav tss-gb__nav--next" data-gallery-nav="1" aria-label="{{ s.next_image_label | default: 'Next image' | escape }}">
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                </button>
+              {%- endif -%}
             </div>
             {%- if product.media.size > 1 -%}
               <div class="tss-gb__bar" aria-hidden="true"><span data-progress></span></div>
@@ -1533,6 +1593,28 @@
         });
       }
 
+      // One image along; past the frame's last (or first) image, the next
+      // (or previous) frame takes over, so the arrows walk the whole collection.
+      function stepGallery(gallery, dir) {
+        var rail = gallery.querySelector('[data-rail]');
+        var width = rail.clientWidth;
+        var pos = Math.abs(rail.scrollLeft);
+        var end = rail.scrollWidth - width - 2;
+        var smooth = reduce.matches ? 'auto' : 'smooth';
+        if ((dir > 0 && pos < end) || (dir < 0 && pos > 2)) {
+          rail.scrollBy({ left: dir * width, behavior: smooth });
+          return;
+        }
+        var galleries = root.querySelectorAll('[data-gallery]');
+        var index = parseInt(gallery.getAttribute('data-gallery'), 10);
+        var next = (index + dir + galleries.length) % galleries.length;
+        showGallery(next);
+        if (dir < 0) {
+          var prevRail = root.querySelector('[data-gallery="' + next + '"] [data-rail]');
+          if (prevRail) prevRail.scrollLeft = prevRail.scrollWidth;
+        }
+      }
+
       root.querySelectorAll('[data-rail]').forEach(function (rail) {
         var bar = rail.parentNode.querySelector('[data-progress]');
         if (!bar) return;
@@ -1579,6 +1661,11 @@
           if (pending) {
             pending.scrollIntoView({ behavior: reduce.matches ? 'auto' : 'smooth', block: 'start' });
           }
+          return;
+        }
+        var nav = e.target.closest('[data-gallery-nav]');
+        if (nav) {
+          stepGallery(nav.closest('[data-gallery]'), parseInt(nav.getAttribute('data-gallery-nav'), 10));
           return;
         }
         var btn = e.target.closest('[data-step-qty]');
