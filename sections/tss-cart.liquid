@@ -29,13 +29,20 @@
     assign gift_on = true
   endif
 
-  # Free delivery follows the shop-wide free-shipping threshold (in cents).
-  assign threshold = 0
-  if settings.free_shipping_bar_enabled and settings.free_shipping_threshold > 0
-    assign threshold = settings.free_shipping_threshold
-  endif
+  # Free delivery matches checkout: it comes only with the set-builder offer —
+  # enough pieces carrying its line property (lids and coasters do not count).
+  # Every other bag pays the delivery charge.
+  assign free_key = s.free_property_key | default: 'Offer'
+  assign free_value = s.free_property_value | default: 'Buy Two, Receive Four'
+  assign free_min = s.free_min_pieces | default: 6
+  assign set_pieces = 0
+  for line in cart.items
+    if line.properties[free_key] == free_value
+      assign set_pieces = set_pieces | plus: line.quantity
+    endif
+  endfor
   assign free_delivery = false
-  if threshold > 0 and cart.total_price >= threshold
+  if free_min > 0 and set_pieces >= free_min
     assign free_delivery = true
   endif
 
@@ -45,14 +52,17 @@
   endif
   assign grand_total = cart.total_price | plus: delivery
 
+  # The meter shows only while the bag holds set pieces.
+  assign threshold = 0
   assign progress = 100
   assign remaining = 0
-  if threshold > 0
-    assign progress = cart.total_price | times: 100 | divided_by: threshold
+  if set_pieces > 0 and free_min > 0
+    assign threshold = free_min
+    assign progress = set_pieces | times: 100 | divided_by: free_min
     if progress > 100
       assign progress = 100
     endif
-    assign remaining = threshold | minus: cart.total_price
+    assign remaining = free_min | minus: set_pieces
   endif
 
   # The pairing offer stands aside once its product is already in the bag.
@@ -923,8 +933,7 @@
               {%- if free_delivery -%}
                 {{ s.free_reached_text | default: 'Your delivery is on us.' | escape }}
               {%- else -%}
-                {%- assign remaining_money = remaining | money | strip_html -%}
-                {{ s.free_away_text | default: '[amount] away from free delivery' | escape | replace: '[amount]', remaining_money }}
+                {{ s.free_away_text | default: '[n] more set pieces for free delivery' | escape | replace: '[n]', remaining | replace: '[amount]', remaining }}
               {%- endif -%}
             </p>
           {%- endif -%}
@@ -1278,9 +1287,12 @@
       "type": "text",
       "id": "free_away_text",
       "label": "Free delivery progress",
-      "info": "Uses the free shipping threshold in Theme settings. [amount] becomes the amount still to spend.",
-      "default": "[amount] away from free delivery"
+      "info": "Shown while the bag has set-builder pieces. [n] becomes the number of pieces still to add.",
+      "default": "[n] more set pieces for free delivery"
     },
+    { "type": "text", "id": "free_property_key", "label": "Free delivery: line property name", "default": "Offer", "info": "Set-builder pieces carry this property." },
+    { "type": "text", "id": "free_property_value", "label": "Free delivery: property value", "default": "Buy Two, Receive Four", "info": "Must match the set builder's offer name." },
+    { "type": "number", "id": "free_min_pieces", "label": "Free delivery: pieces needed", "default": 6, "info": "Keep in step with the SETOF6FREE discount's minimum." },
     { "type": "text", "id": "free_reached_text", "label": "Free delivery reached", "default": "Your delivery is on us." },
     { "type": "text", "id": "promise_1", "label": "Promise, gift icon", "default": "Wrapped by hand, free" },
     { "type": "text", "id": "promise_2", "label": "Promise, delivery icon", "default": "Same-day dispatch in Dhaka" },
