@@ -10,7 +10,7 @@
 {
   "sections": {
     "builder": {
-      "type": "tss-gift-builder",
+      "type": "tss-kiswah-set",
       "blocks": {
         "wrapping": {
           "type": "step",
@@ -71,19 +71,31 @@
       "settings": {
         "collection": "the-kiswah-edition",
         "eyebrow": "Kiswatul Kaaba",
-        "title": "The Kiswah Frame",
-        "lede": "Embroidered by hand on velvet, after the cloth that covers the Kaaba. Made in Bangladesh.",
+        "title": "The Kiswah Edition",
+        "lede": "Embroidered by hand in gold on black velvet, after the cloth that covers the Kaaba. Made in Bangladesh. Choose one for a home, or several for the people you love.",
         "show_from": true,
         "from_label": "From",
         "image_ratio": "1 / 1",
         "design_label": "Design",
-        "design_question": "Which one will they treasure?",
+        "design_question": "Which ones will they treasure?",
         "design_note": "Each is embroidered by hand, so no two are quite identical.",
-        "summary_title": "Your frame,",
+        "summary_title": "Your frames,",
         "summary_subtitle": "ready to give.",
-        "ready_text": "Delivery is chosen and paid at checkout.",
+        "ready_text": "Your offer is applied at checkout.",
         "trust_line": "Cash on Delivery · bKash · 14-day returns",
-        "after_add": "checkout"
+        "after_add": "checkout",
+        "offer_title": "The Kiswah offer",
+        "offer_tiers": "2 | 10\n3 | 15\n4 | 20",
+        "free_delivery_at": 5,
+        "free_delivery_code": "KISWAH5FREE",
+        "free_delivery_label": "Free delivery",
+        "tier_count_label": "[n] frames",
+        "tier_value_label": "[percent]% off",
+        "offer_start_text": "Choose two frames and save 10% on both.",
+        "offer_next_text": "Add [n] more for [offer].",
+        "offer_done_text": "20% off every frame, and delivery is on us.",
+        "offer_property": "Kiswah Edition",
+        "next_label": "Continue"
       }
     }
   },

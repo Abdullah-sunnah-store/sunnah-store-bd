@@ -32,17 +32,32 @@
   # Free delivery matches checkout: it comes only with the set-builder offer —
   # enough pieces carrying its line property (lids and coasters do not count).
   # Every other bag pays the delivery charge.
-  assign free_key = s.free_property_key | default: 'Offer'
-  assign free_value = s.free_property_value | default: 'Buy Two, Receive Four'
-  assign free_min = s.free_min_pieces | default: 6
+  # Free delivery offers: one "line property value | pieces" per line. Lines whose
+  # "Offer" property matches a value are counted; the rule nearest its goal drives
+  # the meter. Keep each in step with its Shopify free shipping code's minimum.
+  assign free_key = 'Offer'
+  assign rule_lines = s.free_rules | default: 'Buy Two, Receive Four | 6' | newline_to_br | split: '<br />'
+  assign rule_a = rule_lines[0] | split: '|'
+  assign rule_b = rule_lines[1] | split: '|'
+  assign free_value = rule_a[0] | strip
+  assign free_min = rule_a[1] | strip | plus: 0
+  assign free_value_2 = rule_b[0] | strip
+  assign free_min_2 = rule_b[1] | strip | plus: 0
   assign set_pieces = 0
+  assign set_pieces_2 = 0
   for line in cart.items
-    if line.properties[free_key] == free_value
+    if free_value != blank and line.properties[free_key] == free_value
       assign set_pieces = set_pieces | plus: line.quantity
+    endif
+    if free_value_2 != blank and line.properties[free_key] == free_value_2
+      assign set_pieces_2 = set_pieces_2 | plus: line.quantity
     endif
   endfor
   assign free_delivery = false
   if free_min > 0 and set_pieces >= free_min
+    assign free_delivery = true
+  endif
+  if free_min_2 > 0 and set_pieces_2 >= free_min_2
     assign free_delivery = true
   endif
 
@@ -52,17 +67,34 @@
   endif
   assign grand_total = cart.total_price | plus: delivery
 
-  # The meter shows only while the bag holds set pieces.
+  # The meter shows only while the bag holds offer pieces.
   assign threshold = 0
   assign progress = 100
   assign remaining = 0
+  assign remaining_1 = 999
+  assign remaining_2 = 999
   if set_pieces > 0 and free_min > 0
-    assign threshold = free_min
-    assign progress = set_pieces | times: 100 | divided_by: free_min
+    assign remaining_1 = free_min | minus: set_pieces
+  endif
+  if set_pieces_2 > 0 and free_min_2 > 0
+    assign remaining_2 = free_min_2 | minus: set_pieces_2
+  endif
+  if remaining_1 < 999 or remaining_2 < 999
+    if remaining_2 < remaining_1
+      assign threshold = free_min_2
+      assign meter_pieces = set_pieces_2
+    else
+      assign threshold = free_min
+      assign meter_pieces = set_pieces
+    endif
+    assign progress = meter_pieces | times: 100 | divided_by: threshold
     if progress > 100
       assign progress = 100
     endif
-    assign remaining = free_min | minus: set_pieces
+    assign remaining = threshold | minus: meter_pieces
+    if remaining < 0
+      assign remaining = 0
+    endif
   endif
 
   # The pairing offer stands aside once its product is already in the bag.
@@ -933,7 +965,7 @@
               {%- if free_delivery -%}
                 {{ s.free_reached_text | default: 'Your delivery is on us.' | escape }}
               {%- else -%}
-                {{ s.free_away_text | default: '[n] more set pieces for free delivery' | escape | replace: '[n]', remaining | replace: '[amount]', remaining }}
+                {{ s.free_away_text | default: '[n] more for free delivery' | escape | replace: '[n]', remaining | replace: '[amount]', remaining }}
               {%- endif -%}
             </p>
           {%- endif -%}
@@ -1288,11 +1320,15 @@
       "id": "free_away_text",
       "label": "Free delivery progress",
       "info": "Shown while the bag has set-builder pieces. [n] becomes the number of pieces still to add.",
-      "default": "[n] more set pieces for free delivery"
+      "default": "[n] more for free delivery"
     },
-    { "type": "text", "id": "free_property_key", "label": "Free delivery: line property name", "default": "Offer", "info": "Set-builder pieces carry this property." },
-    { "type": "text", "id": "free_property_value", "label": "Free delivery: property value", "default": "Buy Two, Receive Four", "info": "Must match the set builder's offer name." },
-    { "type": "number", "id": "free_min_pieces", "label": "Free delivery: pieces needed", "default": 6, "info": "Keep in step with the SETOF6FREE discount's minimum." },
+    {
+      "type": "textarea",
+      "id": "free_rules",
+      "label": "Free delivery offers",
+      "info": "One per line: offer name | pieces needed (up to two). The offer name is the Offer property the page adds to its lines.",
+      "default": "Buy Two, Receive Four | 6\nKiswah Edition | 5"
+    },
     { "type": "text", "id": "free_reached_text", "label": "Free delivery reached", "default": "Your delivery is on us." },
     { "type": "text", "id": "promise_1", "label": "Promise, gift icon", "default": "Wrapped by hand, free" },
     { "type": "text", "id": "promise_2", "label": "Promise, delivery icon", "default": "Same-day dispatch in Dhaka" },
