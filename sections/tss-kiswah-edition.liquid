@@ -493,6 +493,13 @@
     background: var(--kw-img);
   }
 
+  /* blend the product photo's own off-white backdrop into the section background */
+  #kw-{{ uid }} .kw-complete-imgs img {
+    background: transparent;
+    filter: brightness(1.1);
+    mix-blend-mode: multiply;
+  }
+
   #kw-{{ uid }} .kw-complete .kw-eyebrow {
     color: #9a7b3c;
   }
