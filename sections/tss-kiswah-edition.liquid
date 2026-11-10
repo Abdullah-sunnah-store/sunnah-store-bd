@@ -489,7 +489,8 @@
     width: 100%;
     aspect-ratio: 3 / 4;
     object-fit: contain;
-    border-radius: 2px;
+    border: 1px solid var(--kw-line);
+    border-radius: 3px;
     background: var(--kw-img);
   }
 
@@ -498,6 +499,8 @@
     background: transparent;
     filter: brightness(1.1);
     mix-blend-mode: multiply;
+    /* pre-compensated so that after the filter + multiply it renders as --kw-line, matching the frame cards */
+    border-color: #d6d2c9;
   }
 
   #kw-{{ uid }} .kw-complete .kw-eyebrow {
