@@ -473,8 +473,10 @@
     align-items: center;
     padding: 40px 44px;
     border-radius: 3px;
-    background: var(--kw-green);
-    color: var(--kw-bg);
+    border: 1px solid var(--kw-line);
+    border-top: 3px solid var(--kw-green-mid);
+    background: var(--kw-card);
+    color: var(--kw-ink);
   }
 
   #kw-{{ uid }} .kw-complete-imgs {
@@ -493,7 +495,7 @@
   }
 
   #kw-{{ uid }} .kw-complete .kw-eyebrow {
-    color: var(--kw-gold);
+    color: #9a7b3c;
   }
 
   #kw-{{ uid }} .kw-complete h2 {
@@ -502,11 +504,12 @@
     font-weight: 500;
     font-size: 42px;
     line-height: 1.05;
+    color: var(--kw-green);
   }
 
   #kw-{{ uid }} .kw-complete p {
     margin: 0;
-    color: #dce3dd;
+    color: var(--kw-text-2);
   }
 
   #kw-{{ uid }} .kw-complete-price {
@@ -524,7 +527,7 @@
 
   #kw-{{ uid }} .kw-complete-price span:last-child {
     font-size: 13px;
-    color: var(--kw-gold);
+    color: #9a7b3c;
   }
 
   #kw-{{ uid }} .kw-complete .kw-btn {
@@ -1577,7 +1580,7 @@
             <span>{{ all_price | money_without_trailing_zeros }}</span>
             {%- if xb.settings.note != blank -%}<span>{{ xb.settings.note | escape }}</span>{%- endif -%}
           </div>
-          <button type="button" class="kw-btn kw-btn--light" data-pick-all>{{ xb.settings.button | escape }}</button>
+          <button type="button" class="kw-btn kw-btn--dark" data-pick-all>{{ xb.settings.button | escape }}</button>
         </div>
       </div>
     </section>
