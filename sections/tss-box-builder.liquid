@@ -544,6 +544,62 @@
     background: rgb(26 74 58 / 0.06);
   }
 
+  /* Wrapping colours: same swatches as the product page, all on one row. */
+  #tss-bb-{{ uid }} .tss-bb__swatches {
+    display: grid;
+    margin-top: 12px;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: 8px;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__swatch {
+    display: block;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__swatch-chip {
+    display: block;
+    height: 28px;
+    border: 1px solid rgb(8 41 30 / 0.14);
+    background-position: center;
+    background-size: cover;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__swatch:hover .tss-bb__swatch-chip {
+    border-color: rgb(8 41 30 / 0.35);
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__swatch[aria-pressed='true'] .tss-bb__swatch-chip {
+    border-color: var(--tss-green);
+    box-shadow: inset 0 0 0 2px var(--tss-ivory);
+    outline: 1px solid var(--tss-green);
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__swatch:focus-visible .tss-bb__swatch-chip {
+    outline: 2px solid var(--tss-gold);
+    outline-offset: 2px;
+  }
+
+  #tss-bb-{{ uid }} .tss-bb__swatch-label {
+    display: block;
+    margin-top: 6px;
+    overflow: hidden;
+    font-family: var(--tss-sans);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--tss-ink);
+  }
+
   #tss-bb-{{ uid }} .tss-bb__cards-row {
     display: flex;
     margin-top: 12px;
@@ -1385,8 +1441,51 @@
         {%- endif -%}
 
         <div class="tss-bb__fields">
+          {%- liquid
+            assign wrap_product = s.wrapping_product
+            if wrap_product != blank and wrap_product.handle == blank
+              assign wrap_product = all_products[s.wrapping_product]
+            endif
+          -%}
           {%- assign wrapping_list = s.wrapping_options | split: ',' -%}
-          {%- if wrapping_list.size > 0 -%}
+          {%- if wrap_product != blank and wrap_product.handle != blank and wrap_product.has_only_default_variant == false -%}
+            {%- comment -%} Same colour swatches as the product page: the wrap product's first option. {%- endcomment -%}
+            <fieldset class="tss-bb__field">
+              <legend class="tss-bb__label">{{ s.wrapping_label | default: 'Wrapping' | escape }}</legend>
+              <div class="tss-bb__swatches">
+                {%- assign wrap_first = true -%}
+                {%- for value in wrap_product.options_with_values.first.values -%}
+                  {%- liquid
+                    unless value.available
+                      continue
+                    endunless
+                    assign vname = value.name | default: value
+                    assign chip = 'background-color:#ede8df;'
+                    if value.swatch.image != blank
+                      assign chip_url = value.swatch.image | image_url: width: 160
+                      assign chip = 'background-image:url(' | append: chip_url | append: ');'
+                    elsif value.swatch.color != blank
+                      assign chip = 'background-color:' | append: value.swatch.color | append: ';'
+                    elsif value.variant.featured_image != blank
+                      assign chip_url = value.variant.featured_image | image_url: width: 160
+                      assign chip = 'background-image:url(' | append: chip_url | append: ');'
+                    endif
+                  -%}
+                  <button
+                    type="button"
+                    class="tss-bb__swatch"
+                    aria-pressed="{% if wrap_first %}true{% else %}false{% endif %}"
+                    data-bb-wrapping
+                    data-value="{{ vname | escape }}"
+                  >
+                    <span class="tss-bb__swatch-chip" style="{{ chip }}"></span>
+                    <span class="tss-bb__swatch-label">{{ vname | escape }}</span>
+                  </button>
+                  {%- assign wrap_first = false -%}
+                {%- endfor -%}
+              </div>
+            </fieldset>
+          {%- elsif wrapping_list.size > 0 -%}
             <fieldset class="tss-bb__field">
               <legend class="tss-bb__label">{{ s.wrapping_label | default: 'Wrapping' | escape }}</legend>
               <div class="tss-bb__choices">
@@ -1771,6 +1870,38 @@
       error: root.querySelector('[data-bb-error]')
     };
 
+    // ---------- remember the box across a reload ----------
+    // Kept per browser tab, and cleared once the box is in the cart.
+    var STORE_KEY = 'tss-bb:' + {{ uid | json }};
+
+    function save() {
+      try {
+        sessionStorage.setItem(STORE_KEY, JSON.stringify({
+          step: state.step,
+          picks: state.picks.map(function (p) { return { variantId: p.variantId, qty: p.qty }; }),
+          addons: state.addons.map(function (a) { return a.variantId; }),
+          wrapping: state.wrapping,
+          occasion: state.occasion,
+          recipient: state.recipient,
+          message: state.message,
+          hidePrice: state.hidePrice
+        }));
+      } catch (e) {}
+    }
+
+    function forget() {
+      try { sessionStorage.removeItem(STORE_KEY); } catch (e) {}
+    }
+
+    function loadSaved() {
+      try {
+        var raw = sessionStorage.getItem(STORE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
     // ---------- tiers ----------
     function placesUsed() {
       return state.picks.reduce(function (sum, pick) { return sum + pick.qty; }, 0);
@@ -1813,6 +1944,7 @@
       }
       showTray(step === 1);
       if (step === 3) renderReview();
+      save();
       if (window.tssInit) window.tssInit(root);
       if (scroll !== false) root.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -2132,6 +2264,7 @@
       if (els.tray) els.tray.setAttribute('data-filled', used > 0 ? 'true' : 'false');
 
       syncPeek();
+      save();
     }
 
     if (els.cont) {
@@ -2164,6 +2297,7 @@
             buttons[j].setAttribute('aria-pressed', String(buttons[j] === this));
           }
           state[key] = this.getAttribute('data-value') || '';
+          save();
         });
       }
     }
@@ -2175,6 +2309,7 @@
       els.hidePrice.addEventListener('click', function () {
         state.hidePrice = !state.hidePrice;
         els.hidePrice.setAttribute('aria-pressed', String(state.hidePrice));
+        save();
       });
     }
 
@@ -2182,12 +2317,14 @@
       els.message.addEventListener('input', function () {
         state.message = els.message.value;
         els.messageCount.textContent = String(els.message.value.length);
+        save();
       });
     }
 
     if (els.recipient) {
       els.recipient.addEventListener('input', function () {
         state.recipient = els.recipient.value;
+        save();
       });
     }
 
@@ -2216,6 +2353,7 @@
         toggle.textContent = ADDED_LABEL;
       }
       renderTotal();
+      save();
     });
 
     // ---------- 3 · review ----------
@@ -2378,6 +2516,7 @@
             return response.json();
           })
           .then(function () {
+            forget();
             window.location.href = CART_URL;
           })
           .catch(function (err) {
@@ -2394,8 +2533,101 @@
       els.error.hidden = !text;
     }
 
+    // ---------- restore after a reload ----------
+    // Pieces come back only if they are still on the page, and take today's
+    // price from the card rather than the saved copy.
+    function restore() {
+      var saved = loadSaved();
+      if (!saved) return;
+
+      (saved.picks || []).forEach(function (sp) {
+        var card = null;
+        for (var i = 0; i < els.cards.length && !card; i++) {
+          var c = els.cards[i];
+          if (c.getAttribute('data-variant') === String(sp.variantId)) {
+            card = c;
+          } else {
+            var select = c.querySelector('[data-bb-variants]');
+            if (select) {
+              for (var o = 0; o < select.options.length; o++) {
+                if (select.options[o].value === String(sp.variantId)) {
+                  select.selectedIndex = o;
+                  select.dispatchEvent(new Event('change', { bubbles: true }));
+                  card = c;
+                  break;
+                }
+              }
+            }
+          }
+        }
+        if (!card || indexOfPick(card.getAttribute('data-variant')) > -1) return;
+        var pick = readCard(card);
+        pick.qty = Math.max(1, parseInt(sp.qty, 10) || 1);
+        state.picks.push(pick);
+      });
+
+      // Never more pieces than the largest box holds.
+      var room = maxPlaces();
+      state.picks = state.picks.filter(function (p) {
+        if (room <= 0) return false;
+        p.qty = Math.min(p.qty, room);
+        room -= p.qty;
+        return true;
+      });
+
+      function pressChoice(selector, key, value) {
+        if (!value) return;
+        var buttons = root.querySelectorAll(selector);
+        var match = null;
+        for (var i = 0; i < buttons.length; i++) {
+          if (buttons[i].getAttribute('data-value') === value) match = buttons[i];
+        }
+        if (!match) return;
+        for (var j = 0; j < buttons.length; j++) {
+          buttons[j].setAttribute('aria-pressed', String(buttons[j] === match));
+        }
+        state[key] = value;
+      }
+      pressChoice('[data-bb-wrapping]', 'wrapping', saved.wrapping);
+      pressChoice('[data-bb-occasion]', 'occasion', saved.occasion);
+
+      if (els.recipient && saved.recipient) {
+        els.recipient.value = saved.recipient;
+        state.recipient = saved.recipient;
+      }
+      if (els.message && saved.message) {
+        els.message.value = saved.message;
+        state.message = saved.message;
+        if (els.messageCount) els.messageCount.textContent = String(saved.message.length);
+      }
+      if (els.hidePrice && typeof saved.hidePrice === 'boolean') {
+        state.hidePrice = saved.hidePrice;
+        els.hidePrice.setAttribute('aria-pressed', String(state.hidePrice));
+      }
+
+      (saved.addons || []).forEach(function (id) {
+        var toggle = root.querySelector('[data-bb-addon][data-variant="' + String(id).replace(/"/g, '') + '"]');
+        if (!toggle) return;
+        state.addons.push({
+          variantId: toggle.getAttribute('data-variant'),
+          title: toggle.getAttribute('data-title') || '',
+          price: parseInt(toggle.getAttribute('data-price'), 10) || 0
+        });
+        toggle.setAttribute('aria-pressed', 'true');
+        toggle.textContent = ADDED_LABEL;
+      });
+
+      return saved.step;
+    }
+
+    var savedStep = restore();
     sync();
-    showTray(true);
+    if (savedStep > 1 && placesUsed() > 0) {
+      goto(savedStep, false);
+      renderTotal();
+    } else {
+      showTray(true);
+    }
   })();
 </script>
 
@@ -2455,6 +2687,12 @@
       "default": "The card is written by hand, and your message goes on exactly as you type it — so take your time with the words."
     },
     { "type": "text", "id": "wrapping_label", "label": "Wrapping label", "default": "Wrapping" },
+    {
+      "type": "product",
+      "id": "wrapping_product",
+      "label": "Wrapping colours product",
+      "info": "Shows this product's colours as swatches, like the product page. Recorded on the box, not charged. When set, the text options below are not used."
+    },
     {
       "type": "text",
       "id": "wrapping_options",
